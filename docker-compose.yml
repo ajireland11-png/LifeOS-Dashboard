@@ -1,0 +1,33 @@
+services:
+  life-os:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: life-os
+    container_name: life-os
+    restart: unless-stopped
+    init: true
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: "file:/app/data/prod.db"
+      BACKEND_URL: "http://localhost:8080"
+      # Optional: set API_KEY to require Bearer token on all /api/* requests
+      # API_KEY: ""
+      # Optional: restrict CORS to a specific origin
+      # ALLOWED_ORIGIN: "https://yourdomain.com"
+    volumes:
+      - life-os-data:/app/data
+    healthcheck:
+      test: >
+        wget -qO- http://localhost:3000/ > /dev/null &&
+        wget -qO- http://localhost:8080/health > /dev/null
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+volumes:
+  life-os-data:
