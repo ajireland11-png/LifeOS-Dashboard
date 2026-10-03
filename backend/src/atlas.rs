@@ -203,7 +203,7 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
     for r in &rows {
         nodes.push(AtlasNode {
             id: r.try_get("id")?,
-            node_type: format!("knowledge:{}", r.try_get::<String, _>("type")?),
+            node_type: "knowledge".to_string(),
             title: r.try_get("title")?,
             description: r.try_get::<Option<String>, _>("summary")?,
             updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
