@@ -106,9 +106,9 @@ export function Header() {
   const displayName = userName || 'User'
 
   return (
-    <header className="h-12 sticky top-0 z-30 bg-background border-b border-border flex items-center justify-between px-4 gap-4 shrink-0">
+    <header className="h-14 sticky top-0 z-30 bg-background/88 backdrop-blur-md border-b border-[color:var(--lifeos-line)] flex items-center justify-between px-5 lg:px-7 gap-4 shrink-0">
       {/* Left — breadcrumb */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 min-w-0">
         {isMobile && (
           <Button
             variant="ghost"
@@ -164,7 +164,7 @@ export function Header() {
         <div className="flex-1 max-w-sm">
           <button
             onClick={() => setGlobalSearchOpen(true)}
-            className="flex items-center gap-2 w-full h-8 rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground hover:bg-muted/70 transition-colors"
+            className="flex items-center gap-2 w-full h-8 rounded-full border border-[color:var(--lifeos-line)] bg-white/[0.025] px-3 text-sm text-muted-foreground hover:bg-white/[0.05] transition-colors"
           >
             <Search className="h-3.5 w-3.5 shrink-0" />
             <span className="flex-1 text-left">{t('header.searchEverything')}</span>
