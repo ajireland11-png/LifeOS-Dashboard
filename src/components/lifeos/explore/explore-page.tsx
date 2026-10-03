@@ -180,7 +180,25 @@ export function ExplorePage() {
             </button>
           </form>
 
-          {loading ? (
+                     {!loading && subjects.length > 0 && (
+             <div className="mb-10 border-y border-[color:var(--lifeos-line)] py-7">
+               <div className="grid gap-8 sm:grid-cols-[1fr_auto] sm:items-end">
+                 <div>
+                   <p className="lifeos-kicker text-[10px] uppercase tracking-[0.2em]">Field guide</p>
+                   <p className="mt-1 font-serif text-2xl">Things worth understanding</p>
+                   <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+                     Subjects can remain open-ended. A curiosity does not need a deadline,
+                     a score or a finished outcome.
+                   </p>
+                 </div>
+                 <div className="font-serif text-5xl text-foreground/[0.08] sm:text-7xl">
+                   {String(subjects.length).padStart(2, '0')}
+                 </div>
+               </div>
+             </div>
+           )}
+
+{loading ? (
             <p className="text-sm italic text-muted-foreground/80">Reading your library…</p>
           ) : subjects.length > 0 ? (
             <div className="divide-y divide-white/10">
