@@ -39,18 +39,18 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`flex h-full flex-col border-r border-white/10 bg-black/20 transition-all duration-300 ${
+      className={`flex h-full flex-col border-r border-[color:var(--lifeos-line)] bg-[var(--lifeos-night-soft)]/90 backdrop-blur-sm transition-all duration-300 ${
         sidebarCollapsed ? 'w-20' : 'w-64'
       }`}
     >
       {/* Header */}
-      <div className="flex h-20 items-center justify-between px-5">
+      <div className="flex h-20 items-center justify-between px-5 border-b border-[color:var(--lifeos-line)]">
         {!sidebarCollapsed && (
           <div>
-            <div className="font-serif text-xl tracking-wide">
+            <div className="font-serif text-[1.35rem] tracking-[0.08em] text-[var(--lifeos-ivory)]">
               LIFE OS
             </div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            <div className="mt-0.5 text-[9px] uppercase tracking-[0.28em] text-[var(--lifeos-muted)]">
               Personal Atlas
             </div>
           </div>
@@ -58,7 +58,7 @@ export function Sidebar() {
 
         <button
           onClick={toggleSidebar}
-          className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+          className="rounded-md p-2 text-[var(--lifeos-muted)] transition-colors hover:bg-white/5 hover:text-[var(--lifeos-ivory)]"
           aria-label="Toggle sidebar"
         >
           <Menu className="h-5 w-5" />
@@ -67,7 +67,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4">
-        <div className="mb-3 px-3 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+        <div className="mb-3 px-3 text-[9px] uppercase tracking-[0.28em] text-[var(--lifeos-muted)]">
           Navigate
         </div>
 
@@ -80,10 +80,10 @@ export function Sidebar() {
               <button
                 key={item.id}
                 onClick={() => setActiveModule(item.id)}
-                className={`group flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-all ${
+                className={`group relative flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-all ${
                   active
-                    ? 'bg-white/10 text-foreground'
-                    : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+                    ? 'bg-white/[0.045] text-[var(--lifeos-ivory)]'
+                    : 'text-[var(--lifeos-muted)] hover:bg-white/[0.035] hover:text-[var(--lifeos-ivory)]'
                 }`}
               >
                 <Icon
@@ -106,7 +106,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-[color:var(--lifeos-line)] p-3">
         <button
           onClick={() => setActiveModule('settings')}
           className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground ${
