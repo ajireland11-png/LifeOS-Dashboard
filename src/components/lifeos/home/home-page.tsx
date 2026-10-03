@@ -82,15 +82,15 @@ function HomeLink({
     <button
       type="button"
       onClick={onClick}
-      className="group flex w-full items-center justify-between border-b border-black/10 py-4 text-left transition-colors hover:border-black/30"
+      className="group flex w-full items-center justify-between border-b border-[color:var(--lifeos-line)] py-4 text-left transition-colors hover:border-white/20"
     >
-      <span className="text-[15px] text-black/75 group-hover:text-black">
+      <span className="text-[15px] text-foreground/75 group-hover:text-foreground">
         {children}
       </span>
       <Icon
         size={16}
         strokeWidth={1.5}
-        className="text-black/30 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black/70"
+        className="text-muted-foreground/55 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground/70"
       />
     </button>
   )
@@ -104,7 +104,7 @@ function SectionLabel({
   icon: React.ComponentType<{ size?: number; strokeWidth?: number }>
 }) {
   return (
-    <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
+    <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
       <Icon size={14} strokeWidth={1.5} />
       {children}
     </div>
@@ -239,28 +239,28 @@ export function HomePage() {
       description="A quiet view of what is alive in your world — the things you are working on, learning, noticing, and returning to."
     >
       <div className="space-y-16">
-        <section className="border-y border-black/10 py-8">
+        <section className="border-y border-[color:var(--lifeos-line)] py-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-black/40">
+              <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
                 The present
               </p>
-              <h2 className="text-3xl font-light tracking-[-0.03em] text-black sm:text-4xl">
+              <h2 className="text-3xl font-light tracking-[-0.03em] text-foreground sm:text-4xl">
                 Your life, without the dashboard noise.
               </h2>
-              <p className="mt-4 max-w-xl text-[15px] leading-7 text-black/55">
+              <p className="mt-4 max-w-xl text-[15px] leading-7 text-muted-foreground">
                 Home is not a command centre for every minute of the day. It is
                 the place where the different parts of Life OS briefly meet.
               </p>
             </div>
 
-            <label className="flex w-full max-w-sm items-center gap-3 border-b border-black/20 pb-2">
-              <Search size={16} strokeWidth={1.5} className="text-black/35" />
+            <label className="flex w-full max-w-sm items-center gap-3 border-b border-[color:var(--lifeos-line)] pb-2">
+              <Search size={16} strokeWidth={1.5} className="text-muted-foreground/70" />
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Find something in your current world"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-black/30"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/55"
               />
             </label>
           </div>
@@ -270,10 +270,10 @@ export function HomePage() {
           <SectionLabel icon={FolderKanban}>Active threads</SectionLabel>
 
           {loading ? (
-            <p className="text-sm text-black/40">Gathering your current threads…</p>
+            <p className="text-sm text-muted-foreground/80">Gathering your current threads…</p>
           ) : filteredProjects.length === 0 ? (
             <div className="border border-dashed border-black/15 px-6 py-8">
-              <p className="text-sm text-black/50">
+              <p className="text-sm text-muted-foreground">
                 Nothing is currently marked as an active project.
               </p>
               <HomeLink
@@ -293,7 +293,7 @@ export function HomePage() {
                   <span>
                     <span className="block">{titleOf(project)}</span>
                     {project.description && (
-                      <span className="mt-1 block line-clamp-2 text-xs leading-5 text-black/40">
+                      <span className="mt-1 block line-clamp-2 text-xs leading-5 text-muted-foreground/80">
                         {project.description}
                       </span>
                     )}
@@ -309,7 +309,7 @@ export function HomePage() {
             <SectionLabel icon={Sparkles}>Recent discoveries</SectionLabel>
 
             {recentNotes.length === 0 ? (
-              <p className="text-sm leading-6 text-black/40">
+              <p className="text-sm leading-6 text-muted-foreground/80">
                 Your recent notes and discoveries will appear here as Life OS
                 begins to accumulate your history.
               </p>
@@ -322,7 +322,7 @@ export function HomePage() {
                   >
                     <span>
                       <span className="block">{titleOf(note)}</span>
-                      <span className="mt-1 block text-xs text-black/35">
+                      <span className="mt-1 block text-xs text-muted-foreground/70">
                         {relativeDate(note)}
                       </span>
                     </span>
@@ -335,14 +335,14 @@ export function HomePage() {
           <div>
             <SectionLabel icon={Lightbulb}>A place to return to</SectionLabel>
             <div className="border-l border-black/15 pl-6">
-              <p className="text-lg font-light leading-8 text-black/70">
+              <p className="text-lg font-light leading-8 text-foreground/70">
                 Explore is where curiosity can remain curiosity — something you
                 can follow deeply without turning every interest into a task.
               </p>
               <button
                 type="button"
                 onClick={() => setActiveModule("explore")}
-                className="mt-6 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-black/55 transition-colors hover:text-black"
+                className="mt-6 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
               >
                 Continue exploring
                 <ArrowUpRight size={14} strokeWidth={1.5} />
@@ -355,8 +355,8 @@ export function HomePage() {
           <SectionLabel icon={Compass}>What is close at hand</SectionLabel>
 
           {currentTasks.length === 0 ? (
-            <div className="border border-black/10 px-6 py-8">
-              <p className="text-sm text-black/45">
+            <div className="border border-[color:var(--lifeos-line)] px-6 py-8">
+              <p className="text-sm text-muted-foreground">
                 There is nothing currently demanding attention here.
               </p>
             </div>
@@ -370,7 +370,7 @@ export function HomePage() {
                   <span>
                     <span className="block">{titleOf(task)}</span>
                     {task.dueDate && (
-                      <span className="mt-1 block text-xs text-black/35">
+                      <span className="mt-1 block text-xs text-muted-foreground/70">
                         {new Intl.DateTimeFormat(undefined, {
                           weekday: "short",
                           day: "numeric",
@@ -389,7 +389,7 @@ export function HomePage() {
           <SectionLabel icon={Flame}>Recently captured</SectionLabel>
 
           {recentlyCaptured.length === 0 ? (
-            <p className="text-sm leading-6 text-black/40">
+            <p className="text-sm leading-6 text-muted-foreground/80">
               Subjects from Explore and sparks from Studio will show up here
               as soon as you start capturing them.
             </p>
@@ -403,7 +403,7 @@ export function HomePage() {
                 >
                   <span>
                     <span className="block">{titleOf(item)}</span>
-                    <span className="mt-1 block text-xs text-black/35">
+                    <span className="mt-1 block text-xs text-muted-foreground/70">
                       {origin === "explore" ? "Explore" : "Studio"} · {relativeDate(item)}
                     </span>
                   </span>
@@ -413,15 +413,15 @@ export function HomePage() {
           )}
         </section>
 
-        <section className="grid gap-10 border-t border-black/10 pt-10 sm:grid-cols-3">
+        <section className="grid gap-10 border-t border-[color:var(--lifeos-line)] pt-10 sm:grid-cols-3">
           <button
             type="button"
             onClick={() => setActiveModule("atlas")}
             className="text-left transition-opacity hover:opacity-60"
           >
             <NetworkIcon />
-            <h3 className="mt-4 text-base text-black/80">Atlas</h3>
-            <p className="mt-2 text-sm leading-6 text-black/45">
+            <h3 className="mt-4 text-base text-foreground/85">Atlas</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
               See the relationships between interests, things, questions and projects.
             </p>
           </button>
@@ -431,9 +431,9 @@ export function HomePage() {
             onClick={() => setActiveModule("studio")}
             className="text-left transition-opacity hover:opacity-60"
           >
-            <Lightbulb size={18} strokeWidth={1.4} className="text-black/45" />
-            <h3 className="mt-4 text-base text-black/80">Studio</h3>
-            <p className="mt-2 text-sm leading-6 text-black/45">
+            <Lightbulb size={18} strokeWidth={1.4} className="text-muted-foreground" />
+            <h3 className="mt-4 text-base text-foreground/85">Studio</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Keep inspiration, ideas, materials and making close together.
             </p>
           </button>
@@ -443,16 +443,16 @@ export function HomePage() {
             onClick={() => setActiveModule("house")}
             className="text-left transition-opacity hover:opacity-60"
           >
-            <House size={18} strokeWidth={1.4} className="text-black/45" />
-            <h3 className="mt-4 text-base text-black/80">House</h3>
-            <p className="mt-2 text-sm leading-6 text-black/45">
+            <House size={18} strokeWidth={1.4} className="text-muted-foreground" />
+            <h3 className="mt-4 text-base text-foreground/85">House</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Gradually connect the digital environment with the physical home.
             </p>
           </button>
         </section>
 
-        <section className="border-t border-black/10 pt-8">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-xs text-black/35">
+        <section className="border-t border-[color:var(--lifeos-line)] pt-8">
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-xs text-muted-foreground/70">
             <span>{projects.length} projects</span>
             <span>{notes.length} notes</span>
             <span>{tasks.length} tasks</span>
@@ -461,7 +461,7 @@ export function HomePage() {
             <button
               type="button"
               onClick={() => setActiveModule("archive")}
-              className="inline-flex items-center gap-1 transition-colors hover:text-black/70"
+              className="inline-flex items-center gap-1 transition-colors hover:text-foreground/70"
             >
               <BookOpen size={13} strokeWidth={1.5} />
               Your history remains in Archive
