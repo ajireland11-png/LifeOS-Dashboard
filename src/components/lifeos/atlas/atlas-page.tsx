@@ -17,7 +17,7 @@ import {
 import { SectionPage } from "@/components/lifeos/shared/section-page"
 import { useAppStore } from "@/stores/app-store"
 
-type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem"
+type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem" | "knowledge"
 
 type AtlasNode = {
   id: string
@@ -38,6 +38,29 @@ type AtlasEdge = {
   kind: EdgeKind
   label?: string | null
 }
+
+type KnowledgeType = "question" | "concept" | "paper" | "idea" | "inspiration" | "skill" | "thing" | "place"
+
+type KnowledgeItem = {
+  id: string
+  type: KnowledgeType
+  title: string
+  summary?: string | null
+  content: string
+  sourceUrl?: string | null
+  updatedAt?: string
+}
+
+const KNOWLEDGE_TYPES: { value: KnowledgeType; label: string; note: string }[] = [
+  { value: "question", label: "Question", note: "something you want to understand" },
+  { value: "concept", label: "Concept", note: "an idea worth carrying between contexts" },
+  { value: "paper", label: "Paper", note: "a piece of research to keep in orbit" },
+  { value: "idea", label: "Idea", note: "a thought with somewhere to go" },
+  { value: "inspiration", label: "Inspiration", note: "something that catches your attention" },
+  { value: "skill", label: "Skill", note: "something you want to learn or practise" },
+  { value: "thing", label: "Thing", note: "an object, material or subject of curiosity" },
+  { value: "place", label: "Place", note: "somewhere meaningful or worth exploring" },
+]
 
 type AtlasGraph = {
   nodes: AtlasNode[]
@@ -162,6 +185,7 @@ function AtlasLandscape({
     bookmark: { label: "Bookmarks", mark: "B" },
     subject: { label: "Subjects", mark: "S" },
     studioitem: { label: "Studio", mark: "I" },
+    knowledge: { label: "Knowledge", mark: "K" },
   }
 
   const visible = nodes.slice(0, 18)
@@ -297,6 +321,12 @@ export function AtlasPage() {
   const [searchResults, setSearchResults] = useState<{ id: string; title?: string; description?: string; type?: string }[]>([])
   const [loading, setLoading] = useState(true)
   const [searching, setSearching] = useState(false)
+  const [knowledge, setKnowledge] = useState<KnowledgeItem[]>([])
+  const [knowledgeType, setKnowledgeType] = useState<KnowledgeType>("idea")
+  const [knowledgeTitle, setKnowledgeTitle] = useState("")
+  const [knowledgeSummary, setKnowledgeSummary] = useState("")
+  const [knowledgeSaving, setKnowledgeSaving] = useState(false)
+  const [knowledgeError, setKnowledgeError] = useState<string | null>(null)
 
   // "Draw a connection" form state
   const [connectSource, setConnectSource] = useState("")
@@ -574,6 +604,124 @@ export function AtlasPage() {
           </div>
         </section>
 
+        {/* Living knowledge layer */}
+        <section className="border-y border-[color:var(--lifeos-line)] py-10">
+          <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+            <div>
+              <SectionLabel icon={Sparkles}>Living knowledge</SectionLabel>
+              <div className="max-w-2xl">
+                <h2 className="font-serif text-3xl tracking-[-0.02em]">
+                  Keep the things that are not tasks.
+                </h2>
+                <p className="mt-4 max-w-xl text-[15px] leading-7 text-foreground/60">
+                  Questions, concepts, papers, ideas and inspirations can live here
+                  without being promoted into projects. Atlas can then carry them
+                  quietly into the rest of Life OS.
+                </p>
+              </div>
+
+              {knowledge.length > 0 && (
+                <div className="mt-9 grid gap-x-8 gap-y-0 sm:grid-cols-2">
+                  {knowledge.slice(0, 6).map((item) => (
+                    <div key={item.id} className="border-t border-[color:var(--lifeos-line)] py-4">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground/65">
+                          {item.type}
+                        </span>
+                      </div>
+                      <div className="mt-1 font-serif text-lg text-foreground/90">
+                        {displayTitle(item.title)}
+                      </div>
+                      {item.summary && (
+                        <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                          {item.summary}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <form
+              onSubmit={async (event) => {
+                event.preventDefault()
+                setKnowledgeError(null)
+                if (!knowledgeTitle.trim()) return
+                setKnowledgeSaving(true)
+                try {
+                  const response = await fetch("/api/atlas/knowledge", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      type: knowledgeType,
+                      title: knowledgeTitle.trim(),
+                      summary: knowledgeSummary.trim() || null,
+                    }),
+                  })
+                  if (!response.ok) {
+                    const body = await response.json().catch(() => null)
+                    throw new Error(textValue(body?.error) || "Couldn't keep that yet.")
+                  }
+                  const item = (await response.json()) as KnowledgeItem
+                  setKnowledge((current) => [item, ...current])
+                  setKnowledgeTitle("")
+                  setKnowledgeSummary("")
+                } catch (error) {
+                  setKnowledgeError(error instanceof Error ? error.message : "Couldn't keep that yet.")
+                } finally {
+                  setKnowledgeSaving(false)
+                }
+              }}
+              className="relative border-l border-[color:var(--lifeos-line)] pl-7"
+            >
+              <p className="lifeos-kicker text-[10px] uppercase tracking-[0.2em]">
+                Keep a thread
+              </p>
+              <div className="mt-4">
+                <select
+                  value={knowledgeType}
+                  onChange={(event) => setKnowledgeType(event.target.value as KnowledgeType)}
+                  className="w-full border-b border-[color:var(--lifeos-line)] bg-transparent py-2 text-sm outline-none"
+                >
+                  {KNOWLEDGE_TYPES.map((type) => (
+                    <option key={type.value} value={type.value}>{type.label}</option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-muted-foreground/60">
+                  {KNOWLEDGE_TYPES.find((type) => type.value === knowledgeType)?.note}
+                </p>
+                <input
+                  value={knowledgeTitle}
+                  onChange={(event) => setKnowledgeTitle(event.target.value)}
+                  placeholder="Give it a name…"
+                  className="mt-5 w-full border-b border-[color:var(--lifeos-line)] bg-transparent py-3 font-serif text-xl outline-none placeholder:text-muted-foreground/40"
+                />
+                <input
+                  value={knowledgeSummary}
+                  onChange={(event) => setKnowledgeSummary(event.target.value)}
+                  placeholder="A short note, if useful…"
+                  className="mt-3 w-full border-b border-[color:var(--lifeos-line)] bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground/40"
+                />
+                <div className="mt-5 flex items-center justify-between gap-4">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/55">
+                    No project required
+                  </span>
+                  <button
+                    type="submit"
+                    disabled={knowledgeSaving || !knowledgeTitle.trim()}
+                    className="inline-flex items-center gap-2 border border-white/30 px-4 py-2 text-[11px] uppercase tracking-[0.14em] transition-colors hover:bg-foreground hover:text-background disabled:opacity-30"
+                  >
+                    <Plus size={13} strokeWidth={1.6} />
+                    {knowledgeSaving ? "Keeping…" : "Keep thread"}
+                  </button>
+                </div>
+                {knowledgeError && <p className="mt-3 text-sm text-red-300/80">{knowledgeError}</p>}
+              </div>
+            </form>
+          </div>
+        </section>
+
         {/* Themes */}
         <section>
           <SectionLabel icon={Tag}>Themes already present</SectionLabel>
@@ -830,7 +978,7 @@ export function AtlasPage() {
         {/* Counts / quiet metadata */}
         <section className="border-t border-[color:var(--lifeos-line)] pt-7">
           <div className="flex flex-wrap gap-x-8 gap-y-3 text-[11px] uppercase tracking-[0.15em] text-muted-foreground/70">
-            <span>{nodes.length} things</span>
+            <span>{nodes.length} things</span>\n            <span>{knowledge.length} knowledge threads</span>
             <span>{edges.length} connections</span>
             <span>{tags.length} themes</span>
             <span className="inline-flex items-center gap-1.5">
