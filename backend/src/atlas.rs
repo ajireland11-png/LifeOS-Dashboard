@@ -17,8 +17,8 @@ use crate::AppState;
 /// entries and courses are deliberately left out for now — this is a first
 /// slice of Atlas, not the whole vision, and those two can be added later by
 /// copying the same query pattern used below.
-const ENTITY_TYPES: [&str; 8] = [
-    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem",
+const ENTITY_TYPES: [&str; 9] = [
+    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge",
 ];
 
 #[derive(Serialize, Clone)]
@@ -185,6 +185,25 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
         nodes.push(AtlasNode {
             id: r.try_get("id")?,
             node_type: "studioitem".to_string(),
+            title: r.try_get("title")?,
+            description: r.try_get::<Option<String>, _>("summary")?,
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
+        });
+    }
+
+    // First-class knowledge items — concepts, questions, papers, ideas,
+    // inspirations, skills, things and places. They are deliberately lightweight
+    // so the user can capture an intellectual object before deciding what it
+    // should become.
+    let rows = sqlx::query(
+        "SELECT id, type, title, summary, updatedAt FROM KnowledgeItem WHERE archived = 0",
+    )
+    .fetch_all(&st.db)
+    .await?;
+    for r in &rows {
+        nodes.push(AtlasNode {
+            id: r.try_get("id")?,
+            node_type: format!("knowledge:{}", r.try_get::<String, _>("type")?),
             title: r.try_get("title")?,
             description: r.try_get::<Option<String>, _>("summary")?,
             updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
@@ -461,5 +480,174 @@ pub async fn delete_connection(
         .bind(&id)
         .execute(&st.db)
         .await?;
+    Ok(Json(serde_json::json!({ "success": true })))
+}
+
+
+// ─── First-class knowledge items ─────────────────────────────────────────────
+
+const KNOWLEDGE_TYPES: [&str; 8] = [
+    "question", "concept", "paper", "idea", "inspiration", "skill", "thing", "place",
+];
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct KnowledgeItem {
+    id: String,
+    #[serde(rename = "type")]
+    item_type: String,
+    title: String,
+    summary: Option<String>,
+    content: String,
+    source_url: Option<String>,
+    archived: bool,
+    created_at: PrismaDateTime,
+    updated_at: PrismaDateTime,
+}
+
+fn knowledge_item_from_row(r: &sqlx::sqlite::SqliteRow) -> Result<KnowledgeItem, sqlx::Error> {
+    Ok(KnowledgeItem {
+        id: r.try_get("id")?,
+        item_type: r.try_get("type")?,
+        title: r.try_get("title")?,
+        summary: r.try_get::<Option<String>, _>("summary")?,
+        content: r.try_get("content")?,
+        source_url: r.try_get::<Option<String>, _>("sourceUrl")?,
+        archived: r.try_get("archived")?,
+        created_at: PrismaDateTime(r.try_get::<i64, _>("createdAt")?),
+        updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
+    })
+}
+
+pub async fn list_knowledge_items(
+    State(st): State<AppState>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Result<Json<Vec<KnowledgeItem>>, AppError> {
+    let rows = if let Some(item_type) = params.get("type") {
+        sqlx::query(
+            "SELECT * FROM KnowledgeItem WHERE archived = 0 AND type = ? ORDER BY updatedAt DESC",
+        )
+        .bind(item_type)
+        .fetch_all(&st.db)
+        .await?
+    } else {
+        sqlx::query("SELECT * FROM KnowledgeItem WHERE archived = 0 ORDER BY updatedAt DESC")
+            .fetch_all(&st.db)
+            .await?
+    };
+
+    let mut items = Vec::with_capacity(rows.len());
+    for row in &rows {
+        items.push(knowledge_item_from_row(row)?);
+    }
+    Ok(Json(items))
+}
+
+pub async fn create_knowledge_item(
+    State(st): State<AppState>,
+    Json(body): Json<Value>,
+) -> Result<(StatusCode, Json<KnowledgeItem>), AppError> {
+    let item_type = str_or(&body, "type", "idea").to_lowercase();
+    let title = str_or(&body, "title", "").trim().to_string();
+    let summary = truthy_str(&body, "summary");
+    let content = str_or(&body, "content", "");
+    let source_url = truthy_str(&body, "sourceUrl");
+
+    if !KNOWLEDGE_TYPES.contains(&item_type.as_str()) {
+        return Err(AppError::BadRequest(format!(
+            "Knowledge type must be one of: {}",
+            KNOWLEDGE_TYPES.join(", ")
+        )));
+    }
+    if title.is_empty() {
+        return Err(AppError::BadRequest("title is required".to_string()));
+    }
+
+    let id = gen_id();
+    let now = now_ms();
+    sqlx::query(
+        "INSERT INTO KnowledgeItem (id, type, title, summary, content, sourceUrl, archived, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)",
+    )
+    .bind(&id)
+    .bind(&item_type)
+    .bind(&title)
+    .bind(&summary)
+    .bind(&content)
+    .bind(&source_url)
+    .bind(now)
+    .bind(now)
+    .execute(&st.db)
+    .await?;
+
+    let row = sqlx::query("SELECT * FROM KnowledgeItem WHERE id = ?")
+        .bind(&id)
+        .fetch_one(&st.db)
+        .await?;
+
+    Ok((StatusCode::CREATED, Json(knowledge_item_from_row(&row)?)))
+}
+
+pub async fn update_knowledge_item(
+    State(st): State<AppState>,
+    Path(id): Path<String>,
+    Json(body): Json<Value>,
+) -> Result<Json<KnowledgeItem>, AppError> {
+    let existing = sqlx::query("SELECT * FROM KnowledgeItem WHERE id = ?")
+        .bind(&id)
+        .fetch_optional(&st.db)
+        .await?;
+    if existing.is_none() {
+        return Err(AppError::NotFound("Knowledge item not found".to_string()));
+    }
+
+    let title = truthy_str(&body, "title");
+    let summary = truthy_str(&body, "summary");
+    let content = truthy_str(&body, "content");
+    let source_url = truthy_str(&body, "sourceUrl");
+    let item_type = truthy_str(&body, "type");
+    let archived = body.get("archived").and_then(|v| v.as_bool());
+
+    let now = now_ms();
+    sqlx::query(
+        "UPDATE KnowledgeItem SET
+         title = COALESCE(?, title),
+         summary = COALESCE(?, summary),
+         content = COALESCE(?, content),
+         sourceUrl = COALESCE(?, sourceUrl),
+         type = COALESCE(?, type),
+         archived = COALESCE(?, archived),
+         updatedAt = ?
+         WHERE id = ?",
+    )
+    .bind(title)
+    .bind(summary)
+    .bind(content)
+    .bind(source_url)
+    .bind(item_type)
+    .bind(archived)
+    .bind(now)
+    .bind(&id)
+    .execute(&st.db)
+    .await?;
+
+    let row = sqlx::query("SELECT * FROM KnowledgeItem WHERE id = ?")
+        .bind(&id)
+        .fetch_one(&st.db)
+        .await?;
+    Ok(Json(knowledge_item_from_row(&row)?))
+}
+
+pub async fn delete_knowledge_item(
+    State(st): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<Value>, AppError> {
+    let result = sqlx::query("DELETE FROM KnowledgeItem WHERE id = ?")
+        .bind(&id)
+        .execute(&st.db)
+        .await?;
+    if result.rows_affected() == 0 {
+        return Err(AppError::NotFound("Knowledge item not found".to_string()));
+    }
     Ok(Json(serde_json::json!({ "success": true })))
 }
