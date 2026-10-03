@@ -51,6 +51,20 @@ type KnowledgeItem = {
   updatedAt?: string
 }
 
+const RELATION_TYPES = [
+  "relates to",
+  "prerequisite for",
+  "inspires",
+  "used in",
+  "derived from",
+  "supports",
+  "contradicts",
+  "depends on",
+  "leads to",
+  "asks",
+  "answers",
+] as const
+
 const KNOWLEDGE_TYPES: { value: KnowledgeType; label: string; note: string }[] = [
   { value: "question", label: "Question", note: "something you want to understand" },
   { value: "concept", label: "Concept", note: "an idea worth carrying between contexts" },
@@ -331,6 +345,7 @@ export function AtlasPage() {
   // "Draw a connection" form state
   const [connectSource, setConnectSource] = useState("")
   const [connectTarget, setConnectTarget] = useState("")
+  const [connectLabel, setConnectLabel] = useState<(typeof RELATION_TYPES)[number]>("relates to")
   const [connecting, setConnecting] = useState(false)
   const [connectError, setConnectError] = useState<string | null>(null)
 
@@ -475,7 +490,7 @@ export function AtlasPage() {
       const response = await fetch("/api/atlas/connections", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sourceType, sourceId, targetType, targetId }),
+        body: JSON.stringify({ sourceType, sourceId, targetType, targetId, label: connectLabel }),
       })
 
       if (!response.ok) {
@@ -883,6 +898,16 @@ export function AtlasPage() {
                 <option key={nodeKey(node.type, node.id)} value={nodeKey(node.type, node.id)}>
                   {node.type}: {displayTitle(node.title)}
                 </option>
+              ))}
+            </select>
+
+            <select
+              value={connectLabel}
+              onChange={(event) => setConnectLabel(event.target.value as (typeof RELATION_TYPES)[number])}
+              className="min-w-0 border-b border-[color:var(--lifeos-line)] bg-transparent py-2 text-sm outline-none"
+            >
+              {RELATION_TYPES.map((relation) => (
+                <option key={relation} value={relation}>{relation}</option>
               ))}
             </select>
 
