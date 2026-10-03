@@ -253,6 +253,28 @@ pub async fn search(
         });
     }
 
+    // Atlas knowledge items
+    let knowledge_rows = sqlx::query(
+        "SELECT id, title, type, summary, content, updatedAt FROM KnowledgeItem WHERE archived = 0 AND (title LIKE ? OR type LIKE ? OR summary LIKE ? OR content LIKE ?) ORDER BY updatedAt DESC LIMIT 8"
+    ).bind(&pat).bind(&pat).bind(&pat).bind(&pat).fetch_all(&st.db).await.unwrap_or_default();
+    for r in &knowledge_rows {
+        let summary: Option<String> = r.try_get("summary").ok();
+        let item_type: String = r.try_get("type").unwrap_or_default();
+        let content: String = r.try_get("content").unwrap_or_default();
+        results.push(SearchResult {
+            id: r.try_get("id").unwrap_or_default(),
+            r#type: format!("Knowledge · {}", item_type),
+            title: r.try_get("title").unwrap_or_default(),
+            description: summary.filter(|s| !s.is_empty()).unwrap_or_else(|| {
+                content.chars().take(120).collect::<String>().trim().to_string()
+            }),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt").unwrap_or(0)),
+            module: "atlas".to_string(),
+            icon: "Network".to_string(),
+            color: "amber".to_string(),
+        });
+    }
+
     // Projects
     let project_rows = sqlx::query(
         "SELECT id, name, description, updatedAt, status FROM Project WHERE archived = 0 AND (name LIKE ? OR description LIKE ?) ORDER BY updatedAt DESC LIMIT 5"
