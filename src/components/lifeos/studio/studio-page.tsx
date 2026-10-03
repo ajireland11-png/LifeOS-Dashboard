@@ -165,22 +165,22 @@ export function StudioPage() {
       <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,320px)_1fr]">
         {/* List + new item */}
         <section>
-          <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
+          <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <Lightbulb size={14} strokeWidth={1.5} />
             Studio
           </div>
 
-          <form onSubmit={handleCreate} className="mb-4 flex items-center gap-2 border-b border-black/20 pb-3">
+          <form onSubmit={handleCreate} className="mb-4 flex items-center gap-2 border-b border-[color:var(--lifeos-line)] pb-3">
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Capture a spark…"
-              className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-black/30"
+              className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground/55"
             />
             <button
               type="submit"
               disabled={creating || !newTitle.trim()}
-              className="flex shrink-0 items-center justify-center border border-black/70 p-1.5 text-black/80 transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-black/80"
+              className="flex shrink-0 items-center justify-center border border-white/35 p-1.5 text-foreground/85 transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-foreground/85"
               aria-label="Add item"
             >
               <Plus size={14} strokeWidth={1.75} />
@@ -190,7 +190,7 @@ export function StudioPage() {
           <select
             value={newKind}
             onChange={(e) => setNewKind(e.target.value)}
-            className="mb-6 border-b border-black/10 bg-transparent pb-2 text-[12px] uppercase tracking-[0.1em] text-black/50 outline-none"
+            className="mb-6 border-b border-[color:var(--lifeos-line)] bg-transparent pb-2 text-[12px] uppercase tracking-[0.1em] text-muted-foreground outline-none"
           >
             {KIND_OPTIONS.map((k) => (
               <option key={k} value={k}>
@@ -199,11 +199,11 @@ export function StudioPage() {
             ))}
           </select>
 
-          <div className="mb-5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.1em] text-black/40">
+          <div className="mb-5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.1em] text-muted-foreground/80">
             <button
               type="button"
               onClick={() => setKindFilter('all')}
-              className={kindFilter === 'all' ? 'text-black' : 'hover:text-black/70'}
+              className={kindFilter === 'all' ? 'text-foreground' : 'hover:text-foreground/70'}
             >
               All
             </button>
@@ -212,7 +212,7 @@ export function StudioPage() {
                 key={k}
                 type="button"
                 onClick={() => setKindFilter(k)}
-                className={kindFilter === k ? 'text-black' : 'hover:text-black/70'}
+                className={kindFilter === k ? 'text-foreground' : 'hover:text-foreground/70'}
               >
                 {k}
               </button>
@@ -220,30 +220,30 @@ export function StudioPage() {
           </div>
 
           {loading ? (
-            <p className="text-sm italic text-black/40">Reading the studio…</p>
+            <p className="text-sm italic text-muted-foreground/80">Reading the studio…</p>
           ) : visibleItems.length > 0 ? (
-            <div className="divide-y divide-black/10">
+            <div className="divide-y divide-white/10">
               {visibleItems.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setSelectedId(item.id)}
                   className={`block w-full py-3.5 text-left transition-colors ${
-                    item.id === selectedId ? 'text-black' : 'text-black/70 hover:text-black'
+                    item.id === selectedId ? 'text-foreground' : 'text-foreground/70 hover:text-foreground'
                   }`}
                 >
                   <div className="font-serif text-lg">{item.title}</div>
                   {item.summary && (
-                    <div className="mt-0.5 truncate text-sm text-black/45">{item.summary}</div>
+                    <div className="mt-0.5 truncate text-sm text-muted-foreground">{item.summary}</div>
                   )}
-                  <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-black/30">
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-muted-foreground/55">
                     {item.kind} · {formatDate(item.updatedAt)}
                   </div>
                 </button>
               ))}
             </div>
           ) : (
-            <p className="text-sm leading-6 text-black/45">
+            <p className="text-sm leading-6 text-muted-foreground">
               Nothing here yet — capture something above. It can stay exactly
               as small as it is.
             </p>
@@ -251,7 +251,7 @@ export function StudioPage() {
         </section>
 
         {/* Detail / editor */}
-        <section className="border-t border-black/10 pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
+        <section className="border-t border-[color:var(--lifeos-line)] pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
           {selected ? (
             <div>
               <div className="flex items-start justify-between gap-4">
@@ -263,7 +263,7 @@ export function StudioPage() {
                 <select
                   value={editKind}
                   onChange={(e) => setEditKind(e.target.value)}
-                  className="shrink-0 border-b border-black/20 bg-transparent pb-1 text-[12px] uppercase tracking-[0.1em] text-black/50 outline-none"
+                  className="shrink-0 border-b border-[color:var(--lifeos-line)] bg-transparent pb-1 text-[12px] uppercase tracking-[0.1em] text-muted-foreground outline-none"
                 >
                   {KIND_OPTIONS.map((k) => (
                     <option key={k} value={k}>
@@ -277,7 +277,7 @@ export function StudioPage() {
                 value={editSummary}
                 onChange={(e) => setEditSummary(e.target.value)}
                 placeholder="One-line summary…"
-                className="mt-2 w-full bg-transparent text-[15px] text-black/50 outline-none placeholder:text-black/30"
+                className="mt-2 w-full bg-transparent text-[15px] text-muted-foreground outline-none placeholder:text-muted-foreground/55"
               />
 
               <textarea
@@ -285,22 +285,22 @@ export function StudioPage() {
                 onChange={(e) => setEditContent(e.target.value)}
                 placeholder="What is this? Where did it come from? What might it become?"
                 rows={14}
-                className="mt-6 w-full resize-y bg-transparent text-[15px] leading-7 outline-none placeholder:text-black/30"
+                className="mt-6 w-full resize-y bg-transparent text-[15px] leading-7 outline-none placeholder:text-muted-foreground/55"
               />
 
-              <div className="mt-6 flex items-center gap-3 border-t border-black/10 pt-5">
+              <div className="mt-6 flex items-center gap-3 border-t border-[color:var(--lifeos-line)] pt-5">
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className="border border-black/70 px-4 py-2 text-[13px] uppercase tracking-[0.1em] text-black/80 transition-colors hover:bg-black hover:text-white disabled:opacity-40"
+                  className="border border-white/35 px-4 py-2 text-[13px] uppercase tracking-[0.1em] text-foreground/85 transition-colors hover:bg-foreground hover:text-background disabled:opacity-40"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={handleArchive}
-                  className="flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-black/50 transition-colors hover:text-black"
+                  className="flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Archive size={14} strokeWidth={1.5} />
                   Archive
@@ -308,7 +308,7 @@ export function StudioPage() {
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="ml-auto flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-black/40 transition-colors hover:text-red-700"
+                  className="ml-auto flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-muted-foreground/80 transition-colors hover:text-red-700"
                 >
                   <Trash2 size={14} strokeWidth={1.5} />
                   Delete
@@ -316,7 +316,7 @@ export function StudioPage() {
               </div>
             </div>
           ) : (
-            <p className="text-sm leading-6 text-black/45">
+            <p className="text-sm leading-6 text-muted-foreground">
               Select something on the left, or capture a new spark — an
               inspiration item is allowed to just stay an inspiration item.
             </p>
