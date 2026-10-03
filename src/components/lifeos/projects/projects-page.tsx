@@ -197,22 +197,22 @@ export function ProjectsPage() {
       <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,340px)_1fr]">
         {/* List + new project */}
         <section>
-          <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
+          <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <FolderKanban size={14} strokeWidth={1.5} />
             Projects
           </div>
 
-          <form onSubmit={handleCreate} className="mb-6 flex items-center gap-2 border-b border-black/20 pb-3">
+          <form onSubmit={handleCreate} className="mb-6 flex items-center gap-2 border-b border-[color:var(--lifeos-line)] pb-3">
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Start a new project…"
-              className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-black/30"
+              className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground/55"
             />
             <button
               type="submit"
               disabled={creating || !newName.trim()}
-              className="flex shrink-0 items-center justify-center border border-black/70 p-1.5 text-black/80 transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-black/80"
+              className="flex shrink-0 items-center justify-center border border-white/35 p-1.5 text-foreground/85 transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-foreground/85"
               aria-label="Add project"
             >
               <Plus size={14} strokeWidth={1.75} />
@@ -220,16 +220,16 @@ export function ProjectsPage() {
           </form>
 
           {loading ? (
-            <p className="text-sm italic text-black/40">Reading your projects…</p>
+            <p className="text-sm italic text-muted-foreground/80">Reading your projects…</p>
           ) : projects.length > 0 ? (
-            <div className="divide-y divide-black/10">
+            <div className="divide-y divide-white/10">
               {projects.map((project) => (
                 <button
                   key={project.id}
                   type="button"
                   onClick={() => setSelectedId(project.id)}
                   className={`block w-full py-3.5 text-left transition-colors ${
-                    project.id === selectedId ? 'text-black' : 'text-black/70 hover:text-black'
+                    project.id === selectedId ? 'text-foreground' : 'text-foreground/70 hover:text-foreground'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -240,18 +240,18 @@ export function ProjectsPage() {
                     <span className="font-serif text-lg">{project.name}</span>
                   </div>
                   {project.description && (
-                    <div className="mt-0.5 truncate pl-[18px] text-sm text-black/45">
+                    <div className="mt-0.5 truncate pl-[18px] text-sm text-muted-foreground">
                       {project.description}
                     </div>
                   )}
-                  <div className="mt-1 pl-[18px] text-[10px] uppercase tracking-[0.12em] text-black/30">
+                  <div className="mt-1 pl-[18px] text-[10px] uppercase tracking-[0.12em] text-muted-foreground/55">
                     {project.status} · {project._count.tasks} task{project._count.tasks === 1 ? '' : 's'}
                   </div>
                 </button>
               ))}
             </div>
           ) : (
-            <p className="text-sm leading-6 text-black/45">
+            <p className="text-sm leading-6 text-muted-foreground">
               Nothing in motion yet. Start one above when something is ready
               to move beyond an idea.
             </p>
@@ -259,9 +259,9 @@ export function ProjectsPage() {
         </section>
 
         {/* Detail / editor */}
-        <section className="border-t border-black/10 pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
+        <section className="border-t border-[color:var(--lifeos-line)] pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
           {detailLoading ? (
-            <p className="text-sm italic text-black/40">Loading…</p>
+            <p className="text-sm italic text-muted-foreground/80">Loading…</p>
           ) : detail ? (
             <div>
               <div className="flex items-start justify-between gap-4">
@@ -273,7 +273,7 @@ export function ProjectsPage() {
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="shrink-0 border-b border-black/20 bg-transparent pb-1 text-[12px] uppercase tracking-[0.1em] text-black/50 outline-none"
+                  className="shrink-0 border-b border-[color:var(--lifeos-line)] bg-transparent pb-1 text-[12px] uppercase tracking-[0.1em] text-muted-foreground outline-none"
                 >
                   {STATUS_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -303,22 +303,22 @@ export function ProjectsPage() {
                 onChange={(e) => setEditDescription(e.target.value)}
                 placeholder="What is this project, and what does done look like?"
                 rows={4}
-                className="mt-6 w-full resize-y bg-transparent text-[15px] leading-7 outline-none placeholder:text-black/30"
+                className="mt-6 w-full resize-y bg-transparent text-[15px] leading-7 outline-none placeholder:text-muted-foreground/55"
               />
 
-              <div className="mt-6 flex items-center gap-3 border-t border-black/10 pt-5">
+              <div className="mt-6 flex items-center gap-3 border-t border-[color:var(--lifeos-line)] pt-5">
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className="border border-black/70 px-4 py-2 text-[13px] uppercase tracking-[0.1em] text-black/80 transition-colors hover:bg-black hover:text-white disabled:opacity-40"
+                  className="border border-white/35 px-4 py-2 text-[13px] uppercase tracking-[0.1em] text-foreground/85 transition-colors hover:bg-foreground hover:text-background disabled:opacity-40"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={handleArchive}
-                  className="flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-black/50 transition-colors hover:text-black"
+                  className="flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Archive size={14} strokeWidth={1.5} />
                   Archive
@@ -326,7 +326,7 @@ export function ProjectsPage() {
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="ml-auto flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-black/40 transition-colors hover:text-red-700"
+                  className="ml-auto flex items-center gap-1.5 px-2 py-2 text-[13px] uppercase tracking-[0.1em] text-muted-foreground/80 transition-colors hover:text-red-700"
                 >
                   <Trash2 size={14} strokeWidth={1.5} />
                   Delete
@@ -334,25 +334,25 @@ export function ProjectsPage() {
               </div>
 
               {detail.tasks.length > 0 && (
-                <div className="mt-10 border-t border-black/10 pt-8">
-                  <div className="mb-4 text-[11px] uppercase tracking-[0.18em] text-black/40">
+                <div className="mt-10 border-t border-[color:var(--lifeos-line)] pt-8">
+                  <div className="mb-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                     Tasks
                   </div>
-                  <div className="divide-y divide-black/10">
+                  <div className="divide-y divide-white/10">
                     {detail.tasks.map((task) => {
                       const done = task.status === 'done' || task.status === 'completed'
                       return (
                         <div key={task.id} className="flex items-center gap-3 py-2.5">
                           {done ? (
-                            <CheckCircle2 size={15} strokeWidth={1.5} className="shrink-0 text-black/35" />
+                            <CheckCircle2 size={15} strokeWidth={1.5} className="shrink-0 text-muted-foreground/70" />
                           ) : (
-                            <Circle size={15} strokeWidth={1.5} className="shrink-0 text-black/25" />
+                            <Circle size={15} strokeWidth={1.5} className="shrink-0 text-foreground/25" />
                           )}
-                          <span className={`text-sm ${done ? 'text-black/35 line-through' : 'text-black/75'}`}>
+                          <span className={`text-sm ${done ? 'text-muted-foreground/70 line-through' : 'text-foreground/75'}`}>
                             {task.title}
                           </span>
                           {task.dueDate && (
-                            <span className="ml-auto text-xs text-black/30">{formatDate(task.dueDate)}</span>
+                            <span className="ml-auto text-xs text-muted-foreground/55">{formatDate(task.dueDate)}</span>
                           )}
                         </div>
                       )
@@ -366,7 +366,7 @@ export function ProjectsPage() {
                   {detail.goals.map((g) => (
                     <span
                       key={g.id}
-                      className="rounded-full border border-black/15 px-3 py-1 text-xs text-black/55"
+                      className="rounded-full border border-black/15 px-3 py-1 text-xs text-muted-foreground"
                     >
                       {g.goal.title}
                     </span>
@@ -375,7 +375,7 @@ export function ProjectsPage() {
               )}
             </div>
           ) : (
-            <p className="text-sm leading-6 text-black/45">
+            <p className="text-sm leading-6 text-muted-foreground">
               Select a project on the left, or start a new one.
             </p>
           )}
