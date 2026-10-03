@@ -132,6 +132,15 @@ pub fn build_app(pool: SqlitePool) -> Router {
             "/api/atlas/connections/{id}",
             delete(atlas::delete_connection),
         )
+        // Atlas knowledge layer
+        .route(
+            "/api/atlas/knowledge",
+            get(atlas::list_knowledge_items).post(atlas::create_knowledge_item),
+        )
+        .route(
+            "/api/atlas/knowledge/{id}",
+            patch(atlas::update_knowledge_item).delete(atlas::delete_knowledge_item),
+        )
         // Explore
         .route(
             "/api/explore/subjects",
