@@ -129,10 +129,10 @@ function SectionLabel({
 /** Small pill distinguishing how a connection came to exist. */
 function KindBadge({ kind }: { kind: EdgeKind }) {
   const styles: Record<EdgeKind, string> = {
-    observed: "border-black/15 text-muted-foreground",
+    observed: "border-[color:var(--lifeos-line)] text-muted-foreground",
     connected: "border-white/35 text-foreground/85",
-    inferred: "border-black/15 text-muted-foreground/70 border-dashed",
-    suggested: "border-black/15 text-muted-foreground/70 border-dotted",
+    inferred: "border-[color:var(--lifeos-line)] text-muted-foreground/70 border-dashed",
+    suggested: "border-[color:var(--lifeos-line)] text-muted-foreground/70 border-dotted",
   }
 
   return (
@@ -141,6 +141,147 @@ function KindBadge({ kind }: { kind: EdgeKind }) {
     >
       {kind}
     </span>
+  )
+}
+
+
+
+function AtlasLandscape({
+  nodes,
+  edges,
+}: {
+  nodes: AtlasNode[]
+  edges: AtlasEdge[]
+}) {
+  const palette: Record<EntityType, { label: string; mark: string }> = {
+    note: { label: "Notes", mark: "N" },
+    project: { label: "Projects", mark: "P" },
+    task: { label: "Tasks", mark: "T" },
+    goal: { label: "Goals", mark: "G" },
+    habit: { label: "Habits", mark: "H" },
+    bookmark: { label: "Bookmarks", mark: "B" },
+  }
+
+  const visible = nodes.slice(0, 18)
+  const positions = visible.map((node, index) => {
+    const angle = index * 2.399963
+    const radius = 23 + (index % 4) * 8
+    return {
+      node,
+      x: 50 + Math.cos(angle) * radius,
+      y: 50 + Math.sin(angle) * radius * 0.72,
+    }
+  })
+
+  const positionByKey = new Map(
+    positions.map((item) => [nodeKey(item.node.type, item.node.id), item]),
+  )
+
+  const lines = edges
+    .filter((edge) => edge.kind === "connected" || edge.kind === "observed")
+    .map((edge) => ({
+      edge,
+      source: positionByKey.get(nodeKey(edge.sourceType, edge.sourceId)),
+      target: positionByKey.get(nodeKey(edge.targetType, edge.targetId)),
+    }))
+    .filter(
+      (item): item is {
+        edge: AtlasEdge
+        source: { node: AtlasNode; x: number; y: number }
+        target: { node: AtlasNode; x: number; y: number }
+      } => Boolean(item.source && item.target),
+    )
+    .slice(0, 28)
+
+  if (!visible.length) {
+    return (
+      <div className="border-y border-[color:var(--lifeos-line)] py-16">
+        <div className="mx-auto max-w-xl text-center">
+          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--lifeos-line)] text-muted-foreground/60">
+            <Network size={19} strokeWidth={1.2} />
+          </div>
+          <h2 className="font-serif text-2xl">The landscape is still quiet.</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Add notes, projects, questions or other things to give Atlas something
+            to arrange into a living map.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="overflow-hidden border-y border-[color:var(--lifeos-line)]">
+      <div className="flex items-end justify-between gap-6 border-b border-[color:var(--lifeos-line)] px-1 py-5">
+        <div>
+          <p className="lifeos-kicker text-[10px] uppercase tracking-[0.2em]">
+            Intellectual landscape
+          </p>
+          <h2 className="mt-1 font-serif text-2xl">Where things meet</h2>
+        </div>
+        <p className="hidden max-w-sm text-right text-xs leading-5 text-muted-foreground sm:block">
+          Not a literal diagram of everything. A quiet glimpse of the relationships
+          already emerging in your world.
+        </p>
+      </div>
+
+      <div className="relative aspect-[1.65] min-h-[360px] bg-[radial-gradient(circle_at_center,rgba(185,163,122,0.07),transparent_48%)]">
+        <div className="absolute inset-[9%] rounded-full border border-dashed border-[color:var(--lifeos-line)]" />
+        <div className="absolute inset-[22%] rounded-full border border-[color:var(--lifeos-line)] opacity-70" />
+
+        <svg
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          className="absolute inset-0 h-full w-full"
+          aria-hidden="true"
+        >
+          {lines.map(({ edge, source, target }) => (
+            <line
+              key={edge.id}
+              x1={source.x}
+              y1={source.y}
+              x2={target.x}
+              y2={target.y}
+              stroke="currentColor"
+              strokeWidth="0.22"
+              className="text-foreground/20"
+              strokeDasharray={edge.kind === "observed" ? "1 1" : undefined}
+            />
+          ))}
+        </svg>
+
+        <div className="absolute inset-0">
+          {positions.map(({ node, x, y }, index) => {
+            const meta = palette[node.type]
+            return (
+              <div
+                key={nodeKey(node.type, node.id)}
+                className="group absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${x}%`, top: `${y}%` }}
+              >
+                <div
+                  className={`flex h-8 w-8 items-center justify-center rounded-full border text-[10px] uppercase tracking-[0.08em] shadow-[0_0_0_5px_rgba(18,19,17,0.65)] transition-transform duration-300 group-hover:scale-125 ${index === 0 ? "border-[color:var(--lifeos-accent)] text-[var(--lifeos-accent)]" : "border-[color:var(--lifeos-line)] bg-[var(--lifeos-night-soft)] text-muted-foreground"}`}
+                >
+                  {meta.mark}
+                </div>
+                <div className="pointer-events-none absolute left-1/2 top-10 w-32 -translate-x-1/2 text-center opacity-70 transition-opacity group-hover:opacity-100">
+                  <div className="truncate font-serif text-sm text-foreground">
+                    {displayTitle(node.title)}
+                  </div>
+                  <div className="mt-0.5 text-[9px] uppercase tracking-[0.14em] text-muted-foreground/70">
+                    {meta.label}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="absolute bottom-5 left-6 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/55">
+          {visible.length} of {nodes.length} things shown
+        </div>
+      </div>
+    </div>
   )
 }
 
