@@ -17,7 +17,7 @@ import {
 import { SectionPage } from "@/components/lifeos/shared/section-page"
 import { useAppStore } from "@/stores/app-store"
 
-type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark"
+type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem"
 
 type AtlasNode = {
   id: string
@@ -160,6 +160,8 @@ function AtlasLandscape({
     goal: { label: "Goals", mark: "G" },
     habit: { label: "Habits", mark: "H" },
     bookmark: { label: "Bookmarks", mark: "B" },
+    subject: { label: "Subjects", mark: "S" },
+    studioitem: { label: "Studio", mark: "I" },
   }
 
   const visible = nodes.slice(0, 18)
