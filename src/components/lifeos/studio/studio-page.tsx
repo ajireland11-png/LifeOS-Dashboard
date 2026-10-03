@@ -219,7 +219,36 @@ export function StudioPage() {
             ))}
           </div>
 
-          {loading ? (
+                     {!loading && visibleItems.length > 0 && (
+             <div className="mb-10 border-y border-[color:var(--lifeos-line)] py-7">
+               <div className="mb-5 flex items-center justify-between gap-4">
+                 <div>
+                   <p className="lifeos-kicker text-[10px] uppercase tracking-[0.2em]">The workbench</p>
+                   <p className="mt-1 font-serif text-2xl">Loose threads worth keeping</p>
+                 </div>
+                 <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground/55">
+                   {visibleItems.length} {visibleItems.length === 1 ? 'piece' : 'pieces'}
+                 </span>
+               </div>
+               <div className="grid gap-4 sm:grid-cols-2">
+                 {visibleItems.slice(0, 4).map((item, index) => (
+                   <button
+                     key={item.id}
+                     type="button"
+                     onClick={() => setSelectedId(item.id)}
+                     className="group relative min-h-[130px] overflow-hidden border border-[color:var(--lifeos-line)] bg-white/[0.018] p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.035]"
+                   >
+                     <span className="absolute right-4 top-4 font-serif text-3xl text-foreground/[0.07]">{String(index + 1).padStart(2, '0')}</span>
+                     <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground/60">{item.kind}</span>
+                     <span className="mt-7 block max-w-[18rem] font-serif text-xl leading-tight text-foreground/85 group-hover:text-foreground">{item.title}</span>
+                     {item.summary && <span className="mt-2 block max-w-sm text-xs leading-5 text-muted-foreground">{item.summary}</span>}
+                   </button>
+                 ))}
+               </div>
+             </div>
+           )}
+
+{loading ? (
             <p className="text-sm italic text-muted-foreground/80">Reading the studio…</p>
           ) : visibleItems.length > 0 ? (
             <div className="divide-y divide-white/10">
