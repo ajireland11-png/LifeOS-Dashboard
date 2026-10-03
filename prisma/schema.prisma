@@ -610,3 +610,40 @@ model AtlasConnection {
   @@index([sourceType, sourceId])
   @@index([targetType, targetId])
 }
+
+// ============================================
+// EXPLORE — knowledge subjects (field-guide layer)
+// ============================================
+// A first slice of Explore: a subject you're building understanding of.
+// Deliberately plain for now (title, summary, free-form content) — the
+// richer structure from the brief (diagrams, references, related subjects,
+// experiments) is intentionally left for a later pass rather than guessed
+// at here.
+model ExploreSubject {
+  id        String   @id @default(cuid())
+  title     String
+  summary   String?
+  content   String   @default("")
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// STUDIO — inspiration, ideas, and things you might make
+// ============================================
+// An item deliberately does not need to become a task or project — per the
+// brief, an inspiration item is allowed to just stay an inspiration item.
+// `kind` is a loose, user-typed label (e.g. "idea", "inspiration",
+// "material", "technique") rather than a fixed enum, since the brief
+// explicitly favours discovery over rigid categorisation.
+model StudioItem {
+  id        String   @id @default(cuid())
+  title     String
+  kind      String   @default("idea")
+  summary   String?
+  content   String   @default("")
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

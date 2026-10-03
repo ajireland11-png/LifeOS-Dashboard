@@ -6,31 +6,28 @@ import {
   SidebarOpen,
   Plus,
   HelpCircle,
-  LayoutDashboard,
-  CheckSquare,
-  StickyNote,
-  Repeat,
-  BookOpen,
-  Wallet,
-  Target,
-  GraduationCap,
-  CalendarDays,
-  Timer,
-  Settings,
   Maximize2,
+  Home,
+  Library,
+  Compass,
+  Sparkles,
+  FolderKanban,
+  Warehouse,
+  FlaskConical,
+  Archive,
 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useAppStore, type ModuleId } from '@/stores/app-store'
 
 const moduleShortcuts: { key: string; moduleId: ModuleId; label: string; icon: React.ElementType }[] = [
-  { key: '1', moduleId: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: '2', moduleId: 'tasks', label: 'Tasks', icon: CheckSquare },
-  { key: '3', moduleId: 'notes', label: 'Notes', icon: StickyNote },
-  { key: '4', moduleId: 'habits', label: 'Habits', icon: Repeat },
-  { key: '5', moduleId: 'journal', label: 'Journal', icon: BookOpen },
-  { key: '6', moduleId: 'finance', label: 'Finance', icon: Wallet },
-  { key: '7', moduleId: 'goals', label: 'Goals', icon: Target },
-  { key: '8', moduleId: 'learning', label: 'Learning', icon: GraduationCap },
+  { key: '1', moduleId: 'home', label: 'Home', icon: Home },
+  { key: '2', moduleId: 'atlas', label: 'Atlas', icon: Library },
+  { key: '3', moduleId: 'explore', label: 'Explore', icon: Compass },
+  { key: '4', moduleId: 'studio', label: 'Studio', icon: Sparkles },
+  { key: '5', moduleId: 'projects', label: 'Projects', icon: FolderKanban },
+  { key: '6', moduleId: 'house', label: 'House', icon: Warehouse },
+  { key: '7', moduleId: 'research', label: 'Research', icon: FlaskConical },
+  { key: '8', moduleId: 'archive', label: 'Archive', icon: Archive },
 ]
 
 const generalShortcuts = [
@@ -42,14 +39,14 @@ const generalShortcuts = [
 ]
 
 const navigationShortcuts = [
-  { keys: ['⌘', '1'], label: 'Dashboard', icon: LayoutDashboard },
-  { keys: ['⌘', '2'], label: 'Tasks', icon: CheckSquare },
-  { keys: ['⌘', '3'], label: 'Notes', icon: StickyNote },
-  { keys: ['⌘', '4'], label: 'Habits', icon: Repeat },
-  { keys: ['⌘', '5'], label: 'Journal', icon: BookOpen },
-  { keys: ['⌘', '6'], label: 'Finance', icon: Wallet },
-  { keys: ['⌘', '7'], label: 'Goals', icon: Target },
-  { keys: ['⌘', '8'], label: 'Learning', icon: GraduationCap },
+  { keys: ['⌘', '1'], label: 'Home', icon: Home },
+  { keys: ['⌘', '2'], label: 'Atlas', icon: Library },
+  { keys: ['⌘', '3'], label: 'Explore', icon: Compass },
+  { keys: ['⌘', '4'], label: 'Studio', icon: Sparkles },
+  { keys: ['⌘', '5'], label: 'Projects', icon: FolderKanban },
+  { keys: ['⌘', '6'], label: 'House', icon: Warehouse },
+  { keys: ['⌘', '7'], label: 'Research', icon: FlaskConical },
+  { keys: ['⌘', '8'], label: 'Archive', icon: Archive },
 ]
 
 function Kbd({ children }: { children: React.ReactNode }) {

@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Compass,
+  Flame,
   FolderKanban,
   House,
   Lightbulb,
@@ -116,6 +117,8 @@ export function HomePage() {
   const [projects, setProjects] = useState<LifeItem[]>([])
   const [notes, setNotes] = useState<LifeItem[]>([])
   const [tasks, setTasks] = useState<LifeItem[]>([])
+  const [subjects, setSubjects] = useState<LifeItem[]>([])
+  const [studioItems, setStudioItems] = useState<LifeItem[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
 
@@ -125,11 +128,13 @@ export function HomePage() {
     async function load() {
       setLoading(true)
 
-      const [projectsResponse, notesResponse, tasksResponse] =
+      const [projectsResponse, notesResponse, tasksResponse, subjectsResponse, studioResponse] =
         await Promise.allSettled([
           fetch("/api/projects"),
           fetch("/api/notes"),
           fetch("/api/tasks"),
+          fetch("/api/explore/subjects"),
+          fetch("/api/studio/items"),
         ])
 
       if (cancelled) return
@@ -146,16 +151,20 @@ export function HomePage() {
         }
       }
 
-      const [projectData, noteData, taskData] = await Promise.all([
+      const [projectData, noteData, taskData, subjectData, studioData] = await Promise.all([
         readResponse(projectsResponse),
         readResponse(notesResponse),
         readResponse(tasksResponse),
+        readResponse(subjectsResponse),
+        readResponse(studioResponse),
       ])
 
       if (!cancelled) {
         setProjects(projectData)
         setNotes(noteData)
         setTasks(taskData)
+        setSubjects(subjectData)
+        setStudioItems(studioData)
         setLoading(false)
       }
     }
@@ -201,6 +210,17 @@ export function HomePage() {
         })
         .slice(0, 5),
     [tasks],
+  )
+
+  const recentlyCaptured = useMemo(
+    () =>
+      [
+        ...subjects.map((item) => ({ item, origin: "explore" as const })),
+        ...studioItems.map((item) => ({ item, origin: "studio" as const })),
+      ]
+        .sort((a, b) => dateValue(b.item) - dateValue(a.item))
+        .slice(0, 5),
+    [subjects, studioItems],
   )
 
   const searchTerm = search.trim().toLowerCase()
@@ -365,6 +385,34 @@ export function HomePage() {
           )}
         </section>
 
+        <section>
+          <SectionLabel icon={Flame}>Recently captured</SectionLabel>
+
+          {recentlyCaptured.length === 0 ? (
+            <p className="text-sm leading-6 text-black/40">
+              Subjects from Explore and sparks from Studio will show up here
+              as soon as you start capturing them.
+            </p>
+          ) : (
+            <div className="grid gap-x-10 gap-y-0 md:grid-cols-2">
+              {recentlyCaptured.map(({ item, origin }) => (
+                <HomeLink
+                  key={`${origin}-${item.id}`}
+                  icon={origin === "explore" ? Compass : Sparkles}
+                  onClick={() => setActiveModule(origin)}
+                >
+                  <span>
+                    <span className="block">{titleOf(item)}</span>
+                    <span className="mt-1 block text-xs text-black/35">
+                      {origin === "explore" ? "Explore" : "Studio"} · {relativeDate(item)}
+                    </span>
+                  </span>
+                </HomeLink>
+              ))}
+            </div>
+          )}
+        </section>
+
         <section className="grid gap-10 border-t border-black/10 pt-10 sm:grid-cols-3">
           <button
             type="button"
@@ -408,6 +456,8 @@ export function HomePage() {
             <span>{projects.length} projects</span>
             <span>{notes.length} notes</span>
             <span>{tasks.length} tasks</span>
+            <span>{subjects.length} subjects</span>
+            <span>{studioItems.length} studio items</span>
             <button
               type="button"
               onClick={() => setActiveModule("archive")}

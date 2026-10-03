@@ -14,6 +14,8 @@ import {
   Clock,
   X,
   Sparkles,
+  Compass,
+  FolderKanban,
 } from 'lucide-react'
 import { useAppStore, type ModuleId } from '@/stores/app-store'
 import { useSearch, type SearchResult } from '@/lib/api/hooks'
@@ -27,6 +29,9 @@ const iconMap: Record<string, React.ElementType> = {
   Target,
   CalendarDays,
   GraduationCap,
+  Compass,
+  Sparkles,
+  FolderKanban,
 }
 
 const colorMap: Record<string, { bg: string; text: string; border: string; badge: string }> = {
@@ -37,6 +42,8 @@ const colorMap: Record<string, { bg: string; text: string; border: string; badge
   violet: { bg: 'bg-violet-50 dark:bg-violet-950/30', text: 'text-violet-600 dark:text-violet-400', border: 'border-violet-200 dark:border-violet-800', badge: 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300' },
   sky: { bg: 'bg-sky-50 dark:bg-sky-950/30', text: 'text-sky-600 dark:text-sky-400', border: 'border-sky-200 dark:border-sky-800', badge: 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300' },
   cyan: { bg: 'bg-cyan-50 dark:bg-cyan-950/30', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-200 dark:border-cyan-800', badge: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300' },
+  blue: { bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800', badge: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' },
+  slate: { bg: 'bg-slate-50 dark:bg-slate-950/30', text: 'text-slate-600 dark:text-slate-400', border: 'border-slate-200 dark:border-slate-800', badge: 'bg-slate-100 dark:bg-slate-900/40 text-slate-700 dark:text-slate-300' },
 }
 
 const moduleLabels: Record<string, string> = {
@@ -47,6 +54,9 @@ const moduleLabels: Record<string, string> = {
   goals: 'Goals',
   calendar: 'Calendar',
   learning: 'Learning',
+  explore: 'Explore',
+  studio: 'Studio',
+  projects: 'Projects',
 }
 
 function HighlightText({ text, query }: { text: string; query: string }) {

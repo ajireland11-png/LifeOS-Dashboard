@@ -124,7 +124,7 @@ const moduleToModuleId: Record<string, ModuleId> = {
   finance: 'finance',
   journal: 'journal',
   settings: 'settings',
-  dashboard: 'dashboard',
+  dashboard: 'home',
 }
 
 // ─── Relative Time ─────────────────────────────────────────────────
@@ -493,11 +493,11 @@ export function NotificationCenter() {
               size="sm"
               className="h-7 text-xs text-muted-foreground hover:text-foreground"
               onClick={() => {
-                setActiveModule('dashboard')
+                setActiveModule('home')
                 setOpen(false)
               }}
             >
-              Go to Dashboard
+              Go to Home
             </Button>
             <Button
               variant="ghost"

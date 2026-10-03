@@ -124,7 +124,7 @@ export function Header() {
             <BreadcrumbItem>
               <BreadcrumbLink
                 className="cursor-pointer text-muted-foreground hover:text-foreground text-sm transition-colors"
-                onClick={() => setActiveModule('dashboard')}
+                onClick={() => setActiveModule('home')}
               >
                 {t('appName')}
               </BreadcrumbLink>
@@ -132,7 +132,7 @@ export function Header() {
             <BreadcrumbSeparator>
               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30" />
             </BreadcrumbSeparator>
-            {activeModule !== 'dashboard' ? (
+            {activeModule !== 'home' ? (
               <>
                 <BreadcrumbItem>
                   <BreadcrumbLink className="text-muted-foreground/60 text-sm">

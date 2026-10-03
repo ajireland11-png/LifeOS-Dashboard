@@ -212,6 +212,68 @@ pub async fn search(
         });
     }
 
+    // Explore subjects
+    let subject_rows = sqlx::query(
+        "SELECT id, title, summary, content, updatedAt FROM ExploreSubject WHERE archived = 0 AND (title LIKE ? OR summary LIKE ? OR content LIKE ?) ORDER BY updatedAt DESC LIMIT 5"
+    ).bind(&pat).bind(&pat).bind(&pat).fetch_all(&st.db).await.unwrap_or_default();
+    for r in &subject_rows {
+        let summary: Option<String> = r.try_get("summary").ok();
+        let content: String = r.try_get("content").unwrap_or_default();
+        let snippet: String = content.chars().take(120).collect::<String>().trim().to_string();
+        results.push(SearchResult {
+            id: r.try_get("id").unwrap_or_default(),
+            r#type: "Subject".to_string(),
+            title: r.try_get("title").unwrap_or_default(),
+            description: summary.filter(|s| !s.is_empty()).unwrap_or(snippet),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt").unwrap_or(0)),
+            module: "explore".to_string(),
+            icon: "Compass".to_string(),
+            color: "blue".to_string(),
+        });
+    }
+
+    // Studio items
+    let studio_rows = sqlx::query(
+        "SELECT id, title, kind, summary, content, updatedAt FROM StudioItem WHERE archived = 0 AND (title LIKE ? OR summary LIKE ? OR content LIKE ?) ORDER BY updatedAt DESC LIMIT 5"
+    ).bind(&pat).bind(&pat).bind(&pat).fetch_all(&st.db).await.unwrap_or_default();
+    for r in &studio_rows {
+        let summary: Option<String> = r.try_get("summary").ok();
+        let kind: String = r.try_get("kind").unwrap_or_default();
+        results.push(SearchResult {
+            id: r.try_get("id").unwrap_or_default(),
+            r#type: "Studio item".to_string(),
+            title: r.try_get("title").unwrap_or_default(),
+            description: summary
+                .filter(|s| !s.is_empty())
+                .unwrap_or_else(|| format!("Kind: {}", kind)),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt").unwrap_or(0)),
+            module: "studio".to_string(),
+            icon: "Sparkles".to_string(),
+            color: "violet".to_string(),
+        });
+    }
+
+    // Projects
+    let project_rows = sqlx::query(
+        "SELECT id, name, description, updatedAt, status FROM Project WHERE archived = 0 AND (name LIKE ? OR description LIKE ?) ORDER BY updatedAt DESC LIMIT 5"
+    ).bind(&pat).bind(&pat).fetch_all(&st.db).await.unwrap_or_default();
+    for r in &project_rows {
+        let desc: Option<String> = r.try_get("description").ok();
+        let status: String = r.try_get("status").unwrap_or_default();
+        results.push(SearchResult {
+            id: r.try_get("id").unwrap_or_default(),
+            r#type: "Project".to_string(),
+            title: r.try_get("name").unwrap_or_default(),
+            description: desc
+                .filter(|s| !s.is_empty())
+                .unwrap_or_else(|| format!("Status: {}", status)),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt").unwrap_or(0)),
+            module: "projects".to_string(),
+            icon: "FolderKanban".to_string(),
+            color: "slate".to_string(),
+        });
+    }
+
     results.sort_by(|a, b| b.updated_at.0.cmp(&a.updated_at.0));
     Ok(Json(serde_json::json!({ "results": results, "query": q })))
 }

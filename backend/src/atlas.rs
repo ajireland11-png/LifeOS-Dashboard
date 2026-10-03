@@ -13,11 +13,13 @@ use crate::prisma_dt::PrismaDateTime;
 use crate::utils::*;
 use crate::AppState;
 
-/// Entity types Atlas currently knows how to place on the graph. Bookmarks
-/// are included; journal entries and courses are deliberately left out for
-/// now — this is a first slice of Atlas, not the whole vision, and those two
-/// can be added later by copying the same query pattern used below.
-const ENTITY_TYPES: [&str; 6] = ["note", "project", "task", "goal", "habit", "bookmark"];
+/// Entity types Atlas currently knows how to place on the graph. Journal
+/// entries and courses are deliberately left out for now — this is a first
+/// slice of Atlas, not the whole vision, and those two can be added later by
+/// copying the same query pattern used below.
+const ENTITY_TYPES: [&str; 8] = [
+    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem",
+];
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -153,6 +155,39 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
             title: r.try_get("title")?,
             description: r.try_get::<Option<String>, _>("description")?,
             updated_at: PrismaDateTime(r.try_get::<i64, _>("createdAt")?),
+        });
+    }
+
+    // Explore subjects — no archived/updatedAt-vs-createdAt quirks here,
+    // this table was designed alongside Atlas from the start.
+    let rows = sqlx::query(
+        "SELECT id, title, summary, updatedAt FROM ExploreSubject WHERE archived = 0",
+    )
+    .fetch_all(&st.db)
+    .await?;
+    for r in &rows {
+        nodes.push(AtlasNode {
+            id: r.try_get("id")?,
+            node_type: "subject".to_string(),
+            title: r.try_get("title")?,
+            description: r.try_get::<Option<String>, _>("summary")?,
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
+        });
+    }
+
+    // Studio items — same shape as Explore subjects.
+    let rows = sqlx::query(
+        "SELECT id, title, summary, updatedAt FROM StudioItem WHERE archived = 0",
+    )
+    .fetch_all(&st.db)
+    .await?;
+    for r in &rows {
+        nodes.push(AtlasNode {
+            id: r.try_get("id")?,
+            node_type: "studioitem".to_string(),
+            title: r.try_get("title")?,
+            description: r.try_get::<Option<String>, _>("summary")?,
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
         });
     }
 

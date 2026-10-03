@@ -4,6 +4,8 @@ mod activity;
 mod analytics;
 mod atlas;
 mod courses;
+mod explore;
+mod studio;
 mod dashboard;
 mod data;
 pub mod db;
@@ -129,6 +131,28 @@ pub fn build_app(pool: SqlitePool) -> Router {
         .route(
             "/api/atlas/connections/{id}",
             delete(atlas::delete_connection),
+        )
+        // Explore
+        .route(
+            "/api/explore/subjects",
+            get(explore::list_subjects).post(explore::create_subject),
+        )
+        .route(
+            "/api/explore/subjects/{id}",
+            get(explore::get_subject)
+                .patch(explore::update_subject)
+                .delete(explore::delete_subject),
+        )
+        // Studio
+        .route(
+            "/api/studio/items",
+            get(studio::list_items).post(studio::create_item),
+        )
+        .route(
+            "/api/studio/items/{id}",
+            get(studio::get_item)
+                .patch(studio::update_item)
+                .delete(studio::delete_item),
         )
         // Note Folders
         .route(

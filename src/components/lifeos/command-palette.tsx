@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { useAppStore, type ModuleId } from '@/stores/app-store'
 import {
-  LayoutDashboard,
   CheckSquare,
   StickyNote,
   Repeat,
@@ -16,6 +15,14 @@ import {
   Settings,
   Plus,
   Search,
+  Home,
+  Library,
+  Compass,
+  Sparkles,
+  FolderKanban,
+  Warehouse,
+  FlaskConical,
+  Archive,
 } from 'lucide-react'
 import {
   CommandDialog,
@@ -28,7 +35,14 @@ import {
 } from '@/components/ui/command'
 
 const modules: { id: ModuleId; label: string; icon: React.ElementType }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'home', label: 'Home', icon: Home },
+  { id: 'atlas', label: 'Atlas', icon: Library },
+  { id: 'explore', label: 'Explore', icon: Compass },
+  { id: 'studio', label: 'Studio', icon: Sparkles },
+  { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'house', label: 'House', icon: Warehouse },
+  { id: 'research', label: 'Research', icon: FlaskConical },
+  { id: 'archive', label: 'Archive', icon: Archive },
   { id: 'tasks', label: 'Tasks', icon: CheckSquare },
   { id: 'notes', label: 'Notes', icon: StickyNote },
   { id: 'habits', label: 'Habits', icon: Repeat },
