@@ -96,16 +96,16 @@ function AtlasLink({
     <button
       type="button"
       onClick={onClick}
-      className="group flex w-full items-center justify-between border-b border-black/10 py-4 text-left transition-colors hover:border-black/30"
+      className="group flex w-full items-center justify-between border-b border-[color:var(--lifeos-line)] py-4 text-left transition-colors hover:border-white/20"
     >
-      <span className="text-[15px] text-black/75 group-hover:text-black">
+      <span className="text-[15px] text-foreground/75 group-hover:text-foreground">
         {children}
       </span>
 
       <ArrowUpRight
         size={16}
         strokeWidth={1.5}
-        className="text-black/30 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black/70"
+        className="text-muted-foreground/55 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground/70"
       />
     </button>
   )
@@ -119,7 +119,7 @@ function SectionLabel({
   icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
 }) {
   return (
-    <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
+    <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
       <Icon size={14} strokeWidth={1.5} />
       {children}
     </div>
@@ -129,10 +129,10 @@ function SectionLabel({
 /** Small pill distinguishing how a connection came to exist. */
 function KindBadge({ kind }: { kind: EdgeKind }) {
   const styles: Record<EdgeKind, string> = {
-    observed: "border-black/15 text-black/45",
-    connected: "border-black/60 text-black/80",
-    inferred: "border-black/15 text-black/35 border-dashed",
-    suggested: "border-black/15 text-black/35 border-dotted",
+    observed: "border-black/15 text-muted-foreground",
+    connected: "border-white/35 text-foreground/85",
+    inferred: "border-black/15 text-muted-foreground/70 border-dashed",
+    suggested: "border-black/15 text-muted-foreground/70 border-dotted",
   }
 
   return (
@@ -340,24 +340,24 @@ export function AtlasPage() {
 
         {/* Search */}
         <section>
-          <div className="relative border-b border-black/20 pb-3">
+          <div className="relative border-b border-[color:var(--lifeos-line)] pb-3">
             <Search
               size={19}
               strokeWidth={1.4}
-              className="absolute left-0 top-1/2 -translate-y-1/2 text-black/35"
+              className="absolute left-0 top-1/2 -translate-y-1/2 text-muted-foreground/70"
             />
 
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search your atlas…"
-              className="w-full bg-transparent pl-8 pr-4 text-lg font-serif outline-none placeholder:text-black/30"
+              className="w-full bg-transparent pl-8 pr-4 text-lg font-serif outline-none placeholder:text-muted-foreground/55"
             />
           </div>
 
           {search.trim() && (
             <div className="mt-5">
-              <div className="mb-3 text-[11px] uppercase tracking-[0.18em] text-black/40">
+              <div className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                 {searching
                   ? "Searching"
                   : `${searchResults.length} result${
@@ -366,7 +366,7 @@ export function AtlasPage() {
               </div>
 
               {searchResults.length > 0 ? (
-                <div className="divide-y divide-black/10">
+                <div className="divide-y divide-white/10">
                   {searchResults.slice(0, 8).map((result, index) => (
                     <div
                       key={`${result.id}-${index}`}
@@ -378,20 +378,20 @@ export function AtlasPage() {
                         </div>
 
                         {result.description && (
-                          <div className="mt-1 max-w-2xl text-sm text-black/50">
+                          <div className="mt-1 max-w-2xl text-sm text-muted-foreground">
                             {result.description}
                           </div>
                         )}
                       </div>
 
-                      <span className="ml-6 text-[10px] uppercase tracking-[0.15em] text-black/35">
+                      <span className="ml-6 text-[10px] uppercase tracking-[0.15em] text-muted-foreground/70">
                         {result.type || "record"}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : !searching ? (
-                <p className="py-4 text-sm italic text-black/45">
+                <p className="py-4 text-sm italic text-muted-foreground">
                   Nothing in the current atlas matches that search.
                 </p>
               ) : null}
@@ -405,7 +405,7 @@ export function AtlasPage() {
             <Network
               size={27}
               strokeWidth={1.2}
-              className="mt-1 shrink-0 text-black/45"
+              className="mt-1 shrink-0 text-muted-foreground"
             />
 
             <div>
@@ -413,7 +413,7 @@ export function AtlasPage() {
                 A map, not another filing cabinet.
               </h2>
 
-              <p className="mt-4 text-[15px] leading-7 text-black/60">
+              <p className="mt-4 text-[15px] leading-7 text-foreground/60">
                 Atlas is the connective layer of Life OS. Projects, notes,
                 tasks, goals, habits and bookmarks all sit on the same map,
                 joined by connections you draw yourself and by ones already
@@ -421,7 +421,7 @@ export function AtlasPage() {
                 dependencies, a goal's linked project.
               </p>
 
-              <p className="mt-4 text-[15px] leading-7 text-black/60">
+              <p className="mt-4 text-[15px] leading-7 text-foreground/60">
                 Solid connections are ones you made explicitly. Fainter ones
                 were observed from data that already existed. Inferred and
                 suggested connections — patterns and possibilities the system
@@ -436,7 +436,7 @@ export function AtlasPage() {
           <SectionLabel icon={Tag}>Themes already present</SectionLabel>
 
           {loading ? (
-            <p className="text-sm italic text-black/40">
+            <p className="text-sm italic text-muted-foreground/80">
               Reading your atlas…
             </p>
           ) : visibleTags.length > 0 ? (
@@ -444,14 +444,14 @@ export function AtlasPage() {
               {visibleTags.map((tag) => (
                 <span
                   key={tag.id}
-                  className="font-serif text-xl text-black/70 transition-colors hover:text-black"
+                  className="font-serif text-xl text-foreground/70 transition-colors hover:text-foreground"
                 >
                   {tag.name}
                 </span>
               ))}
             </div>
           ) : (
-            <p className="max-w-xl text-sm leading-6 text-black/45">
+            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
               As you add notes, projects and other records, this space will
               become a vocabulary of the subjects that recur throughout your
               life.
@@ -479,7 +479,7 @@ export function AtlasPage() {
                       </span>
 
                       {project.description && (
-                        <span className="mt-1 block max-w-lg text-sm text-black/45">
+                        <span className="mt-1 block max-w-lg text-sm text-muted-foreground">
                           {project.description}
                         </span>
                       )}
@@ -488,7 +488,7 @@ export function AtlasPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm leading-6 text-black/45">
+              <p className="text-sm leading-6 text-muted-foreground">
                 No active projects yet. Projects will appear here as living
                 threads rather than as a task list.
               </p>
@@ -512,7 +512,7 @@ export function AtlasPage() {
                       </span>
 
                       {note.description && (
-                        <span className="mt-1 block max-w-lg text-sm text-black/45">
+                        <span className="mt-1 block max-w-lg text-sm text-muted-foreground">
                           {note.description}
                         </span>
                       )}
@@ -521,7 +521,7 @@ export function AtlasPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm leading-6 text-black/45">
+              <p className="text-sm leading-6 text-muted-foreground">
                 Your notes will become part of the atlas as you build the
                 knowledge layer of Life OS.
               </p>
@@ -530,13 +530,13 @@ export function AtlasPage() {
         </div>
 
         {/* Connections */}
-        <section className="border-t border-black/10 pt-12">
+        <section className="border-t border-[color:var(--lifeos-line)] pt-12">
           <SectionLabel icon={Link2}>Connections</SectionLabel>
 
           {graphLoading ? (
-            <p className="text-sm italic text-black/40">Reading the graph…</p>
+            <p className="text-sm italic text-muted-foreground/80">Reading the graph…</p>
           ) : visibleEdges.length > 0 ? (
-            <div className="divide-y divide-black/10">
+            <div className="divide-y divide-white/10">
               {visibleEdges.map((edge) => {
                 const source = nodesByKey.get(nodeKey(edge.sourceType, edge.sourceId))
                 const target = nodesByKey.get(nodeKey(edge.targetType, edge.targetId))
@@ -545,11 +545,11 @@ export function AtlasPage() {
                 return (
                   <div key={edge.id} className="flex items-center justify-between gap-4 py-3.5">
                     <div className="flex min-w-0 flex-1 items-center gap-2.5 text-[14px]">
-                      <span className="truncate text-black/75">{displayTitle(source.title)}</span>
-                      <span className="shrink-0 text-black/30">
+                      <span className="truncate text-foreground/75">{displayTitle(source.title)}</span>
+                      <span className="shrink-0 text-muted-foreground/55">
                         {edge.label ? `— ${edge.label} —` : "—"}
                       </span>
-                      <span className="truncate text-black/75">{displayTitle(target.title)}</span>
+                      <span className="truncate text-foreground/75">{displayTitle(target.title)}</span>
                     </div>
 
                     <div className="flex shrink-0 items-center gap-3">
@@ -558,7 +558,7 @@ export function AtlasPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteConnection(edge.id)}
-                          className="text-black/25 transition-colors hover:text-black/60"
+                          className="text-foreground/25 transition-colors hover:text-foreground/60"
                           aria-label="Remove connection"
                         >
                           <Trash2 size={14} strokeWidth={1.5} />
@@ -570,7 +570,7 @@ export function AtlasPage() {
               })}
             </div>
           ) : (
-            <p className="text-sm leading-6 text-black/45">
+            <p className="text-sm leading-6 text-muted-foreground">
               No connections yet. Draw one below, or add tags, note links or
               task dependencies elsewhere in Life OS and they'll show up here
               automatically.
@@ -580,12 +580,12 @@ export function AtlasPage() {
           {/* Draw a connection */}
           <form
             onSubmit={handleConnect}
-            className="mt-8 flex flex-col gap-3 border-t border-black/10 pt-6 sm:flex-row sm:items-center"
+            className="mt-8 flex flex-col gap-3 border-t border-[color:var(--lifeos-line)] pt-6 sm:flex-row sm:items-center"
           >
             <select
               value={connectSource}
               onChange={(event) => setConnectSource(event.target.value)}
-              className="min-w-0 flex-1 border-b border-black/20 bg-transparent py-2 text-sm outline-none"
+              className="min-w-0 flex-1 border-b border-[color:var(--lifeos-line)] bg-transparent py-2 text-sm outline-none"
             >
               <option value="">Connect this…</option>
               {nodes.map((node) => (
@@ -595,12 +595,12 @@ export function AtlasPage() {
               ))}
             </select>
 
-            <span className="hidden shrink-0 text-black/30 sm:inline">→</span>
+            <span className="hidden shrink-0 text-muted-foreground/55 sm:inline">→</span>
 
             <select
               value={connectTarget}
               onChange={(event) => setConnectTarget(event.target.value)}
-              className="min-w-0 flex-1 border-b border-black/20 bg-transparent py-2 text-sm outline-none"
+              className="min-w-0 flex-1 border-b border-[color:var(--lifeos-line)] bg-transparent py-2 text-sm outline-none"
             >
               <option value="">…to this</option>
               {nodes.map((node) => (
@@ -613,7 +613,7 @@ export function AtlasPage() {
             <button
               type="submit"
               disabled={connecting || !connectSource || !connectTarget}
-              className="flex shrink-0 items-center justify-center gap-1.5 border border-black/70 px-4 py-2 text-[13px] uppercase tracking-[0.1em] text-black/80 transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-black/80"
+              className="flex shrink-0 items-center justify-center gap-1.5 border border-white/35 px-4 py-2 text-[13px] uppercase tracking-[0.1em] text-foreground/85 transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-foreground/85"
             >
               <Plus size={14} strokeWidth={1.75} />
               Connect
@@ -626,7 +626,7 @@ export function AtlasPage() {
         </section>
 
         {/* Still ahead for Atlas */}
-        <section className="border-t border-black/10 pt-12">
+        <section className="border-t border-[color:var(--lifeos-line)] pt-12">
           <SectionLabel icon={Sparkles}>Still ahead for Atlas</SectionLabel>
 
           <div className="grid gap-10 md:grid-cols-3">
@@ -635,12 +635,12 @@ export function AtlasPage() {
               <FlaskConical
                 size={21}
                 strokeWidth={1.3}
-                className="mb-4 text-black/40"
+                className="mb-4 text-muted-foreground/80"
               />
 
               <h3 className="font-serif text-xl">Interests</h3>
 
-              <p className="mt-3 text-sm leading-6 text-black/50">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Subjects you repeatedly return to, from science and research
                 to materials, crafts, food, architecture or anything else
                 that catches your attention — as a first-class thing on the
@@ -652,12 +652,12 @@ export function AtlasPage() {
               <Sparkles
                 size={21}
                 strokeWidth={1.3}
-                className="mb-4 text-black/40"
+                className="mb-4 text-muted-foreground/80"
               />
 
               <h3 className="font-serif text-xl">Inferred &amp; suggested</h3>
 
-              <p className="mt-3 text-sm leading-6 text-black/50">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Patterns noticed across multiple observations, and possible
                 avenues worth exploring — surfaced by the system, always
                 clearly marked as a guess rather than a fact, and always
@@ -669,12 +669,12 @@ export function AtlasPage() {
               <Network
                 size={21}
                 strokeWidth={1.3}
-                className="mb-4 text-black/40"
+                className="mb-4 text-muted-foreground/80"
               />
 
               <h3 className="font-serif text-xl">Questions</h3>
 
-              <p className="mt-3 text-sm leading-6 text-black/50">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Things you wonder about but do not necessarily need to turn
                 into tasks. Questions can simply remain alive until they lead
                 somewhere.
@@ -685,8 +685,8 @@ export function AtlasPage() {
         </section>
 
         {/* Counts / quiet metadata */}
-        <section className="border-t border-black/10 pt-7">
-          <div className="flex flex-wrap gap-x-8 gap-y-3 text-[11px] uppercase tracking-[0.15em] text-black/35">
+        <section className="border-t border-[color:var(--lifeos-line)] pt-7">
+          <div className="flex flex-wrap gap-x-8 gap-y-3 text-[11px] uppercase tracking-[0.15em] text-muted-foreground/70">
             <span>{nodes.length} things</span>
             <span>{edges.length} connections</span>
             <span>{tags.length} themes</span>
