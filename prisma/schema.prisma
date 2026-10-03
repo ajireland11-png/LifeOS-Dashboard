@@ -595,6 +595,29 @@ model PomodoroSession {
 //                    multiple observations
 //   - "suggested"  — reserved for a future pass that proposes a possible
 //                    connection for the user to confirm or dismiss
+// ============================================
+// ATLAS — connective knowledge layer
+// ============================================
+// These are deliberately lightweight, first-class intellectual objects.
+// They are not forced into tasks/projects. A question can remain a question,
+// an inspiration can remain an inspiration, and a concept can connect many
+// papers, notes, projects and experiments through AtlasConnection.
+model KnowledgeItem {
+  id        String   @id @default(cuid())
+  type      String   // question, concept, paper, idea, inspiration, skill, thing, place
+  title     String
+  summary   String?
+  content   String   @default("")
+  sourceUrl String?
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([archived])
+  @@index([updatedAt])
+}
+
 model AtlasConnection {
   id         String   @id @default(cuid())
   sourceType String
