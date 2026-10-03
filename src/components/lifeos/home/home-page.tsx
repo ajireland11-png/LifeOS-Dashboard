@@ -238,14 +238,14 @@ export function HomePage() {
       title="Home"
       description="A quiet view of what is alive in your world — the things you are working on, learning, noticing, and returning to."
     >
-      <div className="space-y-16">
-        <section className="border-y border-[color:var(--lifeos-line)] py-8">
+      <div className="space-y-20 pb-16">
+        <section className="border-y border-[color:var(--lifeos-line)] py-10 sm:py-12">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
                 The present
               </p>
-              <h2 className="text-3xl font-light tracking-[-0.03em] text-foreground sm:text-4xl">
+              <h2 className="font-serif text-3xl tracking-[-0.02em] text-foreground sm:text-5xl">
                 Your life, without the dashboard noise.
               </h2>
               <p className="mt-4 max-w-xl text-[15px] leading-7 text-muted-foreground">
@@ -272,7 +272,7 @@ export function HomePage() {
           {loading ? (
             <p className="text-sm text-muted-foreground/80">Gathering your current threads…</p>
           ) : filteredProjects.length === 0 ? (
-            <div className="border border-dashed border-black/15 px-6 py-8">
+            <div className="border border-dashed border-[color:var(--lifeos-line)] px-6 py-8">
               <p className="text-sm text-muted-foreground">
                 Nothing is currently marked as an active project.
               </p>
@@ -334,7 +334,7 @@ export function HomePage() {
 
           <div>
             <SectionLabel icon={Lightbulb}>A place to return to</SectionLabel>
-            <div className="border-l border-black/15 pl-6">
+            <div className="border-l border-[color:var(--lifeos-line)] pl-6">
               <p className="text-lg font-light leading-8 text-foreground/70">
                 Explore is where curiosity can remain curiosity — something you
                 can follow deeply without turning every interest into a task.
