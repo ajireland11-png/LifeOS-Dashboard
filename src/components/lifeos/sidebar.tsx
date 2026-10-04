@@ -106,7 +106,12 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="border-t border-[color:var(--lifeos-line)] p-3">\n        {!sidebarCollapsed && (\n          <div className="px-3 pb-2 text-[9px] uppercase tracking-[0.24em] text-[var(--lifeos-muted)]/70">Quiet tools</div>\n        )}
+      <div className="border-t border-[color:var(--lifeos-line)] p-3">
+        {!sidebarCollapsed && (
+          <div className="px-3 pb-2 text-[9px] uppercase tracking-[0.24em] text-[var(--lifeos-muted)]/70">
+            Quiet tools
+          </div>
+        )}
         <button
           onClick={() => setActiveModule('settings')}
           className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground ${
