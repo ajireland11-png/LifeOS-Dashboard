@@ -108,7 +108,7 @@ export function Header() {
   return (
     <header className="h-14 sticky top-0 z-30 bg-background/88 backdrop-blur-md border-b border-[color:var(--lifeos-line)] flex items-center justify-between px-5 lg:px-7 gap-4 shrink-0">
       {/* Left — breadcrumb */}
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center gap-3 min-w-0">
         {isMobile && (
           <Button
             variant="ghost"
@@ -164,11 +164,11 @@ export function Header() {
         <div className="flex-1 max-w-sm">
           <button
             onClick={() => setGlobalSearchOpen(true)}
-            className="flex items-center gap-2 w-full h-8 rounded-full border border-[color:var(--lifeos-line)] bg-white/[0.025] px-3 text-sm text-muted-foreground hover:bg-white/[0.05] transition-colors"
+            className="group flex items-center gap-2 w-full h-8 border-b border-[color:var(--lifeos-line)] bg-transparent px-1 text-sm text-muted-foreground transition-colors hover:border-[color:color-mix(in_srgb,var(--lifeos-accent)_35%,transparent)]"
           >
             <Search className="h-3.5 w-3.5 shrink-0" />
             <span className="flex-1 text-left">{t('header.searchEverything')}</span>
-            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] text-muted-foreground">
+            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 border border-[color:var(--lifeos-line)] px-1.5 font-mono text-[10px] text-muted-foreground/70">
               <Command className="h-2.5 w-2.5" />K
             </kbd>
           </button>
@@ -226,7 +226,7 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-7 px-1.5 gap-1.5 rounded-md hover:bg-accent/60">
-              <Avatar className="h-6 w-6">
+              <Avatar className="h-6 w-6 ring-1 ring-[color:var(--lifeos-line)]">
                 <AvatarFallback className="text-[10px] font-semibold bg-foreground text-background">
                   {initials}
                 </AvatarFallback>
