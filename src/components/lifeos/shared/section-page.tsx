@@ -16,9 +16,9 @@ export function SectionPage({
   children,
 }: SectionPageProps) {
   return (
-    <div className="lifeos-editorial min-h-full">
+    <div className="lifeos-editorial lifeos-atmosphere min-h-full">
       <div className="mx-auto max-w-[1440px] px-7 py-10 sm:px-10 lg:px-16 lg:py-14">
-        <header className="relative max-w-4xl border-l border-[color:var(--lifeos-line)] pl-6 sm:pl-8">
+        <header className="lifeos-hero relative max-w-5xl border-l border-[color:var(--lifeos-line)] pl-6 sm:pl-8">
           <p className="lifeos-kicker text-[10px] uppercase tracking-[0.35em]">
             {eyebrow}
           </p>
@@ -30,9 +30,10 @@ export function SectionPage({
           <p className="mt-6 max-w-2xl text-[15px] leading-7 text-muted-foreground lg:text-base">
             {description}
           </p>
+        <span className="lifeos-hero-mark" aria-hidden="true" />
         </header>
 
-        <div className="mt-14 lg:mt-20">
+        <div className="lifeos-section-rule mt-14 pt-8 lg:mt-20 lg:pt-10">
           {children}
         </div>
       </div>
