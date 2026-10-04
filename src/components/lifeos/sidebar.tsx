@@ -80,7 +80,7 @@ export function Sidebar() {
               <button
                 key={item.id}
                 onClick={() => setActiveModule(item.id)}
-                className={`group relative flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-all ${
+                className={`group relative flex w-full items-center gap-3 relative rounded-md px-3 py-2.5 text-left transition-all duration-200 ${
                   active
                     ? 'bg-white/[0.045] text-[var(--lifeos-ivory)]'
                     : 'text-[var(--lifeos-muted)] hover:bg-white/[0.035] hover:text-[var(--lifeos-ivory)]'
@@ -93,7 +93,7 @@ export function Sidebar() {
                 />
 
                 {!sidebarCollapsed && (
-                  <span className="text-sm">{item.label}</span>
+                  <span className="text-[13px] tracking-[0.01em]">{item.label}</span>
                 )}
 
                 {active && !sidebarCollapsed && (
@@ -106,7 +106,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="border-t border-[color:var(--lifeos-line)] p-3">
+      <div className="border-t border-[color:var(--lifeos-line)] p-3">\n        {!sidebarCollapsed && (\n          <div className="px-3 pb-2 text-[9px] uppercase tracking-[0.24em] text-[var(--lifeos-muted)]/70">Quiet tools</div>\n        )}
         <button
           onClick={() => setActiveModule('settings')}
           className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground ${
