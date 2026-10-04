@@ -1845,3 +1845,40 @@ body {
     animation: none;
   }
 }
+
+::selection {
+  background: color-mix(in srgb, var(--lifeos-accent) 32%, transparent);
+  color: var(--lifeos-ivory);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232, 226, 213, 0.14) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(232, 226, 213, 0.12);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(232, 226, 213, 0.2);
+}
+
+.lifeos-editorial :is(button, a, input, textarea, select):focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--lifeos-accent) 58%, transparent);
+  outline-offset: 3px;
+}
+
+.lifeos-editorial hr {
+  border-color: var(--lifeos-line);
+}
