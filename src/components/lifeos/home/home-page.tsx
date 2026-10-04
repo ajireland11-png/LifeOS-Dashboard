@@ -239,7 +239,7 @@ export function HomePage() {
       description="A quiet view of what is alive in your world — the things you are working on, learning, noticing, and returning to."
     >
       <div className="space-y-20 pb-16">
-        <section className="border-y border-[color:var(--lifeos-line)] py-10 sm:py-12">
+        <section className="lifeos-paper relative border-y border-[color:var(--lifeos-line)] px-6 py-10 sm:px-8 sm:py-12">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
@@ -413,11 +413,11 @@ export function HomePage() {
           )}
         </section>
 
-        <section className="grid gap-10 border-t border-[color:var(--lifeos-line)] pt-10 sm:grid-cols-3">
+        <section className="grid gap-0 border-y border-[color:var(--lifeos-line)] sm:grid-cols-3">
           <button
             type="button"
             onClick={() => setActiveModule("atlas")}
-            className="text-left transition-opacity hover:opacity-60"
+            className="lifeos-section-rule px-0 py-7 text-left transition-all hover:-translate-y-0.5 hover:opacity-80 sm:px-5 sm:py-9 sm:first:pl-0"
           >
             <NetworkIcon />
             <h3 className="mt-4 text-base text-foreground/85">Atlas</h3>
