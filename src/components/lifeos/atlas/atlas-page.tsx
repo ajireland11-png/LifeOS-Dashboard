@@ -1003,7 +1003,7 @@ export function AtlasPage() {
         {/* Counts / quiet metadata */}
         <section className="border-t border-[color:var(--lifeos-line)] pt-7">
           <div className="flex flex-wrap gap-x-8 gap-y-3 text-[11px] uppercase tracking-[0.15em] text-muted-foreground/70">
-            <span>{nodes.length} things</span>\n            <span>{knowledge.length} knowledge threads</span>
+            <span>{nodes.length} things</span>            <span>{knowledge.length} knowledge threads</span>
             <span>{edges.length} connections</span>
             <span>{tags.length} themes</span>
             <span className="inline-flex items-center gap-1.5">
