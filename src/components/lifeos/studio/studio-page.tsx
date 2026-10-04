@@ -162,7 +162,7 @@ export function StudioPage() {
       title="Studio"
       description="Your creative environment for inspiration, references, ideas, materials, techniques and things you might one day make. Nothing here has to become a task."
     >
-      <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,320px)_1fr]">
+      <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,340px)_1fr]">
         {/* List + new item */}
         <section>
           <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -257,11 +257,11 @@ export function StudioPage() {
                   key={item.id}
                   type="button"
                   onClick={() => setSelectedId(item.id)}
-                  className={`block w-full py-3.5 text-left transition-colors ${
-                    item.id === selectedId ? 'text-foreground' : 'text-foreground/70 hover:text-foreground'
+                  className={`group block w-full border-b border-[color:var(--lifeos-line)] py-4 pr-4 text-left transition-all ${
+                    item.id === selectedId ? 'bg-white/[0.018] text-foreground' : 'text-foreground/65 hover:bg-white/[0.012] hover:pl-2 hover:text-foreground'
                   }`}
                 >
-                  <div className="font-serif text-lg">{item.title}</div>
+                  <div className="flex items-baseline justify-between gap-3"><div className="font-serif text-lg">{item.title}</div>{item.id === selectedId && <span className="lifeos-kicker text-[9px] uppercase tracking-[0.16em]">open</span>}</div>
                   {item.summary && (
                     <div className="mt-0.5 truncate text-sm text-muted-foreground">{item.summary}</div>
                   )}
@@ -280,7 +280,7 @@ export function StudioPage() {
         </section>
 
         {/* Detail / editor */}
-        <section className="border-t border-[color:var(--lifeos-line)] pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
+        <section className="min-h-[520px] border-t border-[color:var(--lifeos-line)] pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
           {selected ? (
             <div>
               <div className="flex items-start justify-between gap-4">
