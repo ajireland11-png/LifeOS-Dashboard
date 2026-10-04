@@ -155,7 +155,7 @@ export function ExplorePage() {
       title="Explore"
       description="A living library for subjects you want to understand deeply, from science and history to crafts, cooking, languages and everything that catches your curiosity."
     >
-      <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,320px)_1fr]">
+      <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,340px)_1fr]">
         {/* Subject list + new subject */}
         <section>
           <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -207,11 +207,11 @@ export function ExplorePage() {
                   key={subject.id}
                   type="button"
                   onClick={() => setSelectedId(subject.id)}
-                  className={`block w-full py-3.5 text-left transition-colors ${
-                    subject.id === selectedId ? 'text-foreground' : 'text-foreground/70 hover:text-foreground'
+                  className={`group relative block w-full border-b border-[color:var(--lifeos-line)] py-4 pr-4 text-left transition-all ${
+                    subject.id === selectedId ? 'text-foreground' : 'text-foreground/65 hover:bg-white/[0.018] hover:pl-2 hover:text-foreground'
                   }`}
                 >
-                  <div className="font-serif text-lg">{subject.title}</div>
+                  <div className="flex items-baseline justify-between gap-3"><div className="font-serif text-lg">{subject.title}</div>{subject.id === selectedId && <span className="lifeos-kicker text-[9px] uppercase tracking-[0.16em]">open</span>}</div>
                   {subject.summary && (
                     <div className="mt-0.5 truncate text-sm text-muted-foreground">{subject.summary}</div>
                   )}
@@ -230,7 +230,7 @@ export function ExplorePage() {
         </section>
 
         {/* Detail / editor */}
-        <section className="border-t border-[color:var(--lifeos-line)] pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
+        <section className="min-h-[520px] border-t border-[color:var(--lifeos-line)] pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
           {selected ? (
             <div>
               <input
