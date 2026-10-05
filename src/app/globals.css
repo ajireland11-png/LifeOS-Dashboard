@@ -2641,3 +2641,327 @@ select.lifeos-select option:hover {
   .lifeos-page-art{width:55vw!important;opacity:.5!important;transform:scale(.85);transform-origin:right top}
   .lifeos-hero h1{max-width:11ch}
 }
+
+
+/* ============================================================
+   LIFEOS CABINET OF CURIOSITIES — VISUAL SYSTEM
+   This is intentionally more editorial, botanical and colourful
+   than a conventional productivity dashboard.
+   ============================================================ */
+
+:root {
+  --lifeos-forest: #173b32;
+  --lifeos-moss: #6f8060;
+  --lifeos-sage: #aab89a;
+  --lifeos-ochre: #c79543;
+  --lifeos-amber: #e3b85b;
+  --lifeos-coral: #bd6858;
+  --lifeos-rose: #a85d72;
+  --lifeos-plum: #563b5c;
+  --lifeos-cobalt: #355b7a;
+  --lifeos-turquoise: #3e8f8c;
+  --lifeos-glass-blue: #76aeb5;
+  --lifeos-paper-warm: #e8dfcb;
+  --lifeos-ink-deep: #111713;
+}
+
+.lifeos-editorial {
+  --lifeos-accent: var(--lifeos-amber);
+  color: #e8e3d8;
+}
+
+.lifeos-cabinet-shell {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 82% 5%, rgba(62,143,140,.15), transparent 24rem),
+    radial-gradient(circle at 8% 24%, rgba(189,104,88,.11), transparent 22rem),
+    linear-gradient(135deg, rgba(17,23,19,.97), rgba(24,29,24,.98));
+  border: 1px solid rgba(227,184,91,.20);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.045);
+  overflow: hidden;
+}
+
+.lifeos-cabinet-shell::before,
+.lifeos-cabinet-shell::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.lifeos-cabinet-shell::before {
+  inset: 0;
+  opacity: .42;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.045) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,.03) 0 1px, transparent 1.5px);
+  background-size: 31px 31px, 47px 47px;
+}
+
+.lifeos-cabinet-shell::after {
+  width: 420px;
+  height: 420px;
+  right: -170px;
+  top: -180px;
+  border: 1px solid rgba(118,174,181,.25);
+  border-radius: 48% 52% 44% 56%;
+  transform: rotate(17deg);
+  box-shadow:
+    0 0 0 14px rgba(62,143,140,.045),
+    0 0 0 28px rgba(199,149,67,.035);
+}
+
+.lifeos-mosaic-rail {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  gap: 3px;
+  height: 10px;
+  margin: -1px 0 1.3rem;
+  opacity: .96;
+}
+
+.lifeos-mosaic-rail span {
+  display: block;
+  min-width: 0;
+  transform: skewX(-10deg);
+  box-shadow: inset 0 1px rgba(255,255,255,.28), 0 2px 8px rgba(0,0,0,.18);
+  background: var(--lifeos-forest);
+}
+
+.lifeos-mosaic-rail span:nth-child(3n) { background: var(--lifeos-ochre); }
+.lifeos-mosaic-rail span:nth-child(4n) { background: var(--lifeos-coral); }
+.lifeos-mosaic-rail span:nth-child(5n) { background: var(--lifeos-cobalt); }
+.lifeos-mosaic-rail span:nth-child(7n) { background: var(--lifeos-turquoise); }
+.lifeos-mosaic-rail span:nth-child(9n) { background: var(--lifeos-rose); }
+.lifeos-mosaic-rail span:nth-child(11n) { background: var(--lifeos-amber); }
+
+.lifeos-mosaic-rail-bottom {
+  margin-top: 2.2rem;
+  margin-bottom: -1px;
+}
+
+.lifeos-hero {
+  padding: 1.3rem 1.2rem 2.2rem;
+  border-bottom-color: rgba(227,184,91,.20) !important;
+}
+
+.lifeos-hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: min(48%, 430px);
+  height: 3px;
+  background: linear-gradient(90deg, var(--lifeos-coral), var(--lifeos-ochre), var(--lifeos-turquoise), transparent);
+}
+
+.lifeos-kicker {
+  color: var(--lifeos-amber) !important;
+  text-shadow: 0 0 18px rgba(227,184,91,.16);
+}
+
+.lifeos-hero h1 {
+  max-width: 10ch;
+  color: #f1eadb !important;
+  text-shadow: 0 12px 40px rgba(0,0,0,.25);
+}
+
+.lifeos-hero > .max-w-3xl {
+  position: relative;
+  z-index: 3;
+}
+
+.lifeos-hero-plate {
+  position: absolute;
+  right: clamp(0rem, 4vw, 4rem);
+  bottom: 1.5rem;
+  width: 190px;
+  height: 150px;
+  transform: rotate(3deg);
+  z-index: 2;
+}
+
+.lifeos-plate-image {
+  position: absolute;
+  inset: 0 0 18px 18px;
+  overflow: hidden;
+  border: 7px solid #d8cfba;
+  outline: 1px solid rgba(227,184,91,.55);
+  box-shadow: 0 18px 35px rgba(0,0,0,.34);
+  background: #26332d;
+}
+
+.lifeos-plate-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.86) contrast(1.04);
+}
+
+.lifeos-plate-line {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 65px;
+  height: 42px;
+  border-left: 1px solid rgba(227,184,91,.7);
+  border-bottom: 1px solid rgba(227,184,91,.7);
+}
+
+.lifeos-plate-note {
+  position: absolute;
+  right: -8px;
+  bottom: -1px;
+  padding: 3px 6px;
+  background: #1a211c;
+  color: #d8cfba;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.lifeos-page-art {
+  opacity: .96 !important;
+}
+
+.lifeos-art-pane-a {
+  background: linear-gradient(145deg, rgba(62,143,140,.24), rgba(62,143,140,.03)) !important;
+  border-color: rgba(62,143,140,.35) !important;
+}
+
+.lifeos-art-pane-b {
+  background: linear-gradient(145deg, rgba(189,104,88,.20), rgba(199,149,67,.08)) !important;
+  border-color: rgba(189,104,88,.34) !important;
+}
+
+.lifeos-art-pane-c {
+  background: linear-gradient(145deg, rgba(86,59,92,.24), rgba(53,91,122,.08)) !important;
+  border-color: rgba(168,93,114,.34) !important;
+}
+
+.lifeos-art-caption {
+  color: #d8cfba !important;
+  border-color: rgba(227,184,91,.25) !important;
+  background: rgba(17,23,19,.72) !important;
+  backdrop-filter: blur(12px);
+}
+
+.lifeos-section-rule {
+  border-top-color: rgba(227,184,91,.13) !important;
+}
+
+/* Replace generic rectangular UI with material-rich specimens. */
+.lifeos-editorial .border-border,
+.lifeos-editorial [class*="border-border"] {
+  border-color: rgba(226,216,193,.16) !important;
+}
+
+.lifeos-editorial button {
+  transition:
+    transform .22s cubic-bezier(.2,.8,.2,1),
+    background-color .22s ease,
+    border-color .22s ease,
+    color .22s ease,
+    box-shadow .22s ease;
+}
+
+.lifeos-editorial button:hover {
+  border-color: rgba(227,184,91,.45) !important;
+}
+
+.lifeos-editorial input,
+.lifeos-editorial textarea,
+.lifeos-editorial select {
+  background: rgba(10,15,12,.52) !important;
+  border-color: rgba(226,216,193,.18) !important;
+  color: #eee7d8 !important;
+}
+
+.lifeos-editorial input:focus,
+.lifeos-editorial textarea:focus,
+.lifeos-editorial select:focus {
+  border-color: rgba(227,184,91,.62) !important;
+  box-shadow: 0 0 0 3px rgba(227,184,91,.08), 0 0 28px rgba(62,143,140,.08);
+}
+
+.lifeos-editorial select,
+.lifeos-editorial select option {
+  color: #eee7d8 !important;
+  background-color: #1c231e !important;
+}
+
+.lifeos-editorial ::selection {
+  background: rgba(189,104,88,.38);
+  color: #fff7e9;
+}
+
+/* A reusable specimen surface for future modules. */
+.lifeos-specimen-surface {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(232,223,203,.075), rgba(62,143,140,.035)),
+    rgba(18,23,19,.72);
+  border: 1px solid rgba(226,216,193,.15);
+  box-shadow: 0 16px 42px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.035);
+}
+
+.lifeos-specimen-surface::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(227,184,91,.075);
+  pointer-events: none;
+}
+
+.lifeos-colour-chip {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 0 12px rgba(255,255,255,.05);
+}
+
+.lifeos-botanical-rule {
+  position: relative;
+  height: 30px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.lifeos-botanical-rule::before {
+  content: "◜  ❧  ◝  ·  ◟  ❧  ◞";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(170,184,154,.62);
+  font-family: Georgia, serif;
+  font-size: 17px;
+  letter-spacing: .32em;
+}
+
+.lifeos-editorial .lifeos-list-row:hover,
+.lifeos-editorial .lifeos-selection:hover {
+  background:
+    linear-gradient(90deg, rgba(189,104,88,.09), rgba(62,143,140,.045), transparent) !important;
+  transform: translateX(3px);
+}
+
+@media (max-width: 900px) {
+  .lifeos-hero-plate { opacity: .55; right: -20px; transform: scale(.78) rotate(3deg); transform-origin: bottom right; }
+  .lifeos-hero h1 { max-width: 9ch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lifeos-editorial button,
+  .lifeos-editorial .lifeos-list-row,
+  .lifeos-editorial .lifeos-selection { transition: none; }
+}
