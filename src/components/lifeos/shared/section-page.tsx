@@ -55,8 +55,11 @@ export function SectionPage({
 }: SectionPageProps) {
   return (
     <div className="lifeos-editorial lifeos-atmosphere min-h-full">
-      <div className="mx-auto max-w-[1500px] px-7 py-8 sm:px-10 lg:px-14 lg:py-10">
-        <header className="lifeos-hero relative min-h-[11rem] overflow-visible border-b border-[color:var(--lifeos-line)] pb-7">
+      <div className="lifeos-cabinet-shell mx-auto max-w-[1540px] px-4 py-5 sm:px-7 lg:px-10 lg:py-8">
+        <div className="lifeos-mosaic-rail lifeos-mosaic-rail-top" aria-hidden="true">
+          {Array.from({ length: 18 }).map((_, index) => <span key={index} />)}
+        </div>
+        <header className="lifeos-hero relative min-h-[15rem] overflow-visible border-b border-[color:var(--lifeos-line)] pb-7">
           <div className="relative z-10 max-w-3xl">
             <p className="lifeos-kicker text-[10px] uppercase tracking-[0.3em]">{eyebrow}</p>
             <h1 className="mt-2 font-serif text-5xl tracking-[-0.045em] text-foreground lg:text-[5.2rem] lg:leading-[0.88]">
@@ -67,10 +70,28 @@ export function SectionPage({
             )}
           </div>
           <PageArtifact title={title} />
+          <div className="lifeos-hero-plate" aria-hidden="true">
+            <div className="lifeos-plate-image">
+              <img src={
+                title.toLowerCase().includes('research') ? 'https://images.unsplash.com/photo-1530210124550-912dc1381cb8?auto=format&fit=crop&w=900&q=80' :
+                title.toLowerCase().includes('house') ? 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80' :
+                title.toLowerCase().includes('studio') ? 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=80' :
+                title.toLowerCase().includes('explore') ? 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=900&q=80' :
+                title.toLowerCase().includes('archive') ? 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=900&q=80' :
+                title.toLowerCase().includes('atlas') ? 'https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=900&q=80' :
+                'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80'
+              } alt="" />
+            </div>
+            <span className="lifeos-plate-line" />
+            <span className="lifeos-plate-note">field material / 01</span>
+          </div>
         </header>
 
         <div className="lifeos-section-rule mt-9 pt-7 lg:mt-11 lg:pt-8">
           {children}
+        </div>
+        <div className="lifeos-mosaic-rail lifeos-mosaic-rail-bottom" aria-hidden="true">
+          {Array.from({ length: 18 }).map((_, index) => <span key={index} />)}
         </div>
       </div>
     </div>
