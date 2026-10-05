@@ -30,6 +30,8 @@ interface AppState {
   // Navigation
   activeModule: ModuleId
   setActiveModule: (module: ModuleId) => void
+  newNoteRequest: number
+  requestNewNote: () => void
   
   // Sidebar
   sidebarCollapsed: boolean
@@ -101,6 +103,8 @@ export const useAppStore = create<AppState>()(
     (set) => ({
       activeModule: 'home',
       setActiveModule: (module) => set({ activeModule: module }),
+      newNoteRequest: 0,
+      requestNewNote: () => set((state) => ({ newNoteRequest: state.newNoteRequest + 1 })),
       
       sidebarCollapsed: false,
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
