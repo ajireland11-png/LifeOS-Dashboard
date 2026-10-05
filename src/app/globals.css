@@ -3522,3 +3522,317 @@ select.lifeos-select option:hover {
   .lifeos-home-task { grid-template-columns:24px minmax(0,1fr) 16px; }
   .lifeos-home-task-date { display:none; }
 }
+
+
+/* HOME — quiet editorial dashboard */
+.lifeos-home-room {
+  --home-bg: #171816;
+  --home-surface: #1d1e1b;
+  --home-surface-2: #22231f;
+  --home-paper: #e8e0cf;
+  --home-muted: rgba(232,224,207,.54);
+  --home-faint: rgba(232,224,207,.30);
+  --home-line: rgba(232,224,207,.13);
+  background: var(--home-bg);
+  color: var(--home-paper);
+  overflow: hidden;
+  border-top: 1px solid var(--home-line);
+}
+.lifeos-home-header {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem 0 2.4rem;
+  border-bottom: 1px solid var(--home-line);
+  overflow: hidden;
+}
+.lifeos-home-header-photo {
+  position: absolute;
+  right: -2rem;
+  bottom: -4rem;
+  width: 43%;
+  height: 115%;
+  background-image:
+    linear-gradient(90deg, #171816 0%, rgba(23,24,22,.78) 20%, rgba(23,24,22,.08) 100%),
+    url("https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=90");
+  background-size: cover;
+  background-position: center;
+  opacity: .62;
+  filter: saturate(.72) contrast(1.04);
+}
+.lifeos-home-header-content { position: relative; z-index: 1; }
+.lifeos-home-clock {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(4.8rem, 10vw, 9rem);
+  font-weight: 400;
+  letter-spacing: -.065em;
+  line-height: .82;
+  color: #eee7d7;
+}
+.lifeos-home-date-large {
+  margin-top: 1.15rem;
+  color: rgba(232,224,207,.72);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+}
+.lifeos-home-header .lifeos-home-search {
+  position: relative;
+  z-index: 2;
+  width: min(300px, 35%);
+  margin-bottom: .25rem;
+  border-bottom: 1px solid rgba(232,224,207,.32);
+}
+.lifeos-home-header .lifeos-home-search input { color: #eee7d7 !important; }
+.lifeos-home-actions {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid var(--home-line);
+}
+.lifeos-home-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  min-height: 64px;
+  color: var(--home-muted);
+  border-right: 1px solid var(--home-line);
+  font-size: .72rem;
+  transition: background .2s ease, color .2s ease;
+}
+.lifeos-home-actions button:last-child { border-right: 0; }
+.lifeos-home-actions button:hover {
+  color: #eee7d7;
+  background: #22231f;
+}
+.lifeos-home-actions svg { color: rgba(200,180,145,.72); }
+
+.lifeos-home-dashboard {
+  display: grid;
+  grid-template-columns: 1.25fr 1.1fr .75fr;
+  gap: 1px;
+  margin-top: 2.2rem;
+  background: var(--home-line);
+  border: 1px solid var(--home-line);
+}
+.lifeos-home-dashboard > section {
+  min-width: 0;
+  padding: 1.45rem;
+  background: var(--home-surface);
+}
+.lifeos-home-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 54px;
+  margin-bottom: 1rem;
+}
+.lifeos-home-panel-head.compact { min-height: 42px; }
+.lifeos-home-panel-kicker {
+  display: block;
+  margin-bottom: .45rem;
+  color: rgba(200,180,145,.72);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+  letter-spacing: .2em;
+}
+.lifeos-home-panel-head h2 {
+  margin: 0;
+  color: #e9e1d1;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: -.02em;
+}
+.lifeos-home-panel-head > button {
+  flex: none;
+  color: var(--home-faint);
+  font-size: .65rem;
+}
+.lifeos-home-panel-head > button:hover { color: #e9e1d1; }
+.lifeos-home-today-count {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(200,180,145,.35);
+  border-radius: 50%;
+  color: #e8e0cf;
+  font-family: ui-monospace, monospace;
+  font-size: .72rem;
+}
+.lifeos-home-checklist button,
+.lifeos-home-focus-list button,
+.lifeos-home-next-list button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(0,1fr) 15px;
+  align-items: center;
+  gap: .75rem;
+  padding: .8rem .1rem;
+  text-align: left;
+  border-top: 1px solid var(--home-line);
+}
+.lifeos-home-checklist button:hover,
+.lifeos-home-focus-list button:hover,
+.lifeos-home-next-list button:hover {
+  background: rgba(232,224,207,.035);
+  padding-left: .45rem;
+}
+.lifeos-home-check {
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(232,224,207,.42);
+  border-radius: 50%;
+}
+.lifeos-home-checklist strong,
+.lifeos-home-focus-list strong,
+.lifeos-home-next-list strong,
+.lifeos-home-note-row strong {
+  display: block;
+  overflow: hidden;
+  color: #e7dfce;
+  font-size: .77rem;
+  font-weight: 450;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lifeos-home-checklist small,
+.lifeos-home-focus-list small,
+.lifeos-home-next-list small,
+.lifeos-home-note-row small {
+  display: block;
+  margin-top: .2rem;
+  overflow: hidden;
+  color: var(--home-muted);
+  font-size: .64rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lifeos-home-focus-image {
+  width: 34px;
+  height: 42px;
+  background:
+    linear-gradient(135deg, rgba(23,24,22,.1), rgba(23,24,22,.48)),
+    url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=240&q=82") center/cover;
+  filter: saturate(.55);
+}
+.lifeos-home-next-list button {
+  grid-template-columns: 52px minmax(0,1fr);
+}
+.lifeos-home-next-date {
+  color: rgba(200,180,145,.76);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .82rem;
+}
+.lifeos-home-empty,
+.lifeos-home-empty-action {
+  color: var(--home-muted);
+  font-size: .7rem;
+}
+.lifeos-home-empty-action {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: .85rem 0;
+  border-top: 1px solid var(--home-line);
+  text-align: left;
+}
+.lifeos-home-empty-action:hover { color: #e9e1d1; }
+
+.lifeos-home-lower-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 3.2rem;
+}
+.lifeos-home-note-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .75rem 0;
+  border-top: 1px solid var(--home-line);
+  text-align: left;
+}
+.lifeos-home-note-row:hover { padding-left: .4rem; background: rgba(232,224,207,.025); }
+.lifeos-home-find-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .55rem;
+}
+.lifeos-home-find-tile {
+  min-width: 0;
+  text-align: left;
+}
+.lifeos-home-find-tile:hover { transform: translateY(-2px); }
+.lifeos-home-find-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin-bottom: .55rem;
+  background-position: center;
+  background-size: cover;
+  filter: saturate(.7);
+  border: 1px solid var(--home-line);
+}
+.lifeos-home-find-explore { background-image: url("https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=360&q=86"); }
+.lifeos-home-find-studio { background-image: url("https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=360&q=86"); }
+.lifeos-home-find-tile strong {
+  display: block;
+  overflow: hidden;
+  color: #e7dfce;
+  font-size: .68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lifeos-home-find-tile small {
+  color: var(--home-muted);
+  font-size: .58rem;
+}
+.lifeos-home-bottom-actions {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 2.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--home-line);
+}
+.lifeos-home-bottom-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .55rem .75rem;
+  border: 1px solid var(--home-line);
+  color: var(--home-muted);
+  font-size: .65rem;
+}
+.lifeos-home-bottom-actions button:hover { color: #e9e1d1; border-color: rgba(232,224,207,.3); }
+.lifeos-home-bottom-actions > span {
+  margin-left: auto;
+  color: var(--home-faint);
+  font-family: ui-monospace, monospace;
+  font-size: .56rem;
+}
+
+@media (max-width: 900px) {
+  .lifeos-home-dashboard { grid-template-columns: 1fr; }
+  .lifeos-home-header-photo { width: 55%; }
+}
+@media (max-width: 650px) {
+  .lifeos-home-header { min-height: 270px; display: block; padding-top: 1.5rem; }
+  .lifeos-home-header-photo { width: 80%; opacity: .38; }
+  .lifeos-home-clock { font-size: clamp(4rem, 18vw, 6rem); }
+  .lifeos-home-header .lifeos-home-search { width: 100%; margin-top: 2rem; }
+  .lifeos-home-actions { grid-template-columns: repeat(3, 1fr); }
+  .lifeos-home-actions button:nth-child(3) { border-right: 0; }
+  .lifeos-home-lower-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .lifeos-home-find-grid { grid-template-columns: repeat(2, 1fr); }
+  .lifeos-home-bottom-actions { flex-wrap: wrap; }
+  .lifeos-home-bottom-actions > span { width: 100%; margin-left: 0; }
+}
