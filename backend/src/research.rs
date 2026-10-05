@@ -82,13 +82,13 @@ pub async fn create_paper(State(st): State<AppState>, Json(body): Json<Value>) -
     let title = str_or(&body, "title", "").trim().to_string();
     if title.is_empty() { return Err(AppError::BadRequest("title is required".into())); }
     let id = gen_id(); let now = now_ms();
-    sqlx::query("INSERT INTO ResearchPaper (id,title,authors,journal,year,doi,sourceUrl,abstract,scientificQuestion,background,mechanisms,interpretation,limitations,openQuestions,notes,figuresJson,tablesJson,archived,createdAt,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)")
+    sqlx::query("INSERT INTO ResearchPaper (id,title,authors,journal,year,doi,sourceUrl,abstract,scientificQuestion,background,mechanisms,interpretation,limitations,openQuestions,notes,figuresJson,tablesJson,archived,createdAt,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
         .bind(&id).bind(&title).bind(field(&body,"authors")).bind(field(&body,"journal"))
         .bind(body.get("year").and_then(|v| v.as_i64())).bind(field(&body,"doi")).bind(field(&body,"sourceUrl"))
         .bind(field(&body,"abstract")).bind(field(&body,"scientificQuestion")).bind(field(&body,"background"))
         .bind(field(&body,"mechanisms")).bind(field(&body,"interpretation")).bind(field(&body,"limitations"))
         .bind(field(&body,"openQuestions")).bind(field(&body,"notes")).bind(json_field(&body,"figures"))
-        .bind(json_field(&body,"tables")).bind(now).bind(now).execute(&st.db).await?;
+        .bind(json_field(&body,"tables")).bind(false).bind(now).bind(now).execute(&st.db).await?;
     let row=sqlx::query("SELECT * FROM ResearchPaper WHERE id=?").bind(&id).fetch_one(&st.db).await?;
     Ok((StatusCode::CREATED,Json(paper_from_row(&row)?)))
 }
