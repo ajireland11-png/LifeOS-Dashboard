@@ -153,7 +153,7 @@ export function ExplorePage() {
     <SectionPage
       eyebrow="Knowledge & discovery"
       title="Explore"
-      description="A living library for subjects you want to understand deeply, from science and history to crafts, cooking, languages and everything that catches your curiosity."
+      description=""
     >
       <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,340px)_1fr]">
         {/* Subject list + new subject */}
@@ -201,13 +201,13 @@ export function ExplorePage() {
 {loading ? (
             <p className="text-sm italic text-muted-foreground/80">Reading your library…</p>
           ) : subjects.length > 0 ? (
-            <div className="divide-y divide-white/10">
+            <div className="lifeos-specimen-grid">
               {subjects.map((subject) => (
                 <button
                   key={subject.id}
                   type="button"
                   onClick={() => setSelectedId(subject.id)}
-                  className={`group relative block w-full border-b border-[color:var(--lifeos-line)] py-4 pr-4 text-left transition-all ${
+                  className={`lifeos-specimen-card group relative block w-full border-[color:var(--lifeos-line)] p-5 text-left transition-all ${
                     subject.id === selectedId ? 'text-foreground' : 'text-foreground/65 hover:bg-white/[0.018] hover:pl-2 hover:text-foreground'
                   }`}
                 >
@@ -223,8 +223,7 @@ export function ExplorePage() {
             </div>
           ) : (
             <p className="text-sm leading-6 text-muted-foreground">
-              Nothing here yet — start a subject above. It can stay a single
-              paragraph, or grow into something much bigger over time.
+              <button type="button" onClick={() => document.querySelector<HTMLInputElement>('input[placeholder="Start a new subject…"]')?.focus()} className="text-sm text-muted-foreground hover:text-foreground">Begin a field note →</button>
             </p>
           )}
         </section>
