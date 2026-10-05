@@ -15,6 +15,7 @@ import {
   Wrench,
 } from "lucide-react"
 import { SectionPage } from "@/components/lifeos/shared/section-page"
+import { motion } from "framer-motion"
 import { useAppStore } from "@/stores/app-store"
 
 type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem" | "knowledge"
@@ -265,7 +266,9 @@ function AtlasLandscape({
         </p>
       </div>
 
-      <div className="relative aspect-[1.65] min-h-[360px] bg-[radial-gradient(circle_at_center,rgba(185,163,122,0.07),transparent_48%)]">
+      <div className="lifeos-atlas-mosaic relative aspect-[1.65] min-h-[360px] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(190,160,100,0.12),transparent_48%)]">
+        <div className="lifeos-atlas-bloom absolute -left-12 -top-16 h-52 w-52 rounded-full blur-3xl" aria-hidden="true" />
+        <div className="lifeos-atlas-bloom lifeos-atlas-bloom-2 absolute -bottom-20 right-0 h-64 w-64 rounded-full blur-3xl" aria-hidden="true" />
         <div className="absolute inset-[9%] rounded-full border border-dashed border-[color:var(--lifeos-line)]" />
         <div className="absolute inset-[22%] rounded-full border border-[color:var(--lifeos-line)] opacity-70" />
 
@@ -290,7 +293,7 @@ function AtlasLandscape({
           ))}
         </svg>
 
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 z-10">
           {positions.map(({ node, x, y }, index) => {
             const meta = palette[node.type]
             return (
@@ -620,7 +623,7 @@ export function AtlasPage() {
         </section>
 
         {/* Living knowledge layer */}
-        <section className="border-y border-[color:var(--lifeos-line)] py-10">
+        <section className="lifeos-paper relative border-y border-[color:var(--lifeos-line)] px-6 py-10 sm:px-8">
           <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr]">
             <div>
               <SectionLabel icon={Sparkles}>Living knowledge</SectionLabel>
@@ -746,7 +749,7 @@ export function AtlasPage() {
               Reading your atlas…
             </p>
           ) : visibleTags.length > 0 ? (
-            <div className="flex flex-wrap gap-x-7 gap-y-4">
+            <div className="lifeos-mosaic-type flex flex-wrap gap-x-7 gap-y-4">
               {visibleTags.map((tag) => (
                 <span
                   key={tag.id}
