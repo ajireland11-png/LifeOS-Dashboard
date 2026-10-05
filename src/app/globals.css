@@ -2965,3 +2965,449 @@ select.lifeos-select option:hover {
   .lifeos-editorial .lifeos-list-row,
   .lifeos-editorial .lifeos-selection { transition: none; }
 }
+
+
+/* HOME — personal desk / welcoming room */
+.lifeos-home-room {
+  --home-ink: #e9e1cf;
+  --home-muted: rgba(233,225,207,.58);
+  --home-line: rgba(233,225,207,.14);
+  position: relative;
+  overflow: hidden;
+}
+
+.lifeos-home-room::before {
+  content: "";
+  position: absolute;
+  left: -80px;
+  top: 20px;
+  width: 260px;
+  height: 260px;
+  border-radius: 48% 52% 57% 43%;
+  border: 1px solid rgba(170,184,154,.16);
+  box-shadow: 0 0 0 18px rgba(170,184,154,.025), 0 0 0 36px rgba(199,149,67,.018);
+  transform: rotate(-18deg);
+  pointer-events: none;
+}
+
+.lifeos-home-welcome {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  min-height: 180px;
+  padding: 2.4rem 2rem 2rem;
+  border: 1px solid rgba(227,184,91,.16);
+  background:
+    radial-gradient(circle at 13% 20%, rgba(170,184,154,.13), transparent 13rem),
+    linear-gradient(120deg, rgba(32,52,42,.7), rgba(24,29,24,.55));
+  box-shadow: 0 18px 50px rgba(0,0,0,.16);
+}
+
+.lifeos-home-welcome-copy {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+}
+
+.lifeos-home-sun {
+  display: block;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border-radius: 50% 46% 52% 48%;
+  background:
+    radial-gradient(circle at 38% 35%, #f2d58a 0 12%, #d8a854 13% 34%, rgba(189,104,88,.7) 35% 58%, transparent 59%),
+    conic-gradient(from 20deg, rgba(62,143,140,.65), rgba(227,184,91,.7), rgba(189,104,88,.65), rgba(62,143,140,.65));
+  box-shadow: 0 0 34px rgba(227,184,91,.14);
+  transform: rotate(8deg);
+}
+
+.lifeos-home-kicker {
+  margin: 0 0 .35rem;
+  color: #d5b86e;
+  font-size: 9px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+
+.lifeos-home-welcome h2 {
+  margin: 0;
+  color: var(--home-ink);
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: .95;
+}
+
+.lifeos-home-hint {
+  margin: .7rem 0 0;
+  max-width: 32rem;
+  color: var(--home-muted);
+  font-size: .82rem;
+}
+
+.lifeos-home-search {
+  display: flex;
+  width: min(100%, 270px);
+  align-items: center;
+  gap: .65rem;
+  padding: .65rem 0;
+  color: rgba(233,225,207,.52);
+  border-bottom: 1px solid rgba(227,184,91,.32);
+}
+
+.lifeos-home-search input {
+  min-width: 0;
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: .8rem;
+}
+
+.lifeos-home-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.lifeos-home-section-heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+}
+
+.lifeos-home-section-heading h3 {
+  margin: 0;
+  color: #e9e1cf;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: -.02em;
+}
+
+.lifeos-home-number {
+  color: #b6a67f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+}
+
+.lifeos-home-section-heading button,
+.lifeos-home-section-note {
+  color: rgba(233,225,207,.42);
+  font-size: .68rem;
+}
+
+.lifeos-home-section-heading button:hover {
+  color: #e3b85b;
+}
+
+.lifeos-home-next {
+  margin-top: 2rem;
+  padding: 1.2rem 0 0;
+  border-top: 1px solid rgba(227,184,91,.18);
+}
+
+.lifeos-home-task {
+  display: grid;
+  grid-template-columns: 34px minmax(0,1fr) auto 18px;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: .95rem .8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--home-line);
+  color: var(--home-ink);
+}
+
+.lifeos-home-task:hover {
+  background: linear-gradient(90deg, rgba(62,143,140,.1), rgba(189,104,88,.045), transparent);
+  transform: translateX(4px);
+}
+
+.lifeos-home-task-index {
+  color: rgba(227,184,91,.55);
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+}
+
+.lifeos-home-task-main,
+.lifeos-home-project span:nth-child(2),
+.lifeos-home-note span:nth-child(2),
+.lifeos-home-find span:nth-child(2) {
+  min-width: 0;
+}
+
+.lifeos-home-task strong,
+.lifeos-home-project strong,
+.lifeos-home-note strong,
+.lifeos-home-find strong {
+  display: block;
+  overflow: hidden;
+  color: #e9e1cf;
+  font-size: .84rem;
+  font-weight: 450;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lifeos-home-task small,
+.lifeos-home-project small,
+.lifeos-home-note small,
+.lifeos-home-find small {
+  display: block;
+  overflow: hidden;
+  margin-top: .25rem;
+  color: var(--home-muted);
+  font-size: .68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lifeos-home-task-date {
+  color: #b6a67f;
+  font-size: .68rem;
+}
+
+.lifeos-home-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, .75fr);
+  gap: 2rem;
+  margin-top: 4rem;
+}
+
+.lifeos-home-workbench-main {
+  padding: 1.4rem;
+  border: 1px solid rgba(226,216,193,.13);
+  background: rgba(15,22,17,.38);
+}
+
+.lifeos-home-projects {
+  display: grid;
+  gap: .5rem;
+}
+
+.lifeos-home-project {
+  display: grid;
+  grid-template-columns: 12px minmax(0,1fr) 16px;
+  align-items: center;
+  gap: .85rem;
+  padding: .95rem .75rem;
+  text-align: left;
+  border: 1px solid rgba(226,216,193,.08);
+  background: rgba(232,223,203,.025);
+}
+
+.lifeos-home-project:hover {
+  border-color: rgba(227,184,91,.3);
+  background: rgba(227,184,91,.045);
+  transform: translateY(-2px);
+}
+
+.lifeos-home-project-mark {
+  width: 8px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--lifeos-turquoise);
+}
+
+.lifeos-home-project-1 .lifeos-home-project-mark { background: var(--lifeos-coral); }
+.lifeos-home-project-2 .lifeos-home-project-mark { background: var(--lifeos-amber); }
+.lifeos-home-project-3 .lifeos-home-project-mark { background: var(--lifeos-rose); }
+
+.lifeos-home-navigation {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid rgba(62,143,140,.24);
+  background:
+    linear-gradient(145deg, rgba(62,143,140,.10), rgba(86,59,92,.08)),
+    rgba(15,22,17,.42);
+}
+
+.lifeos-home-navigation h3 {
+  margin: .45rem 0 1rem;
+  color: #e9e1cf;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+.lifeos-home-doors {
+  display: grid;
+  gap: .45rem;
+}
+
+.lifeos-home-door {
+  display: grid;
+  grid-template-columns: 22px minmax(0,1fr) auto;
+  align-items: center;
+  gap: .65rem;
+  padding: .72rem .7rem;
+  text-align: left;
+  border: 1px solid transparent;
+  background: rgba(255,255,255,.025);
+}
+
+.lifeos-home-door span {
+  color: #e9e1cf;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .92rem;
+}
+
+.lifeos-home-door small {
+  color: rgba(233,225,207,.4);
+  font-size: .62rem;
+}
+
+.lifeos-home-door:hover {
+  transform: translateX(4px);
+  border-color: rgba(227,184,91,.28);
+  background: rgba(255,255,255,.055);
+}
+
+.lifeos-home-door-green svg { color: var(--lifeos-sage); }
+.lifeos-home-door-rose svg { color: #d08aa0; }
+.lifeos-home-door-blue svg { color: #83b1cf; }
+.lifeos-home-door-ochre svg { color: #d9ad61; }
+
+.lifeos-home-lower {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 4rem;
+}
+
+.lifeos-home-notes,
+.lifeos-home-captures {
+  min-width: 0;
+}
+
+.lifeos-home-note,
+.lifeos-home-find {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem .2rem;
+  text-align: left;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.lifeos-home-note {
+  grid-template-columns: 10px minmax(0,1fr) 14px;
+}
+
+.lifeos-home-note-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lifeos-ochre);
+  box-shadow: 0 0 12px rgba(199,149,67,.3);
+}
+
+.lifeos-home-note:hover,
+.lifeos-home-find:hover {
+  padding-left: .5rem;
+  background: linear-gradient(90deg, rgba(189,104,88,.07), transparent);
+}
+
+.lifeos-home-find {
+  grid-template-columns: 42px minmax(0,1fr);
+}
+
+.lifeos-home-find-image {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  overflow: hidden;
+  border: 1px solid rgba(226,216,193,.2);
+  background: linear-gradient(135deg, rgba(62,143,140,.6), rgba(23,59,50,.8));
+}
+
+.lifeos-home-find-image::before,
+.lifeos-home-find-image::after,
+.lifeos-home-find-image span {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.lifeos-home-find-image::before {
+  width: 30px;
+  height: 45px;
+  left: 5px;
+  top: 4px;
+  background: rgba(170,184,154,.4);
+  transform: rotate(35deg);
+}
+
+.lifeos-home-find-image::after {
+  width: 18px;
+  height: 18px;
+  right: 4px;
+  bottom: 4px;
+  background: rgba(227,184,91,.65);
+}
+
+.lifeos-home-find-studio { background: linear-gradient(135deg, rgba(86,59,92,.85), rgba(168,93,114,.45)); }
+.lifeos-home-find-studio::before { background: rgba(208,138,160,.4); transform: rotate(-25deg); }
+
+.lifeos-home-empty {
+  padding: 1.2rem;
+  border: 1px dashed rgba(226,216,193,.15);
+  color: rgba(233,225,207,.48);
+  font-size: .75rem;
+}
+
+.lifeos-home-empty button {
+  margin-left: .4rem;
+  color: #d5b86e;
+}
+
+.lifeos-home-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2rem;
+  margin-top: 4rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(227,184,91,.14);
+  color: rgba(233,225,207,.4);
+  font-size: .65rem;
+}
+
+.lifeos-home-footer div {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: rgba(233,225,207,.62);
+}
+
+.lifeos-home-footer button:hover {
+  color: #e3b85b;
+}
+
+.lifeos-home-count {
+  margin-left: auto;
+  font-family: ui-monospace, monospace;
+  font-size: .58rem;
+  opacity: .65;
+}
+
+@media (max-width: 850px) {
+  .lifeos-home-welcome { align-items: flex-start; flex-direction: column; }
+  .lifeos-home-workbench,
+  .lifeos-home-lower { grid-template-columns: 1fr; }
+  .lifeos-home-count { margin-left: 0; width: 100%; }
+}
+
+@media (max-width: 560px) {
+  .lifeos-home-welcome { padding: 1.5rem; }
+  .lifeos-home-welcome-copy { align-items: flex-start; }
+  .lifeos-home-sun { width: 52px; height: 52px; flex-basis: 52px; }
+  .lifeos-home-task { grid-template-columns: 24px minmax(0,1fr) 16px; }
+  .lifeos-home-task-date { display: none; }
+}
