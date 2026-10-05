@@ -1,3 +1,10 @@
+one terminal needs "cd "C:\Dev\foundation\backend"" then "cargo run"
+one terminal needs "cd "C:\Dev\foundation""
+then  "Remove-Item -Recurse -Force .next" to clear current cache.
+then "git pull --rebase origin main" to draw new updates from GitHub repository
+then "bun run dev"
+
+
 <div align="center">
 
 <img src="public/logo.svg" alt="Life OS" width="112" height="112" />
