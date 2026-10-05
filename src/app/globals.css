@@ -2384,3 +2384,36 @@ body {
   .lifeos-specimen-grid { grid-template-columns: 1fr; }
   .lifeos-studio-grid .lifeos-specimen-card:nth-child(2n) { transform: none; }
 }
+
+/* ROOMS — Research laboratory */
+.lifeos-research-room { position:relative; min-height:32rem; padding:1rem 0 2rem; }
+.lifeos-research-intro { display:flex; align-items:center; gap:.7rem; color:rgba(232,226,213,.7); text-transform:uppercase; letter-spacing:.18em; font-size:10px; }
+.lifeos-research-rule { height:1px; flex:1; background:var(--lifeos-line); }
+.lifeos-research-intro small { color:rgba(232,226,213,.3); }
+.lifeos-research-shelves { display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:3rem; }
+.lifeos-research-shelf { position:relative; min-height:12rem; padding:1.3rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; border:1px solid rgba(235,226,207,.12); text-align:left; overflow:hidden; transition:transform 300ms cubic-bezier(.22,1,.36,1),box-shadow 300ms ease,border-color 300ms ease; }
+.lifeos-research-shelf:hover { transform:translateY(-5px) rotate(-.5deg); border-color:rgba(235,226,207,.25); box-shadow:0 24px 50px rgba(0,0,0,.2); }
+.lifeos-research-shelf strong { font:1.45rem/1.05 var(--font-serif); color:rgba(232,226,213,.9); }
+.lifeos-research-shelf-index { position:absolute; top:1rem; right:1rem; font-size:9px; letter-spacing:.16em; color:rgba(232,226,213,.28); }
+.lifeos-research-arrow { position:absolute; right:1.2rem; bottom:1.2rem; color:rgba(232,226,213,.45); }
+.lifeos-research-shelf-gold { background:linear-gradient(145deg,rgba(214,170,91,.2),rgba(25,26,23,.7)); }
+.lifeos-research-shelf-green { background:linear-gradient(145deg,rgba(121,153,132,.19),rgba(25,26,23,.7)); transform:translateY(1rem); }
+.lifeos-research-shelf-mauve { background:linear-gradient(145deg,rgba(154,113,155,.18),rgba(25,26,23,.7)); }
+.lifeos-research-shelf-terracotta { background:linear-gradient(145deg,rgba(194,126,101,.18),rgba(25,26,23,.7)); transform:translateY(1rem); }
+.lifeos-research-bottom { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--lifeos-line); display:flex; justify-content:space-between; gap:2rem; color:rgba(232,226,213,.4); font-size:11px; letter-spacing:.06em; }
+@media(max-width:700px){.lifeos-research-shelves{grid-template-columns:1fr}.lifeos-research-shelf-green,.lifeos-research-shelf-terracotta{transform:none}.lifeos-research-bottom{flex-direction:column}}
+
+/* ROOMS — Archive library stacks */
+.lifeos-archive-room { min-height:32rem; display:grid; grid-template-columns:4rem 1fr; gap:1.5rem; padding:1rem 0 2rem; }
+.lifeos-archive-spine { display:flex; flex-direction:column; align-items:center; gap:1rem; padding-top:1rem; color:rgba(232,226,213,.45); border-right:1px solid var(--lifeos-line); }
+.lifeos-archive-spine span { writing-mode:vertical-rl; letter-spacing:.3em; font-size:9px; }
+.lifeos-archive-shelves { display:grid; gap:.55rem; align-content:start; }
+.lifeos-archive-shelf { position:relative; min-height:6rem; display:flex; align-items:center; gap:1rem; padding:1rem 1.2rem; text-align:left; border-bottom:1px solid rgba(235,226,207,.1); transition:background 220ms ease,transform 260ms cubic-bezier(.22,1,.36,1); }
+.lifeos-archive-shelf:hover { background:rgba(255,255,255,.025); transform:translateX(6px); }
+.lifeos-archive-index { width:2rem; font-size:9px; color:rgba(232,226,213,.25); }
+.lifeos-archive-shelf strong { flex:1; font:1.35rem/1 var(--font-serif); color:rgba(232,226,213,.82); }
+.lifeos-archive-book { width:.55rem; height:3.2rem; border:1px solid rgba(235,226,207,.15); }
+.lifeos-archive-book-a { background:rgba(214,170,91,.18); transform:rotate(-3deg); }
+.lifeos-archive-book-b { background:rgba(121,153,132,.15); transform:rotate(4deg); margin-left:-.7rem; }
+.lifeos-archive-foot { grid-column:2; display:flex; gap:.7rem; align-items:center; padding-top:2rem; color:rgba(232,226,213,.4); font-size:11px; }
+@media(max-width:600px){.lifeos-archive-room{grid-template-columns:2.5rem 1fr}.lifeos-archive-spine span{display:none}}
