@@ -223,8 +223,18 @@ export function NotesPage() {
 
   useEffect(() => {
     if (newNoteRequest === 0) return
-    handleQuickNote()
-  }, [newNoteRequest, handleQuickNote])
+    createNoteMutation.mutate({
+      title: 'Quick Note',
+      type: 'note',
+      content: '',
+    }, {
+      onSuccess: (data) => {
+        const created = data as Record<string, unknown>
+        setSelectedNoteId(created.id as string)
+        showToast.success('Quick note created')
+      }
+    })
+  }, [newNoteRequest, createNoteMutation])
 
   const updateNoteContent = useCallback((id: string, content: string) => {
     updateNoteMutation.mutate({
