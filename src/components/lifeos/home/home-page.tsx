@@ -373,7 +373,7 @@ export function HomePage() {
       </div>
     </SectionPage>
   )
-
+}
 
 function NetworkIcon() {
   return (
