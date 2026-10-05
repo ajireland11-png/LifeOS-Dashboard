@@ -75,6 +75,7 @@ function sameDay(value: string | null | undefined, reference: Date): boolean {
 
 export function HomePage() {
   const setActiveModule = useAppStore((state) => state.setActiveModule)
+  const requestNewNote = useAppStore((state) => state.requestNewNote)
 
   const [projects, setProjects] = useState<LifeItem[]>([])
   const [notes, setNotes] = useState<LifeItem[]>([])
@@ -203,6 +204,21 @@ export function HomePage() {
 
   const searchTerm = search.trim().toLowerCase()
 
+  const searchResults = useMemo(() => {
+    if (!searchTerm) return []
+    const sources: Array<{ item: LifeItem; module: "projects" | "notes" | "tasks" | "explore" | "studio" }> = [
+      ...projects.map((item) => ({ item, module: "projects" as const })),
+      ...notes.map((item) => ({ item, module: "notes" as const })),
+      ...tasks.map((item) => ({ item, module: "tasks" as const })),
+      ...subjects.map((item) => ({ item, module: "explore" as const })),
+      ...studioItems.map((item) => ({ item, module: "studio" as const })),
+    ]
+    return sources
+      .filter(({ item }) => `${titleOf(item)} ${item.description || ""}`.toLowerCase().includes(searchTerm))
+      .sort((a, b) => dateValue(b.item) - dateValue(a.item))
+      .slice(0, 7)
+  }, [notes, projects, searchTerm, studioItems, subjects, tasks])
+
   const filteredProjects = useMemo(() => {
     if (!searchTerm) return activeProjects
     return activeProjects.filter((item) =>
@@ -231,20 +247,32 @@ export function HomePage() {
             <div className="lifeos-home-clock">{timeLabel}</div>
             <div className="lifeos-home-date-large">{dateLabel}</div>
           </div>
-          <label className="lifeos-home-search">
-            <Search size={16} strokeWidth={1.5} />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search projects…"
-              aria-label="Search your life"
-            />
-          </label>
+          <div className="lifeos-home-search-wrap">
+            <label className="lifeos-home-search">
+              <Search size={16} strokeWidth={1.5} />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search your life…"
+                aria-label="Search your life"
+              />
+            </label>
+            {searchTerm && (
+              <div className="lifeos-home-search-results">
+                {searchResults.length ? searchResults.map(({ item, module }) => (
+                  <button key={`${module}-${item.id}`} type="button" onClick={() => { setActiveModule(module); setSearch("") }}>
+                    <span><strong>{titleOf(item)}</strong><small>{module}</small></span>
+                    <ArrowUpRight size={14} />
+                  </button>
+                )) : <div className="lifeos-home-search-empty">Nothing found</div>}
+              </div>
+            )}
+          </div>
         </header>
 
         <nav className="lifeos-home-actions" aria-label="Home shortcuts">
           <button type="button" onClick={() => setActiveModule("tasks")}><CalendarDays size={18} /><span>Tasks</span></button>
-          <button type="button" onClick={() => setActiveModule("notes")}><BookOpen size={18} /><span>New note</span></button>
+          <button type="button" onClick={requestNewNote}><BookOpen size={18} /><span>New note</span></button>
           <button type="button" onClick={() => setActiveModule("explore")}><Compass size={18} /><span>Explore</span></button>
           <button type="button" onClick={() => setActiveModule("studio")}><Sparkles size={18} /><span>Studio</span></button>
           <button type="button" onClick={() => setActiveModule("atlas")}><NetworkIcon /><span>Atlas</span></button>
@@ -365,10 +393,9 @@ export function HomePage() {
         </section>
 
         <section className="lifeos-home-bottom-actions">
-          <button type="button" onClick={() => setActiveModule("archive")}><BookOpen size={17} /><span>Open Archive</span></button>
-          <button type="button" onClick={() => setActiveModule("atlas")}><NetworkIcon /><span>Browse Atlas</span></button>
-          <button type="button" onClick={() => setActiveModule("house")}><House size={17} /><span>Work on the house</span></button>
-          <span>{projects.length} projects · {notes.length} notes · {studioItems.length + subjects.length} collected</span>
+          <button type="button" onClick={() => setActiveModule("archive")}><BookOpen size={17} /><span>Archive</span></button>
+          <button type="button" onClick={() => setActiveModule("atlas")}><NetworkIcon /><span>Atlas</span></button>
+          <button type="button" onClick={() => setActiveModule("house")}><House size={17} /><span>House</span></button>
         </section>
       </div>
     </SectionPage>
