@@ -232,225 +232,131 @@ export function HomePage() {
     )
   }, [activeProjects, searchTerm])
 
-  return (
-    <SectionPage
-      eyebrow="Personal operating environment"
-      title="Home"
-      description=""
-    >
-      <div className="space-y-20 pb-16">
-        <section className="lifeos-paper relative border-y border-[color:var(--lifeos-line)] px-6 py-10 sm:px-8 sm:py-12">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="lifeos-home-specimen">
-                <div className="lifeos-home-specimen-mark" aria-hidden="true">
-                  <span /><span /><span /><span /><span />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/75">Today</p>
-                  <h2 className="mt-1 font-serif text-3xl tracking-[-0.025em] text-foreground sm:text-5xl">
-                    What needs you?
-                  </h2>
-                </div>
-              </div>
-            </div>
+  const dueToday = currentTasks.filter((task) => {
+    if (!task.dueDate) return false
+    const date = new Date(task.dueDate)
+    const now = new Date()
+    return date.toDateString() === now.toDateString()
+  })
 
-            <label className="flex w-full max-w-sm items-center gap-3 border-b border-[color:var(--lifeos-line)] pb-2">
-              <Search size={16} strokeWidth={1.5} className="text-muted-foreground/70" />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search…"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/55"
-              />
-            </label>
+  return (
+    <SectionPage eyebrow="Your personal space" title="Home" description="">
+      <div className="lifeos-home-room pb-16">
+        <section className="lifeos-home-welcome">
+          <div className="lifeos-home-welcome-copy">
+            <span className="lifeos-home-sun" aria-hidden="true" />
+            <div>
+              <p className="lifeos-home-kicker">Your desk · today</p>
+              <h2 className="font-serif">A place to begin.</h2>
+              <p className="lifeos-home-hint">Your active things, nearby thoughts, and next places to go.</p>
+            </div>
           </div>
+          <label className="lifeos-home-search">
+            <Search size={16} strokeWidth={1.5} />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Find something…"
+              aria-label="Find something"
+            />
+          </label>
         </section>
 
-        <section>
-          <SectionLabel icon={FolderKanban}>Active threads</SectionLabel>
+        <section className="lifeos-home-next">
+          <div className="lifeos-home-section-heading">
+            <div>
+              <span className="lifeos-home-number">01</span>
+              <h3>Next</h3>
+            </div>
+            <span className="lifeos-home-section-note">{dueToday.length ? `${dueToday.length} today` : "A clear view of what matters"}</span>
+          </div>
 
           {loading ? (
-            <p className="text-sm text-muted-foreground/80">Gathering your current threads…</p>
-          ) : filteredProjects.length === 0 ? (
-            <div className="border border-dashed border-[color:var(--lifeos-line)] px-6 py-8">
-              <HomeLink
-                icon={ArrowUpRight}
-                onClick={() => setActiveModule("projects")}
-              >
-                Open Projects
-              </HomeLink>
+            <div className="lifeos-home-empty">Opening your desk…</div>
+          ) : currentTasks.length === 0 ? (
+            <div className="lifeos-home-empty">
+              <span>Nothing pressing.</span>
+              <button type="button" onClick={() => setActiveModule("projects")}>Browse projects →</button>
             </div>
           ) : (
-            <div className="grid gap-x-10 gap-y-0 md:grid-cols-2">
-              {filteredProjects.map((project) => (
-                <HomeLink
-                  key={project.id}
-                  onClick={() => setActiveModule("projects")}
-                >
-                  <span>
-                    <span className="block">{titleOf(project)}</span>
-                    {project.description && (
-                      <span className="mt-1 block line-clamp-2 text-xs leading-5 text-muted-foreground/80">
-                        {project.description}
-                      </span>
-                    )}
+            <div className="lifeos-home-task-list">
+              {currentTasks.map((task, index) => (
+                <button key={task.id} type="button" onClick={() => setActiveModule("projects")} className="lifeos-home-task">
+                  <span className="lifeos-home-task-index">0{index + 1}</span>
+                  <span className="lifeos-home-task-main">
+                    <strong>{titleOf(task)}</strong>
+                    {task.description && <small>{task.description}</small>}
                   </span>
-                </HomeLink>
+                  {task.dueDate && <span className="lifeos-home-task-date">{new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(new Date(task.dueDate))}</span>}
+                  <ArrowUpRight size={15} strokeWidth={1.4} />
+                </button>
               ))}
             </div>
           )}
         </section>
 
-        <section className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <SectionLabel icon={Sparkles}>Recent discoveries</SectionLabel>
-
-            {recentNotes.length === 0 ? (
-              <button type="button" onClick={() => setActiveModule("explore")} className="text-sm text-muted-foreground transition-colors hover:text-foreground">Open your library →</button>
+        <section className="lifeos-home-workbench">
+          <div className="lifeos-home-workbench-main">
+            <div className="lifeos-home-section-heading">
+              <div><span className="lifeos-home-number">02</span><h3>In progress</h3></div>
+              <button type="button" onClick={() => setActiveModule("projects")}>See all →</button>
+            </div>
+            {filteredProjects.length === 0 ? (
+              <div className="lifeos-home-empty">No active projects. <button type="button" onClick={() => setActiveModule("projects")}>Start one →</button></div>
             ) : (
-              <div>
-                {recentNotes.map((note) => (
-                  <HomeLink
-                    key={note.id}
-                    onClick={() => setActiveModule("notes")}
-                  >
-                    <span>
-                      <span className="block">{titleOf(note)}</span>
-                      <span className="mt-1 block text-xs text-muted-foreground/70">
-                        {relativeDate(note)}
-                      </span>
-                    </span>
-                  </HomeLink>
+              <div className="lifeos-home-projects">
+                {filteredProjects.map((project, index) => (
+                  <button key={project.id} type="button" onClick={() => setActiveModule("projects")} className={`lifeos-home-project lifeos-home-project-${index % 4}`}>
+                    <span className="lifeos-home-project-mark" aria-hidden="true" />
+                    <span><strong>{titleOf(project)}</strong>{project.description && <small>{project.description}</small>}</span>
+                    <ArrowUpRight size={15} strokeWidth={1.4} />
+                  </button>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="lifeos-home-portals lg:col-span-1">
-            <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-portal lifeos-home-portal-green">
-              <Compass size={17} strokeWidth={1.3} />
-              <span>Explore</span>
-            </button>
-            <button type="button" onClick={() => setActiveModule("studio")} className="lifeos-home-portal lifeos-home-portal-mauve">
-              <Sparkles size={17} strokeWidth={1.3} />
-              <span>Studio</span>
-            </button>
-            <button type="button" onClick={() => setActiveModule("atlas")} className="lifeos-home-portal lifeos-home-portal-gold">
-              <NetworkIcon />
-              <span>Atlas</span>
-            </button>
+          <aside className="lifeos-home-navigation">
+            <span className="lifeos-home-number">03</span>
+            <h3>Go somewhere</h3>
+            <div className="lifeos-home-doors">
+              <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-door lifeos-home-door-green"><Compass size={17}/><span>Explore</span><small>Find & collect</small></button>
+              <button type="button" onClick={() => setActiveModule("studio")} className="lifeos-home-door lifeos-home-door-rose"><Sparkles size={17}/><span>Studio</span><small>Make & gather</small></button>
+              <button type="button" onClick={() => setActiveModule("atlas")} className="lifeos-home-door lifeos-home-door-blue"><NetworkIcon/><span>Atlas</span><small>Connect ideas</small></button>
+              <button type="button" onClick={() => setActiveModule("house")} className="lifeos-home-door lifeos-home-door-ochre"><House size={17}/><span>House</span><small>Shape your space</small></button>
+            </div>
+          </aside>
+        </section>
+
+        <section className="lifeos-home-lower">
+          <div className="lifeos-home-notes">
+            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">04</span><h3>Nearby thoughts</h3></div><button type="button" onClick={() => setActiveModule("notes")}>All notes →</button></div>
+            {recentNotes.length === 0 ? <button type="button" onClick={() => setActiveModule("notes")} className="lifeos-home-empty">No notes yet — open Notes →</button> : recentNotes.map((note) => (
+              <button key={note.id} type="button" onClick={() => setActiveModule("notes")} className="lifeos-home-note">
+                <span className="lifeos-home-note-dot" /><span><strong>{titleOf(note)}</strong><small>{relativeDate(note)}</small></span><ArrowUpRight size={14}/>
+              </button>
+            ))}
+          </div>
+
+          <div className="lifeos-home-captures">
+            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">05</span><h3>Recent finds</h3></div></div>
+            {recentlyCaptured.length === 0 ? <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-empty">Collect something →</button> : recentlyCaptured.map(({ item, origin }) => (
+              <button key={`${origin}-${item.id}`} type="button" onClick={() => setActiveModule(origin)} className="lifeos-home-find">
+                <span className={`lifeos-home-find-image lifeos-home-find-${origin}`}><span /></span>
+                <span><strong>{titleOf(item)}</strong><small>{origin === "explore" ? "Explore" : "Studio"} · {relativeDate(item)}</small></span>
+              </button>
+            ))}
           </div>
         </section>
 
-        <section>
-          <SectionLabel icon={Compass}>What is close at hand</SectionLabel>
-
-          {currentTasks.length === 0 ? (
-            <div className="border border-[color:var(--lifeos-line)] px-6 py-8">
-              <button type="button" onClick={() => setActiveModule("projects")} className="text-sm text-muted-foreground transition-colors hover:text-foreground">Open Projects →</button>
-            </div>
-          ) : (
-            <div className="grid gap-x-10 md:grid-cols-2">
-              {currentTasks.map((task) => (
-                <HomeLink
-                  key={task.id}
-                  onClick={() => setActiveModule("projects")}
-                >
-                  <span>
-                    <span className="block">{titleOf(task)}</span>
-                    {task.dueDate && (
-                      <span className="mt-1 block text-xs text-muted-foreground/70">
-                        {new Intl.DateTimeFormat(undefined, {
-                          weekday: "short",
-                          day: "numeric",
-                          month: "short",
-                        }).format(new Date(task.dueDate))}
-                      </span>
-                    )}
-                  </span>
-                </HomeLink>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section>
-          <SectionLabel icon={Flame}>Recently captured</SectionLabel>
-
-          {recentlyCaptured.length === 0 ? (
-            <button type="button" onClick={() => setActiveModule("studio")} className="text-sm text-muted-foreground transition-colors hover:text-foreground">Capture a spark →</button>
-          ) : (
-            <div className="grid gap-x-10 gap-y-0 md:grid-cols-2">
-              {recentlyCaptured.map(({ item, origin }) => (
-                <HomeLink
-                  key={`${origin}-${item.id}`}
-                  icon={origin === "explore" ? Compass : Sparkles}
-                  onClick={() => setActiveModule(origin)}
-                >
-                  <span>
-                    <span className="block">{titleOf(item)}</span>
-                    <span className="mt-1 block text-xs text-muted-foreground/70">
-                      {origin === "explore" ? "Explore" : "Studio"} · {relativeDate(item)}
-                    </span>
-                  </span>
-                </HomeLink>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="grid gap-0 border-y border-[color:var(--lifeos-line)] sm:grid-cols-3">
-          <button
-            type="button"
-            onClick={() => setActiveModule("atlas")}
-            className="lifeos-section-rule px-0 py-7 text-left transition-all hover:-translate-y-0.5 hover:opacity-80 sm:px-5 sm:py-9 sm:first:pl-0"
-          >
-            <NetworkIcon />
-            <h3 className="mt-4 text-base text-foreground/85">Atlas</h3>
-
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveModule("studio")}
-            className="text-left transition-opacity hover:opacity-60"
-          >
-            <Lightbulb size={18} strokeWidth={1.4} className="text-muted-foreground" />
-            <h3 className="mt-4 text-base text-foreground/85">Studio</h3>
-
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveModule("house")}
-            className="text-left transition-opacity hover:opacity-60"
-          >
-            <House size={18} strokeWidth={1.4} className="text-muted-foreground" />
-            <h3 className="mt-4 text-base text-foreground/85">House</h3>
-
-          </button>
-        </section>
-
-        <section className="border-t border-[color:var(--lifeos-line)] pt-8">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-xs text-muted-foreground/70">
-            <span>{projects.length} projects</span>
-            <span>{notes.length} notes</span>
-            <span>{tasks.length} tasks</span>
-            <span>{subjects.length} subjects</span>
-            <span>{studioItems.length} studio items</span>
-            <button
-              type="button"
-              onClick={() => setActiveModule("archive")}
-              className="inline-flex items-center gap-1 transition-colors hover:text-foreground/70"
-            >
-              <BookOpen size={13} strokeWidth={1.5} />
-              Your history remains in Archive
-            </button>
-          </div>
+        <section className="lifeos-home-footer">
+          <div><BookOpen size={15}/><span>Everything else can wait.</span></div>
+          <button type="button" onClick={() => setActiveModule("archive")}>Open Archive →</button>
+          <span className="lifeos-home-count">{projects.length} projects · {notes.length} notes · {studioItems.length + subjects.length} collected</span>
         </section>
       </div>
     </SectionPage>
+  )
   )
 }
 
