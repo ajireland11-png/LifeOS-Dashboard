@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import {
   ArrowUpRight,
   BookOpen,
+  CalendarDays,
   Compass,
   House,
   Search,
@@ -66,6 +67,12 @@ function relativeDate(item: LifeItem): string {
   }).format(date)
 }
 
+function sameDay(value: string | null | undefined, reference: Date): boolean {
+  if (!value) return false
+  const date = new Date(value)
+  return !Number.isNaN(date.getTime()) && date.toDateString() === reference.toDateString()
+}
+
 export function HomePage() {
   const setActiveModule = useAppStore((state) => state.setActiveModule)
 
@@ -76,6 +83,12 @@ export function HomePage() {
   const [studioItems, setStudioItems] = useState<LifeItem[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 1000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -167,6 +180,16 @@ export function HomePage() {
     [tasks],
   )
 
+  const todayTasks = useMemo(
+    () => currentTasks.filter((task) => sameDay(task.dueDate, now)),
+    [currentTasks, now],
+  )
+
+  const upcomingTasks = useMemo(
+    () => currentTasks.filter((task) => !sameDay(task.dueDate, now)).slice(0, 3),
+    [currentTasks, now],
+  )
+
   const recentlyCaptured = useMemo(
     () =>
       [
@@ -187,23 +210,29 @@ export function HomePage() {
     )
   }, [activeProjects, searchTerm])
 
-  const dueToday = currentTasks.filter((task) => {
-    if (!task.dueDate) return false
-    const date = new Date(task.dueDate)
-    const now = new Date()
-    return date.toDateString() === now.toDateString()
-  })
+  const dateLabel = new Intl.DateTimeFormat(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(now)
+
+  const timeLabel = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(now)
 
   return (
     <SectionPage eyebrow="Your personal space" title="Home" description="">
       <div className="lifeos-home-room pb-16">
         <section className="lifeos-home-welcome">
+          <div className="lifeos-home-welcome-image" aria-hidden="true" />
           <div className="lifeos-home-welcome-copy">
-            <span className="lifeos-home-sun" aria-hidden="true" />
             <div>
-              <p className="lifeos-home-kicker">Your desk · today</p>
+              <p className="lifeos-home-kicker">Your desk · {timeLabel}</p>
               <h2 className="font-serif">A place to begin.</h2>
-              <p className="lifeos-home-hint">Your active things, nearby thoughts, and next places to go.</p>
+              <p className="lifeos-home-date">{dateLabel}</p>
+              <p className="lifeos-home-hint">Your day, your active work, and the things worth noticing.</p>
             </div>
           </div>
           <label className="lifeos-home-search">
@@ -217,32 +246,65 @@ export function HomePage() {
           </label>
         </section>
 
-        <section className="lifeos-home-next">
-          <div className="lifeos-home-section-heading">
+        <section className="lifeos-home-today">
+          <div className="lifeos-home-today-heading">
             <div>
               <span className="lifeos-home-number">01</span>
-              <h3>Next</h3>
+              <div>
+                <p className="lifeos-home-kicker">Today</p>
+                <h3>What’s on</h3>
+              </div>
             </div>
-            <span className="lifeos-home-section-note">{dueToday.length ? `${dueToday.length} today` : "A clear view of what matters"}</span>
+            <CalendarDays size={19} strokeWidth={1.2} />
           </div>
 
           {loading ? (
             <div className="lifeos-home-empty">Opening your desk…</div>
-          ) : currentTasks.length === 0 ? (
-            <div className="lifeos-home-empty">
-              <span>Nothing pressing.</span>
-              <button type="button" onClick={() => setActiveModule("projects")}>Browse projects →</button>
+          ) : (
+            <div className="lifeos-home-today-grid">
+              <div className="lifeos-home-today-main">
+                <span className="lifeos-home-time">{timeLabel}</span>
+                <strong>{todayTasks.length ? `${todayTasks.length} thing${todayTasks.length === 1 ? "" : "s"} due today` : "A little room in the day"}</strong>
+                <small>{todayTasks.length ? "Your next actions are gathered below." : "No tasks are currently due today."}</small>
+              </div>
+              <div className="lifeos-home-today-list">
+                {todayTasks.length === 0 ? (
+                  <button type="button" onClick={() => setActiveModule("projects")}>Look through projects <ArrowUpRight size={14} /></button>
+                ) : (
+                  todayTasks.map((task) => (
+                    <button key={task.id} type="button" onClick={() => setActiveModule("projects")}>
+                      <span className="lifeos-home-today-dot" />
+                      <span><strong>{titleOf(task)}</strong>{task.description && <small>{task.description}</small>}</span>
+                      <ArrowUpRight size={14} />
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
+          )}
+        </section>
+
+        <section className="lifeos-home-next">
+          <div className="lifeos-home-section-heading">
+            <div>
+              <span className="lifeos-home-number">02</span>
+              <h3>Next</h3>
+            </div>
+            <span className="lifeos-home-section-note">Coming up</span>
+          </div>
+
+          {upcomingTasks.length === 0 ? (
+            <div className="lifeos-home-empty">Nothing else is pressing. Browse your projects when you’re ready.</div>
           ) : (
             <div className="lifeos-home-task-list">
-              {currentTasks.map((task, index) => (
+              {upcomingTasks.map((task, index) => (
                 <button key={task.id} type="button" onClick={() => setActiveModule("projects")} className="lifeos-home-task">
                   <span className="lifeos-home-task-index">0{index + 1}</span>
                   <span className="lifeos-home-task-main">
                     <strong>{titleOf(task)}</strong>
                     {task.description && <small>{task.description}</small>}
                   </span>
-                  {task.dueDate && <span className="lifeos-home-task-date">{new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(new Date(task.dueDate))}</span>}
+                  {task.dueDate && <span className="lifeos-home-task-date">{new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric", month: "short" }).format(new Date(task.dueDate))}</span>}
                   <ArrowUpRight size={15} strokeWidth={1.4} />
                 </button>
               ))}
@@ -253,7 +315,7 @@ export function HomePage() {
         <section className="lifeos-home-workbench">
           <div className="lifeos-home-workbench-main">
             <div className="lifeos-home-section-heading">
-              <div><span className="lifeos-home-number">02</span><h3>In progress</h3></div>
+              <div><span className="lifeos-home-number">03</span><h3>In progress</h3></div>
               <button type="button" onClick={() => setActiveModule("projects")}>See all →</button>
             </div>
             {filteredProjects.length === 0 ? (
@@ -272,7 +334,7 @@ export function HomePage() {
           </div>
 
           <aside className="lifeos-home-navigation">
-            <span className="lifeos-home-number">03</span>
+            <span className="lifeos-home-number">04</span>
             <h3>Go somewhere</h3>
             <div className="lifeos-home-doors">
               <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-door lifeos-home-door-green"><Compass size={17}/><span>Explore</span><small>Find & collect</small></button>
@@ -285,7 +347,7 @@ export function HomePage() {
 
         <section className="lifeos-home-lower">
           <div className="lifeos-home-notes">
-            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">04</span><h3>Nearby thoughts</h3></div><button type="button" onClick={() => setActiveModule("notes")}>All notes →</button></div>
+            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">05</span><h3>Nearby thoughts</h3></div><button type="button" onClick={() => setActiveModule("notes")}>All notes →</button></div>
             {recentNotes.length === 0 ? <button type="button" onClick={() => setActiveModule("notes")} className="lifeos-home-empty">No notes yet — open Notes →</button> : recentNotes.map((note) => (
               <button key={note.id} type="button" onClick={() => setActiveModule("notes")} className="lifeos-home-note">
                 <span className="lifeos-home-note-dot" /><span><strong>{titleOf(note)}</strong><small>{relativeDate(note)}</small></span><ArrowUpRight size={14}/>
@@ -294,7 +356,7 @@ export function HomePage() {
           </div>
 
           <div className="lifeos-home-captures">
-            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">05</span><h3>Recent finds</h3></div></div>
+            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">06</span><h3>Recent finds</h3></div></div>
             {recentlyCaptured.length === 0 ? <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-empty">Collect something →</button> : recentlyCaptured.map(({ item, origin }) => (
               <button key={`${origin}-${item.id}`} type="button" onClick={() => setActiveModule(origin)} className="lifeos-home-find">
                 <span className={`lifeos-home-find-image lifeos-home-find-${origin}`}><span /></span>
