@@ -160,7 +160,7 @@ export function StudioPage() {
     <SectionPage
       eyebrow="Ideas & making"
       title="Studio"
-      description="Your creative environment for inspiration, references, ideas, materials, techniques and things you might one day make. Nothing here has to become a task."
+      description=""
     >
       <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,340px)_1fr]">
         {/* List + new item */}
@@ -230,13 +230,13 @@ export function StudioPage() {
                    {visibleItems.length} {visibleItems.length === 1 ? 'piece' : 'pieces'}
                  </span>
                </div>
-               <div className="grid gap-4 sm:grid-cols-2">
+               <div className="lifeos-specimen-grid lifeos-studio-grid">
                  {visibleItems.slice(0, 4).map((item, index) => (
                    <button
                      key={item.id}
                      type="button"
                      onClick={() => setSelectedId(item.id)}
-                     className="group relative min-h-[130px] overflow-hidden border border-[color:var(--lifeos-line)] bg-white/[0.018] p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.035]"
+                     className="lifeos-specimen-card group relative min-h-[150px] overflow-hidden p-5 text-left transition-all duration-300"
                    >
                      <span className="absolute right-4 top-4 font-serif text-3xl text-foreground/[0.07]">{String(index + 1).padStart(2, '0')}</span>
                      <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground/60">{item.kind}</span>
