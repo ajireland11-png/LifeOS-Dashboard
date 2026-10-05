@@ -344,6 +344,7 @@ export function AtlasPage() {
   const [knowledgeSummary, setKnowledgeSummary] = useState("")
   const [knowledgeSaving, setKnowledgeSaving] = useState(false)
   const [knowledgeError, setKnowledgeError] = useState<string | null>(null)
+  const [knowledgeLoading, setKnowledgeLoading] = useState(true)
 
   // "Draw a connection" form state
   const [connectSource, setConnectSource] = useState("")
@@ -369,6 +370,30 @@ export function AtlasPage() {
   useEffect(() => {
     loadGraph()
   }, [loadGraph])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadKnowledge() {
+      setKnowledgeLoading(true)
+      try {
+        const response = await fetch("/api/atlas/knowledge")
+        if (!response.ok) throw new Error("Failed to load knowledge")
+        const data = (await response.json()) as KnowledgeItem[]
+        if (!cancelled) setKnowledge(data)
+      } catch {
+        if (!cancelled) setKnowledge([])
+      } finally {
+        if (!cancelled) setKnowledgeLoading(false)
+      }
+    }
+
+    loadKnowledge()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
 
   useEffect(() => {
     let cancelled = false
@@ -638,10 +663,23 @@ export function AtlasPage() {
                 </p>
               </div>
 
-              {knowledge.length > 0 && (
+              {knowledgeLoading ? (
+                <p className="mt-8 text-sm italic text-muted-foreground/70">Gathering the loose threads…</p>
+              ) : knowledge.length > 0 ? (
                 <div className="mt-9 grid gap-x-8 gap-y-0 sm:grid-cols-2">
-                  {knowledge.slice(0, 6).map((item) => (
-                    <div key={item.id} className="border-t border-[color:var(--lifeos-line)] py-4">
+                  {knowledge.slice(0, 8).map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="group relative border-t border-[color:var(--lifeos-line)] py-4 pl-4 transition-transform duration-300 hover:translate-x-1"
+                    >
+                      <span
+                        className="absolute left-0 top-5 h-8 w-px opacity-70"
+                        style={{
+                          background:
+                            ["#d7ad63", "#789b82", "#9a719b", "#c27e65", "#6f91a4", "#b9a37a"][index % 6],
+                        }}
+                        aria-hidden="true"
+                      />
                       <div className="flex items-baseline justify-between gap-4">
                         <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground/65">
                           {item.type}
@@ -657,6 +695,12 @@ export function AtlasPage() {
                       )}
                     </div>
                   ))}
+                </div>
+              ) : (
+                <div className="mt-8 border-t border-[color:var(--lifeos-line)] pt-6">
+                  <p className="max-w-md text-sm leading-6 text-muted-foreground">
+                    This is the place for questions, ideas, papers and inspirations that are still becoming something.
+                  </p>
                 </div>
               )}
             </div>
