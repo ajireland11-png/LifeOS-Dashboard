@@ -327,18 +327,19 @@ export function HomePage() {
             )}
           </div>
 
-          <div>
-            <SectionLabel icon={Lightbulb}>A place to return to</SectionLabel>
-            <div className="border-l border-[color:var(--lifeos-line)] pl-6">
-              <button
-                type="button"
-                onClick={() => setActiveModule("explore")}
-                className="mt-6 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Continue exploring
-                <ArrowUpRight size={14} strokeWidth={1.5} />
-              </button>
-            </div>
+          <div className="lifeos-home-portals lg:col-span-1">
+            <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-portal lifeos-home-portal-green">
+              <Compass size={17} strokeWidth={1.3} />
+              <span>Explore</span>
+            </button>
+            <button type="button" onClick={() => setActiveModule("studio")} className="lifeos-home-portal lifeos-home-portal-mauve">
+              <Sparkles size={17} strokeWidth={1.3} />
+              <span>Studio</span>
+            </button>
+            <button type="button" onClick={() => setActiveModule("atlas")} className="lifeos-home-portal lifeos-home-portal-gold">
+              <NetworkIcon />
+              <span>Atlas</span>
+            </button>
           </div>
         </section>
 
@@ -378,10 +379,7 @@ export function HomePage() {
           <SectionLabel icon={Flame}>Recently captured</SectionLabel>
 
           {recentlyCaptured.length === 0 ? (
-            <p className="text-sm leading-6 text-muted-foreground/80">
-              Subjects from Explore and sparks from Studio will show up here
-              as soon as you start capturing them.
-            </p>
+            <button type="button" onClick={() => setActiveModule("studio")} className="text-sm text-muted-foreground transition-colors hover:text-foreground">Capture a spark →</button>
           ) : (
             <div className="grid gap-x-10 gap-y-0 md:grid-cols-2">
               {recentlyCaptured.map(({ item, origin }) => (
