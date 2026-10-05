@@ -2321,3 +2321,66 @@ body {
 .lifeos-editorial a:hover {
   text-decoration-color: rgba(214,170,91,.5);
 }
+
+/* COLLECTIONS — living objects rather than database rows */
+.lifeos-specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+}
+.lifeos-specimen-card {
+  position: relative;
+  min-height: 10rem;
+  overflow: hidden;
+  border: 1px solid rgba(235,226,207,.11);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.055), transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(214,170,91,.09), transparent 45%),
+    rgba(25,26,23,.58);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+  isolation: isolate;
+}
+.lifeos-specimen-card::before {
+  content: "";
+  position: absolute;
+  width: 8rem; height: 8rem;
+  right: -2.8rem; bottom: -3.2rem;
+  border: 1px solid rgba(121,153,132,.22);
+  border-radius: 44% 56% 52% 48%;
+  transform: rotate(22deg);
+  z-index: -1;
+  transition: transform 450ms cubic-bezier(.22,1,.36,1);
+}
+.lifeos-specimen-card::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; width: 2px; height: 100%;
+  background: linear-gradient(rgba(214,170,91,.7), rgba(121,153,132,.5), rgba(154,113,155,.5));
+  opacity: .7;
+}
+.lifeos-specimen-card:hover {
+  transform: translateY(-4px) rotate(-.35deg);
+  border-color: rgba(235,226,207,.24);
+  box-shadow: 0 22px 48px rgba(0,0,0,.2);
+}
+.lifeos-specimen-card:hover::before { transform: rotate(42deg) scale(1.08); }
+.lifeos-specimen-number {
+  position: absolute;
+  top: .7rem; right: .8rem;
+  font: 10px/1 var(--font-geist-sans), sans-serif;
+  letter-spacing: .16em;
+  color: rgba(232,226,213,.26);
+}
+.lifeos-specimen-card .text-\[10px\] { color: rgba(214,170,91,.65); }
+.lifeos-studio-grid .lifeos-specimen-card:nth-child(2n) { transform: translateY(.55rem) rotate(.45deg); }
+.lifeos-studio-grid .lifeos-specimen-card:nth-child(3n) { background:
+  linear-gradient(145deg, rgba(154,113,155,.11), transparent 48%),
+  rgba(25,26,23,.58); }
+.lifeos-studio-grid .lifeos-specimen-card:nth-child(4n) { background:
+  linear-gradient(145deg, rgba(121,153,132,.11), transparent 48%),
+  rgba(25,26,23,.58); }
+.lifeos-studio-grid .lifeos-specimen-card:hover { transform: translateY(-4px) rotate(0); }
+@media (max-width: 720px) {
+  .lifeos-specimen-grid { grid-template-columns: 1fr; }
+  .lifeos-studio-grid .lifeos-specimen-card:nth-child(2n) { transform: none; }
+}
