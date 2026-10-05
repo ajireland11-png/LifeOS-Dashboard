@@ -192,7 +192,7 @@ export function ProjectsPage() {
     <SectionPage
       eyebrow="Things in motion"
       title="Projects"
-      description="Projects that have grown practical machinery — a goal, a deadline, real steps. Not everything needs to live here; an idea can stay in Studio until it does."
+      description=""
     >
       <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,340px)_1fr]">
         {/* List + new project */}
@@ -206,7 +206,7 @@ export function ProjectsPage() {
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="Start a new project…"
+              placeholder="New project…"
               className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground/55"
             />
             <button
