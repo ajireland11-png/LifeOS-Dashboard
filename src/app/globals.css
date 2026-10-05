@@ -2520,3 +2520,24 @@ select.lifeos-select option:hover {
   .lifeos-project-material { min-height: 22rem; }
   .lifeos-project-material::before { inset: 1rem; }
 }
+
+
+/* Readable native menus throughout Life OS. Browser option lists otherwise inherit
+   the OS white menu with low-contrast text. */
+.lifeos-editorial select,
+.lifeos-editorial select option {
+  color: #eee7d8;
+  background-color: #20211d;
+}
+.lifeos-editorial select {
+  color-scheme: dark;
+}
+.lifeos-editorial select option:checked {
+  color: #fff7e9;
+  background-color: #3a3b34;
+}
+.lifeos-editorial select:focus-visible {
+  outline: none;
+  border-color: rgba(214,170,91,.65);
+  box-shadow: 0 0 0 2px rgba(214,170,91,.10);
+}
