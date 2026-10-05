@@ -2294,3 +2294,30 @@ body {
 .lifeos-home-portal-gold { background: linear-gradient(145deg, rgba(214,170,91,.2), rgba(25,26,23,.72)); }
 .lifeos-home-portal span:last-child { font: 1.05rem/1 var(--font-serif); color: rgba(232,226,213,.9); }
 @media (max-width: 700px) { .lifeos-home-portals { grid-template-columns: 1fr; } .lifeos-home-portal-mauve { transform: none; } }
+
+/* Global cabinet atmosphere: every page is a room, not a SaaS dashboard */
+.lifeos-editorial::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  opacity: .24;
+  background:
+    linear-gradient(118deg, transparent 0 32%, rgba(214,170,91,.035) 32.2% 32.5%, transparent 32.7%),
+    linear-gradient(62deg, transparent 0 68%, rgba(121,153,132,.035) 68.2% 68.5%, transparent 68.7%),
+    radial-gradient(circle at 74% 18%, rgba(154,113,155,.045), transparent 16rem),
+    radial-gradient(circle at 18% 76%, rgba(194,126,101,.035), transparent 18rem);
+}
+.lifeos-editorial > * {
+  position: relative;
+  z-index: 0;
+}
+.lifeos-editorial button,
+.lifeos-editorial a {
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 220ms cubic-bezier(.22,1,.36,1);
+}
+.lifeos-editorial button:hover,
+.lifeos-editorial a:hover {
+  text-decoration-color: rgba(214,170,91,.5);
+}
