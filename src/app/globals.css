@@ -2553,3 +2553,91 @@ select.lifeos-select option:hover {
 .lifeos-dropzone{min-height:8rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;border:1px dashed rgba(214,170,91,.25);color:rgba(232,226,213,.4);font-size:10px;text-transform:uppercase;letter-spacing:.1em;transition:background .2s,border-color .2s}.lifeos-dropzone:hover{background:rgba(214,170,91,.06);border-color:rgba(214,170,91,.5)}.lifeos-dropzone strong{color:#d9c8a8;font-size:10px}.lifeos-dropzone span{font-size:8px;color:rgba(232,226,213,.25)}
 .lifeos-table-stack{display:flex;flex-direction:column;gap:.8rem}.lifeos-table-specimen{border:1px solid rgba(232,226,213,.1);background:rgba(255,255,255,.018);padding:.7rem}.lifeos-table-title{display:flex;gap:.5rem;margin-bottom:.55rem}.lifeos-table-title input{flex:1;background:transparent;color:#d8cebd;font:1rem Georgia,serif;outline:none}.lifeos-table-title button{color:rgba(232,226,213,.3)}.lifeos-mini-table{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid rgba(232,226,213,.08);border-left:1px solid rgba(232,226,213,.08)}.lifeos-mini-table input{min-width:0;border-right:1px solid rgba(232,226,213,.08);border-bottom:1px solid rgba(232,226,213,.08);background:transparent;padding:.45rem;color:#c9bfaf;font-size:9px;outline:none}.lifeos-add-module{display:flex;align-items:center;gap:.5rem;color:rgba(214,170,91,.75);font-size:10px;text-transform:uppercase;letter-spacing:.12em}.lifeos-lab-error{margin-top:1rem;color:#d8917c;font-size:11px}
 @media(max-width:950px){.lifeos-lab-layout{grid-template-columns:1fr}.lifeos-paper-shelf{border-right:0;border-bottom:1px solid rgba(232,226,213,.1);padding-right:0;max-height:15rem;overflow:auto}.lifeos-lab-bench{padding-left:0}.lifeos-paper-grid{grid-template-columns:1fr}}@media(max-width:600px){.lifeos-paper-header{flex-direction:column}.lifeos-paper-actions{order:-1}.lifeos-figure-grid{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   LIFE OS — visual system v2
+   Replace dashboard chrome with an editorial / cabinet atmosphere.
+   ========================================================= */
+.lifeos-atmosphere{
+  position:relative;
+  isolation:isolate;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(121,153,132,.075), transparent 30%),
+    radial-gradient(ellipse at 88% 12%, rgba(154,113,155,.075), transparent 27%),
+    radial-gradient(ellipse at 58% 92%, rgba(214,170,91,.045), transparent 32%),
+    #121311;
+}
+.lifeos-atmosphere::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.22;
+  background-image:
+    radial-gradient(rgba(235,226,207,.14) .55px, transparent .55px),
+    linear-gradient(115deg, transparent 0 49.7%, rgba(235,226,207,.025) 49.8% 50.2%, transparent 50.3%);
+  background-size:17px 17px, 100% 100%;
+  mix-blend-mode:screen;
+}
+.lifeos-hero{
+  min-height:15rem!important;
+  padding-top:1.5rem;
+}
+.lifeos-hero h1{
+  max-width:9ch;
+  text-shadow:0 1px 0 rgba(255,255,255,.03);
+}
+.lifeos-page-art{
+  width:min(42vw,31rem)!important;
+  height:15rem!important;
+  right:0!important;
+  top:-1rem!important;
+  opacity:.95!important;
+}
+.lifeos-page-art::before{
+  content:"";
+  position:absolute;
+  inset:18% 5% 4% 15%;
+  border:1px solid rgba(235,226,207,.08);
+  transform:skewY(-7deg);
+}
+.lifeos-page-art::after{
+  content:"";
+  position:absolute;
+  left:18%;
+  bottom:6%;
+  width:56%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(214,170,91,.55),transparent);
+}
+.lifeos-art-pane{
+  box-shadow:0 18px 60px rgba(0,0,0,.16);
+  backdrop-filter:blur(5px);
+}
+.lifeos-art-pane-a{background:linear-gradient(135deg,rgba(214,170,91,.13),rgba(214,170,91,.015))!important}
+.lifeos-art-pane-b{background:linear-gradient(135deg,rgba(121,153,132,.12),rgba(121,153,132,.015))!important}
+.lifeos-art-pane-c{background:linear-gradient(135deg,rgba(154,113,155,.12),rgba(154,113,155,.015))!important}
+.lifeos-art-caption{
+  background:rgba(18,19,17,.78)!important;
+  border-color:rgba(235,226,207,.14)!important;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+}
+.lifeos-section-rule{border-top-color:rgba(235,226,207,.07)!important}
+.lifeos-editorial button,.lifeos-editorial input,.lifeos-editorial textarea,.lifeos-editorial select{
+  transition-duration:180ms;
+}
+.lifeos-editorial button:focus-visible,
+.lifeos-editorial a:focus-visible,
+.lifeos-editorial input:focus-visible,
+.lifeos-editorial textarea:focus-visible,
+.lifeos-editorial select:focus-visible{
+  outline:1px solid rgba(214,170,91,.72);
+  outline-offset:3px;
+}
+@media(max-width:800px){
+  .lifeos-hero{min-height:12rem!important}
+  .lifeos-page-art{width:55vw!important;opacity:.5!important;transform:scale(.85);transform-origin:right top}
+  .lifeos-hero h1{max-width:11ch}
+}
