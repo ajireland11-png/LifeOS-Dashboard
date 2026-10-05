@@ -616,12 +616,14 @@ export function AtlasPage() {
         </section>
 
         {/* Atlas introduction */}
-        <section className="max-w-3xl">
+        <section className="lifeos-cabinet lifeos-glass-window max-w-4xl px-6 py-8 sm:px-8">
+          <div className="lifeos-colour-dash absolute left-0 right-0 top-0" aria-hidden="true" />
           <div className="flex items-start gap-5">
+            <div className="lifeos-flower hidden sm:block" aria-hidden="true" />
             <Network
               size={27}
               strokeWidth={1.2}
-              className="mt-1 shrink-0 text-muted-foreground"
+              className="mt-1 shrink-0 text-[color:var(--lifeos-accent)]"
             />
 
             <div>
