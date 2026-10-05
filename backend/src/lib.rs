@@ -22,6 +22,7 @@ mod notifications;
 mod pomodoro;
 mod prisma_dt;
 mod profile;
+mod research;
 mod projects;
 mod search;
 mod tags;
@@ -140,6 +141,17 @@ pub fn build_app(pool: SqlitePool) -> Router {
         .route(
             "/api/atlas/knowledge/{id}",
             patch(atlas::update_knowledge_item).delete(atlas::delete_knowledge_item),
+        )
+        // Research
+        .route(
+            "/api/research/papers",
+            get(research::list_papers).post(research::create_paper),
+        )
+        .route(
+            "/api/research/papers/{id}",
+            get(research::get_paper)
+                .patch(research::update_paper)
+                .delete(research::delete_paper),
         )
         // Explore
         .route(
