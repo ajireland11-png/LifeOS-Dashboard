@@ -242,11 +242,13 @@ export function HomePage() {
         <section className="lifeos-paper relative border-y border-[color:var(--lifeos-line)] px-6 py-10 sm:px-8 sm:py-12">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <div className="flex items-center gap-3">
-                <span className="lifeos-flower" aria-hidden="true" />
+              <div className="lifeos-home-specimen">
+                <div className="lifeos-home-specimen-mark" aria-hidden="true">
+                  <span /><span /><span /><span /><span />
+                </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/75">Today</p>
-                  <h2 className="mt-1 font-serif text-3xl tracking-[-0.02em] text-foreground sm:text-5xl">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/75">Today</p>
+                  <h2 className="mt-1 font-serif text-3xl tracking-[-0.025em] text-foreground sm:text-5xl">
                     What needs you?
                   </h2>
                 </div>
@@ -272,9 +274,6 @@ export function HomePage() {
             <p className="text-sm text-muted-foreground/80">Gathering your current threads…</p>
           ) : filteredProjects.length === 0 ? (
             <div className="border border-dashed border-[color:var(--lifeos-line)] px-6 py-8">
-              <p className="text-sm text-muted-foreground">
-                Nothing is currently marked as an active project.
-              </p>
               <HomeLink
                 icon={ArrowUpRight}
                 onClick={() => setActiveModule("projects")}
@@ -308,10 +307,7 @@ export function HomePage() {
             <SectionLabel icon={Sparkles}>Recent discoveries</SectionLabel>
 
             {recentNotes.length === 0 ? (
-              <p className="text-sm leading-6 text-muted-foreground/80">
-                Your recent notes and discoveries will appear here as Life OS
-                begins to accumulate your history.
-              </p>
+              <button type="button" onClick={() => setActiveModule("explore")} className="text-sm text-muted-foreground transition-colors hover:text-foreground">Open your library →</button>
             ) : (
               <div>
                 {recentNotes.map((note) => (
@@ -334,10 +330,6 @@ export function HomePage() {
           <div>
             <SectionLabel icon={Lightbulb}>A place to return to</SectionLabel>
             <div className="border-l border-[color:var(--lifeos-line)] pl-6">
-              <p className="text-lg font-light leading-8 text-foreground/70">
-                Explore is where curiosity can remain curiosity — something you
-                can follow deeply without turning every interest into a task.
-              </p>
               <button
                 type="button"
                 onClick={() => setActiveModule("explore")}
@@ -355,9 +347,7 @@ export function HomePage() {
 
           {currentTasks.length === 0 ? (
             <div className="border border-[color:var(--lifeos-line)] px-6 py-8">
-              <p className="text-sm text-muted-foreground">
-                There is nothing currently demanding attention here.
-              </p>
+              <button type="button" onClick={() => setActiveModule("projects")} className="text-sm text-muted-foreground transition-colors hover:text-foreground">Open Projects →</button>
             </div>
           ) : (
             <div className="grid gap-x-10 md:grid-cols-2">
@@ -420,9 +410,7 @@ export function HomePage() {
           >
             <NetworkIcon />
             <h3 className="mt-4 text-base text-foreground/85">Atlas</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              See the relationships between interests, things, questions and projects.
-            </p>
+
           </button>
 
           <button
@@ -432,9 +420,7 @@ export function HomePage() {
           >
             <Lightbulb size={18} strokeWidth={1.4} className="text-muted-foreground" />
             <h3 className="mt-4 text-base text-foreground/85">Studio</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Keep inspiration, ideas, materials and making close together.
-            </p>
+
           </button>
 
           <button
@@ -444,9 +430,7 @@ export function HomePage() {
           >
             <House size={18} strokeWidth={1.4} className="text-muted-foreground" />
             <h3 className="mt-4 text-base text-foreground/85">House</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Gradually connect the digital environment with the physical home.
-            </p>
+
           </button>
         </section>
 
