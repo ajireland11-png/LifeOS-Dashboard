@@ -194,10 +194,10 @@ export function ProjectsPage() {
       title="Projects"
       description=""
     >
-      <div className="grid gap-14 pb-20 lg:grid-cols-[minmax(0,340px)_1fr]">
+      <div className="lifeos-project-workshop grid gap-10 pb-20 lg:grid-cols-[minmax(0,300px)_1fr]">
         {/* List + new project */}
         <section>
-          <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="mb-4 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <FolderKanban size={14} strokeWidth={1.5} />
             Projects
           </div>
@@ -222,15 +222,17 @@ export function ProjectsPage() {
           {loading ? (
             <p className="text-sm italic text-muted-foreground/80">Reading your projects…</p>
           ) : projects.length > 0 ? (
-            <div className="divide-y divide-white/10">
+            <div className="lifeos-project-list">
               {projects.map((project) => (
                 <button
                   key={project.id}
                   type="button"
                   onClick={() => setSelectedId(project.id)}
-                  className={`block w-full py-3.5 text-left transition-colors ${
+                  className={`lifeos-project-item ${
                     project.id === selectedId ? 'text-foreground' : 'text-foreground/70 hover:text-foreground'
                   }`}
+                  style={{ ['--project-colour' as string]: project.color }}
+                  data-selected={project.id === selectedId}
                 >
                   <div className="flex items-center gap-2.5">
                     <span
@@ -245,7 +247,7 @@ export function ProjectsPage() {
                     </div>
                   )}
                   <div className="mt-1 pl-[18px] text-[10px] uppercase tracking-[0.12em] text-muted-foreground/55">
-                    {project.status} · {project._count.tasks} task{project._count.tasks === 1 ? '' : 's'}
+                    {project._count.tasks} task{project._count.tasks === 1 ? '' : 's'}
                   </div>
                 </button>
               ))}
@@ -259,12 +261,15 @@ export function ProjectsPage() {
         </section>
 
         {/* Detail / editor */}
-        <section className="border-t border-[color:var(--lifeos-line)] pt-10 lg:border-t-0 lg:border-l lg:pl-14 lg:pt-0">
+        <section className="lg:pl-4">
           {detailLoading ? (
             <p className="text-sm italic text-muted-foreground/80">Loading…</p>
           ) : detail ? (
-            <div>
-              <div className="flex items-start justify-between gap-4">
+            <div
+              className="lifeos-project-material p-7 sm:p-10"
+              style={{ ['--project-colour' as string]: editColor }}
+            >
+              <div className="relative z-10 flex items-start justify-between gap-4">
                 <input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
@@ -273,7 +278,7 @@ export function ProjectsPage() {
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="shrink-0 border-b border-[color:var(--lifeos-line)] bg-transparent pb-1 text-[12px] uppercase tracking-[0.1em] text-muted-foreground outline-none"
+                  className="lifeos-select shrink-0 border px-2.5 py-1.5 text-[11px] uppercase tracking-[0.1em] outline-none"
                 >
                   {STATUS_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -283,7 +288,7 @@ export function ProjectsPage() {
                 </select>
               </div>
 
-              <div className="mt-3 flex items-center gap-2">
+              <div className="relative z-10 mt-4 flex items-center gap-2">
                 {COLOR_OPTIONS.map((color) => (
                   <button
                     key={color}
@@ -298,15 +303,20 @@ export function ProjectsPage() {
                 ))}
               </div>
 
+              <div className="relative z-10 mt-7 flex items-center gap-4">
+                <div className="lifeos-project-mark">{editName.trim().slice(0,1).toUpperCase() || "P"}</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Project workshop</div>
+              </div>
+
               <textarea
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 placeholder="What is this project, and what does done look like?"
                 rows={4}
-                className="mt-6 w-full resize-y bg-transparent text-[15px] leading-7 outline-none placeholder:text-muted-foreground/55"
+                className="relative z-10 mt-7 w-full resize-y bg-transparent text-[15px] leading-7 outline-none placeholder:text-muted-foreground/55"
               />
 
-              <div className="mt-6 flex items-center gap-3 border-t border-[color:var(--lifeos-line)] pt-5">
+              <div className="relative z-10 mt-6 flex items-center gap-3 border-t border-[color:var(--lifeos-line)] pt-5">
                 <button
                   type="button"
                   onClick={handleSave}
@@ -334,15 +344,15 @@ export function ProjectsPage() {
               </div>
 
               {detail.tasks.length > 0 && (
-                <div className="mt-10 border-t border-[color:var(--lifeos-line)] pt-8">
+                <div className="relative z-10 mt-10 border-t border-[color:var(--lifeos-line)] pt-8">
                   <div className="mb-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                     Tasks
                   </div>
-                  <div className="divide-y divide-white/10">
+                  <div>
                     {detail.tasks.map((task) => {
                       const done = task.status === 'done' || task.status === 'completed'
                       return (
-                        <div key={task.id} className="flex items-center gap-3 py-2.5">
+                        <div key={task.id} className="lifeos-project-task">
                           {done ? (
                             <CheckCircle2 size={15} strokeWidth={1.5} className="shrink-0 text-muted-foreground/70" />
                           ) : (
@@ -362,11 +372,11 @@ export function ProjectsPage() {
               )}
 
               {detail.goals.length > 0 && (
-                <div className="mt-8 flex flex-wrap gap-2">
+                <div className="relative z-10 mt-8 flex flex-wrap gap-2">
                   {detail.goals.map((g) => (
                     <span
                       key={g.id}
-                      className="rounded-full border border-black/15 px-3 py-1 text-xs text-muted-foreground"
+                      className="border border-white/15 px-3 py-1 text-xs text-muted-foreground"
                     >
                       {g.goal.title}
                     </span>
