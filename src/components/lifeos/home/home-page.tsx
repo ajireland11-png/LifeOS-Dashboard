@@ -236,22 +236,21 @@ export function HomePage() {
     <SectionPage
       eyebrow="Personal operating environment"
       title="Home"
-      description="A quiet view of what is alive in your world — the things you are working on, learning, noticing, and returning to."
+      description=""
     >
       <div className="space-y-20 pb-16">
         <section className="lifeos-paper relative border-y border-[color:var(--lifeos-line)] px-6 py-10 sm:px-8 sm:py-12">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
-                The present
-              </p>
-              <h2 className="font-serif text-3xl tracking-[-0.02em] text-foreground sm:text-5xl">
-                Your life, without the dashboard noise.
-              </h2>
-              <p className="mt-4 max-w-xl text-[15px] leading-7 text-muted-foreground">
-                Home is not a command centre for every minute of the day. It is
-                the place where the different parts of Life OS briefly meet.
-              </p>
+              <div className="flex items-center gap-3">
+                <span className="lifeos-flower" aria-hidden="true" />
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/75">Today</p>
+                  <h2 className="mt-1 font-serif text-3xl tracking-[-0.02em] text-foreground sm:text-5xl">
+                    What needs you?
+                  </h2>
+                </div>
+              </div>
             </div>
 
             <label className="flex w-full max-w-sm items-center gap-3 border-b border-[color:var(--lifeos-line)] pb-2">
@@ -259,7 +258,7 @@ export function HomePage() {
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Find something in your current world"
+                placeholder="Search…"
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/55"
               />
             </label>
