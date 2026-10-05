@@ -2264,3 +2264,33 @@ body {
 .lifeos-home-specimen-mark span:nth-child(5) { grid-column: 2; grid-row: 3; }
 .lifeos-home-specimen:hover .lifeos-home-specimen-mark { transform: rotate(-2deg) scale(1.03); }
 .lifeos-home-specimen-mark { transition: transform 360ms cubic-bezier(.22,1,.36,1); }
+
+.lifeos-home-portals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: .65rem;
+}
+.lifeos-home-portal {
+  position: relative;
+  min-height: 8.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  text-align: left;
+  overflow: hidden;
+  border: 1px solid rgba(235,226,207,.12);
+  transition: transform 260ms cubic-bezier(.22,1,.36,1), box-shadow 260ms ease, border-color 260ms ease;
+}
+.lifeos-home-portal::after {
+  content: "";
+  position: absolute;
+  width: 7rem; height: 7rem; right: -2rem; bottom: -3rem;
+  border: 1px solid rgba(255,255,255,.15); border-radius: 50%;
+}
+.lifeos-home-portal:hover { transform: translateY(-4px) rotate(-1deg); border-color: rgba(235,226,207,.25); box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+.lifeos-home-portal-green { background: linear-gradient(145deg, rgba(121,153,132,.22), rgba(25,26,23,.72)); }
+.lifeos-home-portal-mauve { background: linear-gradient(145deg, rgba(154,113,155,.2), rgba(25,26,23,.72)); transform: translateY(.65rem); }
+.lifeos-home-portal-gold { background: linear-gradient(145deg, rgba(214,170,91,.2), rgba(25,26,23,.72)); }
+.lifeos-home-portal span:last-child { font: 1.05rem/1 var(--font-serif); color: rgba(232,226,213,.9); }
+@media (max-width: 700px) { .lifeos-home-portals { grid-template-columns: 1fr; } .lifeos-home-portal-mauve { transform: none; } }
