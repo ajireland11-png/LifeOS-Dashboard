@@ -223,158 +223,157 @@ export function HomePage() {
   }).format(now)
 
   return (
-    <SectionPage eyebrow="Your personal space" title="Home" description="">
-      <div className="lifeos-home-room pb-16">
-        <section className="lifeos-home-welcome">
-          <div className="lifeos-home-welcome-image" aria-hidden="true" />
-          <div className="lifeos-home-welcome-copy">
-            <div>
-              <p className="lifeos-home-kicker">Your desk · {timeLabel}</p>
-              <h2 className="font-serif">A place to begin.</h2>
-              <p className="lifeos-home-date">{dateLabel}</p>
-              <p className="lifeos-home-hint">Your day, your active work, and the things worth noticing.</p>
-            </div>
+    <SectionPage eyebrow="Personal dashboard" title="Home" description="">
+      <div className="lifeos-home-room pb-12">
+        <header className="lifeos-home-header">
+          <div className="lifeos-home-header-photo" aria-hidden="true" />
+          <div className="lifeos-home-header-content">
+            <div className="lifeos-home-clock">{timeLabel}</div>
+            <div className="lifeos-home-date-large">{dateLabel}</div>
           </div>
           <label className="lifeos-home-search">
             <Search size={16} strokeWidth={1.5} />
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Find something…"
-              aria-label="Find something"
+              placeholder="Search your life…"
+              aria-label="Search your life"
             />
           </label>
-        </section>
+        </header>
 
-        <section className="lifeos-home-today">
-          <div className="lifeos-home-today-heading">
-            <div>
-              <span className="lifeos-home-number">01</span>
+        <nav className="lifeos-home-actions" aria-label="Home shortcuts">
+          <button type="button" onClick={() => setActiveModule("tasks")}><CalendarDays size={18} /><span>Tasks</span></button>
+          <button type="button" onClick={() => setActiveModule("notes")}><BookOpen size={18} /><span>New note</span></button>
+          <button type="button" onClick={() => setActiveModule("explore")}><Compass size={18} /><span>Explore</span></button>
+          <button type="button" onClick={() => setActiveModule("studio")}><Sparkles size={18} /><span>Studio</span></button>
+          <button type="button" onClick={() => setActiveModule("atlas")}><NetworkIcon /><span>Atlas</span></button>
+          <button type="button" onClick={() => setActiveModule("house")}><House size={18} /><span>House</span></button>
+        </nav>
+
+        <main className="lifeos-home-dashboard">
+          <section className="lifeos-home-today-panel">
+            <div className="lifeos-home-panel-head">
               <div>
-                <p className="lifeos-home-kicker">Today</p>
-                <h3>What’s on</h3>
+                <span className="lifeos-home-panel-kicker">TODAY</span>
+                <h2>What needs your attention?</h2>
               </div>
+              <span className="lifeos-home-today-count">{todayTasks.length}</span>
             </div>
-            <CalendarDays size={19} strokeWidth={1.2} />
-          </div>
-
-          {loading ? (
-            <div className="lifeos-home-empty">Opening your desk…</div>
-          ) : (
-            <div className="lifeos-home-today-grid">
-              <div className="lifeos-home-today-main">
-                <span className="lifeos-home-time">{timeLabel}</span>
-                <strong>{todayTasks.length ? `${todayTasks.length} thing${todayTasks.length === 1 ? "" : "s"} due today` : "A little room in the day"}</strong>
-                <small>{todayTasks.length ? "Your next actions are gathered below." : "No tasks are currently due today."}</small>
-              </div>
-              <div className="lifeos-home-today-list">
-                {todayTasks.length === 0 ? (
-                  <button type="button" onClick={() => setActiveModule("projects")}>Look through projects <ArrowUpRight size={14} /></button>
-                ) : (
-                  todayTasks.map((task) => (
-                    <button key={task.id} type="button" onClick={() => setActiveModule("projects")}>
-                      <span className="lifeos-home-today-dot" />
-                      <span><strong>{titleOf(task)}</strong>{task.description && <small>{task.description}</small>}</span>
-                      <ArrowUpRight size={14} />
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-        </section>
-
-        <section className="lifeos-home-next">
-          <div className="lifeos-home-section-heading">
-            <div>
-              <span className="lifeos-home-number">02</span>
-              <h3>Next</h3>
-            </div>
-            <span className="lifeos-home-section-note">Coming up</span>
-          </div>
-
-          {upcomingTasks.length === 0 ? (
-            <div className="lifeos-home-empty">Nothing else is pressing. Browse your projects when you’re ready.</div>
-          ) : (
-            <div className="lifeos-home-task-list">
-              {upcomingTasks.map((task, index) => (
-                <button key={task.id} type="button" onClick={() => setActiveModule("projects")} className="lifeos-home-task">
-                  <span className="lifeos-home-task-index">0{index + 1}</span>
-                  <span className="lifeos-home-task-main">
-                    <strong>{titleOf(task)}</strong>
-                    {task.description && <small>{task.description}</small>}
-                  </span>
-                  {task.dueDate && <span className="lifeos-home-task-date">{new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric", month: "short" }).format(new Date(task.dueDate))}</span>}
-                  <ArrowUpRight size={15} strokeWidth={1.4} />
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="lifeos-home-workbench">
-          <div className="lifeos-home-workbench-main">
-            <div className="lifeos-home-section-heading">
-              <div><span className="lifeos-home-number">03</span><h3>In progress</h3></div>
-              <button type="button" onClick={() => setActiveModule("projects")}>See all →</button>
-            </div>
-            {filteredProjects.length === 0 ? (
-              <div className="lifeos-home-empty">No active projects. <button type="button" onClick={() => setActiveModule("projects")}>Start one →</button></div>
-            ) : (
-              <div className="lifeos-home-projects">
-                {filteredProjects.map((project, index) => (
-                  <button key={project.id} type="button" onClick={() => setActiveModule("projects")} className={`lifeos-home-project lifeos-home-project-${index % 4}`}>
-                    <span className="lifeos-home-project-mark" aria-hidden="true" />
-                    <span><strong>{titleOf(project)}</strong>{project.description && <small>{project.description}</small>}</span>
-                    <ArrowUpRight size={15} strokeWidth={1.4} />
+            {loading ? (
+              <div className="lifeos-home-empty">Loading your day…</div>
+            ) : todayTasks.length ? (
+              <div className="lifeos-home-checklist">
+                {todayTasks.map((task) => (
+                  <button key={task.id} type="button" onClick={() => setActiveModule("tasks")}>
+                    <span className="lifeos-home-check" />
+                    <span><strong>{titleOf(task)}</strong>{task.description && <small>{task.description}</small>}</span>
+                    <ArrowUpRight size={15} />
                   </button>
                 ))}
               </div>
+            ) : (
+              <button type="button" className="lifeos-home-empty-action" onClick={() => setActiveModule("tasks")}>
+                <span>No tasks due today.</span><ArrowUpRight size={15} />
+              </button>
+            )}
+          </section>
+
+          <section className="lifeos-home-focus-panel">
+            <div className="lifeos-home-panel-head">
+              <div>
+                <span className="lifeos-home-panel-kicker">IN PROGRESS</span>
+                <h2>What are you working on?</h2>
+              </div>
+              <button type="button" onClick={() => setActiveModule("projects")}>All projects →</button>
+            </div>
+            {filteredProjects.length ? (
+              <div className="lifeos-home-focus-list">
+                {filteredProjects.map((project) => (
+                  <button key={project.id} type="button" onClick={() => setActiveModule("projects")}>
+                    <span className="lifeos-home-focus-image" aria-hidden="true" />
+                    <span><strong>{titleOf(project)}</strong>{project.description && <small>{project.description}</small>}</span>
+                    <ArrowUpRight size={15} />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button type="button" className="lifeos-home-empty-action" onClick={() => setActiveModule("projects")}>
+                <span>Start or open a project.</span><ArrowUpRight size={15} />
+              </button>
+            )}
+          </section>
+
+          <section className="lifeos-home-next-panel">
+            <div className="lifeos-home-panel-head">
+              <div>
+                <span className="lifeos-home-panel-kicker">UP NEXT</span>
+                <h2>Coming up</h2>
+              </div>
+            </div>
+            {upcomingTasks.length ? (
+              <div className="lifeos-home-next-list">
+                {upcomingTasks.map((task) => (
+                  <button key={task.id} type="button" onClick={() => setActiveModule("tasks")}>
+                    <span className="lifeos-home-next-date">
+                      {task.dueDate ? new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(new Date(task.dueDate)) : "—"}
+                    </span>
+                    <span><strong>{titleOf(task)}</strong>{task.description && <small>{task.description}</small>}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="lifeos-home-empty">Nothing else is pressing.</div>
+            )}
+          </section>
+        </main>
+
+        <section className="lifeos-home-lower-grid">
+          <div>
+            <div className="lifeos-home-panel-head compact">
+              <div><span className="lifeos-home-panel-kicker">RECENT NOTES</span><h2>Nearby thoughts</h2></div>
+              <button type="button" onClick={() => setActiveModule("notes")}>Notes →</button>
+            </div>
+            {recentNotes.length ? recentNotes.map((note) => (
+              <button key={note.id} type="button" onClick={() => setActiveModule("notes")} className="lifeos-home-note-row">
+                <span><strong>{titleOf(note)}</strong><small>{relativeDate(note)}</small></span><ArrowUpRight size={14} />
+              </button>
+            )) : (
+              <button type="button" className="lifeos-home-empty-action" onClick={() => setActiveModule("notes")}>Write a note →</button>
             )}
           </div>
 
-          <aside className="lifeos-home-navigation">
-            <span className="lifeos-home-number">04</span>
-            <h3>Go somewhere</h3>
-            <div className="lifeos-home-doors">
-              <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-door lifeos-home-door-green"><Compass size={17}/><span>Explore</span><small>Find & collect</small></button>
-              <button type="button" onClick={() => setActiveModule("studio")} className="lifeos-home-door lifeos-home-door-rose"><Sparkles size={17}/><span>Studio</span><small>Make & gather</small></button>
-              <button type="button" onClick={() => setActiveModule("atlas")} className="lifeos-home-door lifeos-home-door-blue"><NetworkIcon/><span>Atlas</span><small>Connect ideas</small></button>
-              <button type="button" onClick={() => setActiveModule("house")} className="lifeos-home-door lifeos-home-door-ochre"><House size={17}/><span>House</span><small>Shape your space</small></button>
+          <div>
+            <div className="lifeos-home-panel-head compact">
+              <div><span className="lifeos-home-panel-kicker">RECENTLY FOUND</span><h2>Things you've collected</h2></div>
+              <button type="button" onClick={() => setActiveModule("explore")}>Explore →</button>
             </div>
-          </aside>
-        </section>
-
-        <section className="lifeos-home-lower">
-          <div className="lifeos-home-notes">
-            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">05</span><h3>Nearby thoughts</h3></div><button type="button" onClick={() => setActiveModule("notes")}>All notes →</button></div>
-            {recentNotes.length === 0 ? <button type="button" onClick={() => setActiveModule("notes")} className="lifeos-home-empty">No notes yet — open Notes →</button> : recentNotes.map((note) => (
-              <button key={note.id} type="button" onClick={() => setActiveModule("notes")} className="lifeos-home-note">
-                <span className="lifeos-home-note-dot" /><span><strong>{titleOf(note)}</strong><small>{relativeDate(note)}</small></span><ArrowUpRight size={14}/>
-              </button>
-            ))}
-          </div>
-
-          <div className="lifeos-home-captures">
-            <div className="lifeos-home-section-heading"><div><span className="lifeos-home-number">06</span><h3>Recent finds</h3></div></div>
-            {recentlyCaptured.length === 0 ? <button type="button" onClick={() => setActiveModule("explore")} className="lifeos-home-empty">Collect something →</button> : recentlyCaptured.map(({ item, origin }) => (
-              <button key={`${origin}-${item.id}`} type="button" onClick={() => setActiveModule(origin)} className="lifeos-home-find">
-                <span className={`lifeos-home-find-image lifeos-home-find-${origin}`}><span /></span>
-                <span><strong>{titleOf(item)}</strong><small>{origin === "explore" ? "Explore" : "Studio"} · {relativeDate(item)}</small></span>
-              </button>
-            ))}
+            {recentlyCaptured.length ? (
+              <div className="lifeos-home-find-grid">
+                {recentlyCaptured.slice(0, 4).map(({ item, origin }) => (
+                  <button key={`${origin}-${item.id}`} type="button" onClick={() => setActiveModule(origin)} className="lifeos-home-find-tile">
+                    <span className={`lifeos-home-find-image lifeos-home-find-${origin}`} />
+                    <strong>{titleOf(item)}</strong>
+                    <small>{origin === "explore" ? "Explore" : "Studio"}</small>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button type="button" className="lifeos-home-empty-action" onClick={() => setActiveModule("explore")}>Find something →</button>
+            )}
           </div>
         </section>
 
-        <section className="lifeos-home-footer">
-          <div><BookOpen size={15}/><span>Everything else can wait.</span></div>
-          <button type="button" onClick={() => setActiveModule("archive")}>Open Archive →</button>
-          <span className="lifeos-home-count">{projects.length} projects · {notes.length} notes · {studioItems.length + subjects.length} collected</span>
+        <section className="lifeos-home-bottom-actions">
+          <button type="button" onClick={() => setActiveModule("archive")}><BookOpen size={17} /><span>Open Archive</span></button>
+          <button type="button" onClick={() => setActiveModule("atlas")}><NetworkIcon /><span>Browse Atlas</span></button>
+          <button type="button" onClick={() => setActiveModule("house")}><House size={17} /><span>Work on the house</span></button>
+          <span>{projects.length} projects · {notes.length} notes · {studioItems.length + subjects.length} collected</span>
         </section>
       </div>
     </SectionPage>
   )
-}
+
 
 function NetworkIcon() {
   return (
