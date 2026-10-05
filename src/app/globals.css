@@ -2417,3 +2417,106 @@ body {
 .lifeos-archive-book-b { background:rgba(121,153,132,.15); transform:rotate(4deg); margin-left:-.7rem; }
 .lifeos-archive-foot { grid-column:2; display:flex; gap:.7rem; align-items:center; padding-top:2rem; color:rgba(232,226,213,.4); font-size:11px; }
 @media(max-width:600px){.lifeos-archive-room{grid-template-columns:2.5rem 1fr}.lifeos-archive-spine span{display:none}}
+
+
+/* =========================================================
+   LIFE OS — native controls / project workshop
+   ========================================================= */
+
+/* Native select menus must remain legible against the dark editorial UI. */
+select.lifeos-select,
+select.lifeos-select option {
+  color: #eee7d8;
+  background: #20211d;
+}
+select.lifeos-select {
+  color-scheme: dark;
+  border-color: rgba(232,226,213,.16);
+  border-radius: .15rem;
+}
+select.lifeos-select:focus {
+  border-color: rgba(214,170,91,.65);
+  box-shadow: 0 0 0 2px rgba(214,170,91,.10);
+}
+select.lifeos-select option:checked,
+select.lifeos-select option:hover {
+  color: #f5eddf;
+  background: #34352f;
+}
+
+/* Project workshop: the data becomes the material of the room. */
+.lifeos-project-workshop {
+  position: relative;
+}
+.lifeos-project-list {
+  position: relative;
+}
+.lifeos-project-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: .9rem .75rem .9rem 1rem;
+  text-align: left;
+  border-left: 2px solid transparent;
+  transition: transform 220ms cubic-bezier(.22,1,.36,1), background 220ms ease, border-color 220ms ease;
+}
+.lifeos-project-item:hover {
+  transform: translateX(4px);
+  background: rgba(255,255,255,.025);
+}
+.lifeos-project-item[data-selected="true"] {
+  border-left-color: var(--project-colour);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--project-colour) 13%, transparent), transparent 75%);
+}
+.lifeos-project-material {
+  position: relative;
+  min-height: 28rem;
+  overflow: hidden;
+  border: 1px solid rgba(232,226,213,.12);
+  background:
+    radial-gradient(circle at 78% 18%, color-mix(in srgb, var(--project-colour) 20%, transparent), transparent 28%),
+    linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.008));
+}
+.lifeos-project-material::before {
+  content: "";
+  position: absolute;
+  inset: 1.5rem;
+  border: 1px solid rgba(232,226,213,.08);
+  pointer-events: none;
+}
+.lifeos-project-material::after {
+  content: "";
+  position: absolute;
+  width: 22rem;
+  height: 22rem;
+  right: -7rem;
+  top: -8rem;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--project-colour) 28%, transparent);
+  box-shadow: 0 0 0 2rem color-mix(in srgb, var(--project-colour) 5%, transparent),
+              0 0 0 4rem color-mix(in srgb, var(--project-colour) 3%, transparent);
+  pointer-events: none;
+}
+.lifeos-project-mark {
+  width: 3.2rem;
+  height: 3.2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--project-colour) 45%, rgba(232,226,213,.2));
+  background: color-mix(in srgb, var(--project-colour) 13%, rgba(20,21,18,.8));
+  color: var(--project-colour);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+.lifeos-project-task {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .72rem 0;
+  border-top: 1px solid rgba(232,226,213,.08);
+}
+.lifeos-project-task svg { flex: 0 0 auto; }
+@media (max-width: 800px) {
+  .lifeos-project-material { min-height: 22rem; }
+  .lifeos-project-material::before { inset: 1rem; }
+}
