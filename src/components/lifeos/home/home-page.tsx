@@ -236,7 +236,7 @@ export function HomePage() {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search your life…"
+              placeholder="Search projects…"
               aria-label="Search your life"
             />
           </label>
@@ -256,7 +256,7 @@ export function HomePage() {
             <div className="lifeos-home-panel-head">
               <div>
                 <span className="lifeos-home-panel-kicker">TODAY</span>
-                <h2>What needs your attention?</h2>
+                <h2>Today</h2>
               </div>
               <span className="lifeos-home-today-count">{todayTasks.length}</span>
             </div>
@@ -283,7 +283,7 @@ export function HomePage() {
             <div className="lifeos-home-panel-head">
               <div>
                 <span className="lifeos-home-panel-kicker">IN PROGRESS</span>
-                <h2>What are you working on?</h2>
+                <h2>In progress</h2>
               </div>
               <button type="button" onClick={() => setActiveModule("projects")}>All projects →</button>
             </div>
@@ -331,7 +331,7 @@ export function HomePage() {
         <section className="lifeos-home-lower-grid">
           <div>
             <div className="lifeos-home-panel-head compact">
-              <div><span className="lifeos-home-panel-kicker">RECENT NOTES</span><h2>Nearby thoughts</h2></div>
+              <div><span className="lifeos-home-panel-kicker">NOTES</span><h2>Recent notes</h2></div>
               <button type="button" onClick={() => setActiveModule("notes")}>Notes →</button>
             </div>
             {recentNotes.length ? recentNotes.map((note) => (
@@ -345,7 +345,7 @@ export function HomePage() {
 
           <div>
             <div className="lifeos-home-panel-head compact">
-              <div><span className="lifeos-home-panel-kicker">RECENTLY FOUND</span><h2>Things you've collected</h2></div>
+              <div><span className="lifeos-home-panel-kicker">RECENT</span><h2>Recent finds</h2></div>
               <button type="button" onClick={() => setActiveModule("explore")}>Explore →</button>
             </div>
             {recentlyCaptured.length ? (
