@@ -133,7 +133,7 @@ function RelativeTime({ dateStr }: { dateStr: string }) {
 }
 
 export function NotesPage() {
-  const { accentColor } = useAppStore()
+  const { accentColor, newNoteRequest } = useAppStore()
   const { t } = useTranslation()
   const accentHexMap: Record<string, string> = {
     emerald: '#10b981', teal: '#14b8a6', amber: '#f59e0b',
@@ -220,6 +220,11 @@ export function NotesPage() {
       }
     })
   }, [createNoteMutation])
+
+  useEffect(() => {
+    if (newNoteRequest === 0) return
+    handleQuickNote()
+  }, [newNoteRequest, handleQuickNote])
 
   const updateNoteContent = useCallback((id: string, content: string) => {
     updateNoteMutation.mutate({
