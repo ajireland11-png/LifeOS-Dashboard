@@ -2063,3 +2063,169 @@ body {
     0 20px 50px rgba(0,0,0,0.14);
   backdrop-filter: blur(14px) saturate(125%);
 }
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   LIVING ATLAS / CABINET OF CURIOSITIES
+   A visual layer for the personal-library aesthetic.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.lifeos-cabinet {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(214, 170, 91, 0.08), transparent 24%),
+    radial-gradient(circle at 92% 18%, rgba(121, 153, 132, 0.07), transparent 22%),
+    linear-gradient(145deg, rgba(255,255,255,0.025), transparent 42%);
+}
+
+.lifeos-cabinet::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  background-image:
+    radial-gradient(circle at 18% 28%, rgba(214, 170, 91, 0.55) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 76% 66%, rgba(121, 153, 132, 0.5) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 48% 84%, rgba(154, 113, 155, 0.45) 0 1px, transparent 1.5px);
+  background-size: 130px 110px, 170px 150px, 210px 180px;
+  mix-blend-mode: screen;
+}
+
+.lifeos-glass-window {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.012)),
+    linear-gradient(125deg, rgba(214,170,91,0.07), rgba(116,156,125,0.045) 48%, rgba(154,91,137,0.055));
+  border: 1px solid rgba(235,226,207,0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.09),
+    inset -1px -1px 0 rgba(0,0,0,0.14),
+    0 28px 80px rgba(0,0,0,0.16);
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+.lifeos-glass-window::before,
+.lifeos-glass-window::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.lifeos-glass-window::before {
+  width: 15rem;
+  height: 15rem;
+  right: -5rem;
+  top: -7rem;
+  border: 1px solid rgba(214,170,91,0.16);
+  transform: rotate(24deg);
+  box-shadow:
+    0 0 0 1.5rem rgba(214,170,91,0.018),
+    0 0 0 3rem rgba(121,153,132,0.015);
+}
+
+.lifeos-glass-window::after {
+  width: 8rem;
+  height: 8rem;
+  left: -3rem;
+  bottom: -3rem;
+  border: 1px solid rgba(154,113,155,0.16);
+  border-radius: 42% 58% 55% 45%;
+  transform: rotate(-18deg);
+}
+
+.lifeos-flower {
+  position: relative;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex: none;
+}
+
+.lifeos-flower::before {
+  content: "✿";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--lifeos-accent) 78%, #c78aa8 22%);
+  font-size: 2.35rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--lifeos-accent) 22%, transparent));
+  transform: rotate(-8deg);
+}
+
+.lifeos-flower::after {
+  content: "";
+  position: absolute;
+  width: 1.1rem;
+  height: 2.8rem;
+  left: 1.45rem;
+  top: 2.2rem;
+  border-left: 1px solid rgba(121,153,132,0.65);
+  border-radius: 50%;
+  transform: rotate(25deg);
+  transform-origin: top;
+}
+
+.lifeos-mosaic-tile {
+  position: relative;
+  overflow: hidden;
+  min-height: 9rem;
+  border: 1px solid rgba(235,226,207,0.1);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.055), transparent 55%),
+    rgba(25,26,23,0.62);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), border-color 260ms ease, box-shadow 260ms ease;
+}
+
+.lifeos-mosaic-tile:hover {
+  transform: translateY(-3px) rotate(-0.35deg);
+  border-color: rgba(235,226,207,0.2);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.18);
+}
+
+.lifeos-mosaic-tile:nth-child(3n) { transform: rotate(0.4deg); }
+.lifeos-mosaic-tile:nth-child(3n):hover { transform: translateY(-3px) rotate(0deg); }
+.lifeos-mosaic-tile:nth-child(4n) { transform: rotate(-0.55deg); }
+.lifeos-mosaic-tile:nth-child(4n):hover { transform: translateY(-3px) rotate(-0.15deg); }
+
+.lifeos-ink-quiet {
+  color: color-mix(in srgb, var(--lifeos-ivory) 72%, transparent);
+}
+
+.lifeos-colour-dash {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(214,170,91,0.75),
+    rgba(121,153,132,0.7) 34%,
+    rgba(154,113,155,0.68) 67%,
+    rgba(194,126,101,0.7)
+  );
+  opacity: 0.72;
+}
+
+.lifeos-colour-dash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transform: translateX(-100%);
+  animation: lifeos-glint 5s ease-in-out infinite;
+}
+
+@keyframes lifeos-glint {
+  0%, 45% { transform: translateX(-100%); }
+  65%, 100% { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lifeos-colour-dash::after { animation: none; }
+  .lifeos-mosaic-tile,
+  .lifeos-mosaic-tile:hover { transform: none; }
+}
