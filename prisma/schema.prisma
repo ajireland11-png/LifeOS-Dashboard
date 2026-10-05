@@ -670,3 +670,36 @@ model StudioItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+// ============================================
+// RESEARCH — papers as living laboratory objects
+// ============================================
+// A paper is deliberately modular: prose, questions, interpretation,
+// figures and tables can be edited independently in the Research room.
+// Figure images are stored as data URLs for the local-first prototype.
+model ResearchPaper {
+  id              String   @id @default(cuid())
+  title           String
+  authors         String?
+  journal         String?
+  year            Int?
+  doi             String?
+  sourceUrl       String?
+  abstract        String?
+  scientificQuestion String?
+  background      String?
+  mechanisms      String?
+  interpretation  String?
+  limitations     String?
+  openQuestions   String?
+  notes           String?
+  figuresJson     String   @default("[]")
+  tablesJson      String   @default("[]")
+  archived        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([archived])
+  @@index([updatedAt])
+}
