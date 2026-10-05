@@ -1982,3 +1982,84 @@ body {
     display: none;
   }
 }
+
+
+/* Botanical / stained-glass visual vocabulary */
+.lifeos-atlas-mosaic::before,
+.lifeos-atlas-mosaic::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: 999px;
+  mix-blend-mode: screen;
+}
+
+.lifeos-atlas-mosaic::before {
+  width: 34%;
+  height: 72%;
+  left: 4%;
+  top: 18%;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(214, 170, 91, 0.34), transparent 17%),
+    radial-gradient(circle at 28% 48%, rgba(116, 156, 125, 0.24), transparent 22%),
+    radial-gradient(circle at 70% 62%, rgba(145, 104, 153, 0.22), transparent 24%);
+  filter: blur(18px);
+}
+
+.lifeos-atlas-mosaic::after {
+  width: 40%;
+  height: 60%;
+  right: 2%;
+  bottom: -10%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(174, 116, 91, 0.25), transparent 24%),
+    radial-gradient(circle at 28% 32%, rgba(86, 129, 150, 0.22), transparent 25%);
+  filter: blur(22px);
+}
+
+.lifeos-atlas-bloom {
+  background:
+    radial-gradient(circle at 48% 44%, rgba(218, 170, 87, 0.22), transparent 34%),
+    radial-gradient(circle at 65% 62%, rgba(154, 91, 137, 0.2), transparent 42%),
+    radial-gradient(circle at 28% 72%, rgba(83, 133, 112, 0.18), transparent 38%);
+  opacity: 0.75;
+}
+
+.lifeos-atlas-bloom-2 {
+  background:
+    radial-gradient(circle at 50% 44%, rgba(93, 143, 164, 0.2), transparent 32%),
+    radial-gradient(circle at 68% 62%, rgba(201, 132, 102, 0.18), transparent 42%);
+}
+
+.lifeos-mosaic-type span:nth-child(3n) {
+  transform: rotate(-1deg);
+}
+
+.lifeos-mosaic-type span:nth-child(4n) {
+  transform: rotate(1.5deg);
+}
+
+.lifeos-botanical {
+  position: relative;
+}
+
+.lifeos-botanical::after {
+  content: "✦";
+  position: absolute;
+  right: 0;
+  top: -0.4rem;
+  color: color-mix(in srgb, var(--lifeos-accent) 62%, transparent);
+  font-size: 1rem;
+  opacity: 0.55;
+}
+
+.lifeos-glass {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.015)),
+    color-mix(in srgb, var(--lifeos-night-soft) 72%, transparent);
+  border: 1px solid rgba(235, 226, 207, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 20px 50px rgba(0,0,0,0.14);
+  backdrop-filter: blur(14px) saturate(125%);
+}
