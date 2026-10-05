@@ -5,10 +5,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Compass,
-  Flame,
-  FolderKanban,
   House,
-  Lightbulb,
   Search,
   Sparkles,
 } from "lucide-react"
@@ -67,48 +64,6 @@ function relativeDate(item: LifeItem): string {
     day: "numeric",
     month: "short",
   }).format(date)
-}
-
-function HomeLink({
-  children,
-  onClick,
-  icon: Icon = ArrowUpRight,
-}: {
-  children: React.ReactNode
-  onClick?: () => void
-  icon?: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex w-full items-center justify-between border-b border-[color:var(--lifeos-line)] py-4 text-left transition-colors hover:border-white/20"
-    >
-      <span className="text-[15px] text-foreground/75 group-hover:text-foreground">
-        {children}
-      </span>
-      <Icon
-        size={16}
-        strokeWidth={1.5}
-        className="text-muted-foreground/55 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground/70"
-      />
-    </button>
-  )
-}
-
-function SectionLabel({
-  children,
-  icon: Icon,
-}: {
-  children: React.ReactNode
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>
-}) {
-  return (
-    <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-      <Icon size={14} strokeWidth={1.5} />
-      {children}
-    </div>
-  )
 }
 
 export function HomePage() {
@@ -356,7 +311,6 @@ export function HomePage() {
         </section>
       </div>
     </SectionPage>
-  )
   )
 }
 
