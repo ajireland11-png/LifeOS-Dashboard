@@ -8,6 +8,7 @@ interface SectionPageProps {
   title: string
   description?: string
   children?: ReactNode
+  plain?: boolean
 }
 
 function PageArtifact({ title }: { title: string }) {
@@ -52,14 +53,17 @@ export function SectionPage({
   title,
   description,
   children,
+  plain = false,
 }: SectionPageProps) {
   return (
     <div className="lifeos-editorial lifeos-atmosphere min-h-full">
-      <div className="lifeos-cabinet-shell mx-auto max-w-[1540px] px-4 py-5 sm:px-7 lg:px-10 lg:py-8">
-        <div className="lifeos-mosaic-rail lifeos-mosaic-rail-top" aria-hidden="true">
-          {Array.from({ length: 18 }).map((_, index) => <span key={index} />)}
-        </div>
-        <header className="lifeos-hero relative min-h-[15rem] overflow-visible border-b border-[color:var(--lifeos-line)] pb-7">
+      <div className={plain ? "lifeos-cabinet-shell lifeos-section-plain mx-auto max-w-[1540px] px-4 sm:px-7 lg:px-10" : "lifeos-cabinet-shell mx-auto max-w-[1540px] px-4 py-5 sm:px-7 lg:px-10 lg:py-8"}>
+        {!plain && (
+          <div className="lifeos-mosaic-rail lifeos-mosaic-rail-top" aria-hidden="true">
+            {Array.from({ length: 18 }).map((_, index) => <span key={index} />)}
+          </div>
+        )}
+        <header className={plain ? "lifeos-section-plain-header" : "lifeos-hero relative min-h-[15rem] overflow-visible border-b border-[color:var(--lifeos-line)] pb-7"}>
           <div className="relative z-10 max-w-3xl">
             <p className="lifeos-kicker text-[10px] uppercase tracking-[0.3em]">{eyebrow}</p>
             <h1 className="mt-2 font-serif text-5xl tracking-[-0.045em] text-foreground lg:text-[5.2rem] lg:leading-[0.88]">
@@ -69,8 +73,8 @@ export function SectionPage({
               <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground/70">{description}</p>
             )}
           </div>
-          <PageArtifact title={title} />
-          <div className="lifeos-hero-plate" aria-hidden="true">
+          {!plain && <PageArtifact title={title} />}
+          {!plain && <div className="lifeos-hero-plate" aria-hidden="true">
             <div className="lifeos-plate-image">
               <img src={
                 title.toLowerCase().includes('research') ? 'https://images.unsplash.com/photo-1530210124550-912dc1381cb8?auto=format&fit=crop&w=900&q=80' :
@@ -84,15 +88,17 @@ export function SectionPage({
             </div>
             <span className="lifeos-plate-line" />
             <span className="lifeos-plate-note">field material / 01</span>
-          </div>
+          </div>}
         </header>
 
-        <div className="lifeos-section-rule mt-9 pt-7 lg:mt-11 lg:pt-8">
+        <div className={plain ? "lifeos-section-rule lifeos-section-plain-content" : "lifeos-section-rule"} mt-9 pt-7 lg:mt-11 lg:pt-8">
           {children}
         </div>
-        <div className="lifeos-mosaic-rail lifeos-mosaic-rail-bottom" aria-hidden="true">
-          {Array.from({ length: 18 }).map((_, index) => <span key={index} />)}
-        </div>
+        {!plain && (
+          <div className="lifeos-mosaic-rail lifeos-mosaic-rail-bottom" aria-hidden="true">
+            {Array.from({ length: 18 }).map((_, index) => <span key={index} />)}
+          </div>
+        )}
       </div>
     </div>
   )
