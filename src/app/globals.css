@@ -3870,3 +3870,51 @@ select.lifeos-select option:hover {
 .lifeos-home-bottom-actions button:last-child { border-right:0; }
 @media (max-width:900px) { .lifeos-home-header-photo { width:58%; } .lifeos-home-search-wrap { width:min(290px,40%); } }
 @media (max-width:650px) { .lifeos-home-header { min-height:250px; } .lifeos-home-header-photo { width:100%; opacity:.34; } .lifeos-home-header-content { padding:1.5rem 0 1rem; } .lifeos-home-search-wrap { width:100%; margin-bottom:1rem; } }
+
+/* HOME / PLAIN PAGE — remove decorative scaffolding and let real material lead */
+.lifeos-section-plain {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.lifeos-section-plain-header {
+  position: relative;
+  min-height: 0;
+  padding: 1.15rem 0 .9rem;
+  border-bottom: 1px solid var(--lifeos-line);
+}
+.lifeos-section-plain-header .lifeos-kicker {
+  margin: 0 0 .3rem;
+}
+.lifeos-section-plain-header h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 5vw, 4.6rem);
+  line-height: .9;
+}
+.lifeos-section-plain-content {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+.lifeos-home-room {
+  margin-top: 0;
+  border-top: 0;
+}
+.lifeos-home-header {
+  min-height: 205px !important;
+  border-top: 0;
+}
+.lifeos-home-focus-mark {
+  width: 7px;
+  height: 7px;
+  margin-left: .3rem;
+  border-radius: 50%;
+  background: rgba(200,180,145,.55);
+}
+.lifeos-home-focus-image { display:none !important; }
+.lifeos-home-focus-list button {
+  grid-template-columns: 15px minmax(0,1fr) 15px !important;
+}
+.lifeos-home-find-image {
+  background-image: none !important;
+  background: rgba(232,224,207,.045);
+}
+.lifeos-home-find-image::before { display:none !important; }
