@@ -91,7 +91,7 @@ export function SectionPage({
           </div>}
         </header>
 
-        <div className={plain ? "lifeos-section-rule lifeos-section-plain-content" : "lifeos-section-rule"} mt-9 pt-7 lg:mt-11 lg:pt-8">
+        <div className={`${plain ? "lifeos-section-rule lifeos-section-plain-content" : "lifeos-section-rule"} mt-9 pt-7 lg:mt-11 lg:pt-8`}>
           {children}
         </div>
         {!plain && (
