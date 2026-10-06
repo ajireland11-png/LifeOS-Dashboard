@@ -239,7 +239,7 @@ export function HomePage() {
   }).format(now)
 
   return (
-    <SectionPage eyebrow="Personal dashboard" title="Home" description="">
+    <SectionPage eyebrow="Personal dashboard" title="Home" description="" plain>
       <div className="lifeos-home-room pb-12">
         <header className="lifeos-home-header">
           <div className="lifeos-home-header-photo" aria-hidden="true" />
@@ -319,7 +319,7 @@ export function HomePage() {
               <div className="lifeos-home-focus-list">
                 {filteredProjects.map((project) => (
                   <button key={project.id} type="button" onClick={() => setActiveModule("projects")}>
-                    <span className="lifeos-home-focus-image" aria-hidden="true" />
+                    <span className="lifeos-home-focus-mark" aria-hidden="true" />
                     <span><strong>{titleOf(project)}</strong>{project.description && <small>{project.description}</small>}</span>
                     <ArrowUpRight size={15} />
                   </button>
