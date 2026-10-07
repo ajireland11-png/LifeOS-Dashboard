@@ -4249,3 +4249,415 @@ select.lifeos-select option:hover {
   .lifeos-home-lower-grid { grid-template-columns: 1fr; }
   .lifeos-home-lower-grid > div { border-right: 0 !important; border-bottom: 1px solid rgba(232,224,207,.12); }
 }
+
+
+/* HOME — handmade Italian tile mosaic theme */
+.lifeos-home-room {
+  --tile-cream: #f5e8c8;
+  --tile-cobalt: #28527a;
+  --tile-terracotta: #c85b3f;
+  --tile-celadon: #6f9f8d;
+  --tile-sun: #e5b84b;
+  --tile-rose: #b85c68;
+  --tile-ink: #26333a;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--tile-cream);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(229,184,75,.14), transparent 24%),
+    radial-gradient(circle at 86% 72%, rgba(40,82,122,.16), transparent 28%),
+    #f0e3c4;
+  border: 0;
+  box-shadow: 0 24px 60px rgba(52,39,25,.22);
+}
+.lifeos-home-room::after {
+  display: none;
+}
+
+/* The whole page becomes a tiled architectural object. */
+.lifeos-home-room::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .98;
+  background:
+    linear-gradient(45deg, transparent 47%, rgba(48,42,33,.11) 48%, rgba(48,42,33,.11) 52%, transparent 53%) 0 0 / 58px 58px,
+    linear-gradient(-45deg, transparent 47%, rgba(48,42,33,.11) 48%, rgba(48,42,33,.11) 52%, transparent 53%) 0 0 / 58px 58px,
+    #ead9b3;
+  box-shadow: inset 0 0 80px rgba(86,60,31,.14);
+}
+
+/* Header: a real hand-painted ceramic panel with irregular colour fields. */
+.lifeos-home-header {
+  min-height: 350px !important;
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 0;
+  padding: 18px;
+  border: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(245,232,200,.98) 0 55%, transparent 55%),
+    transparent;
+}
+.lifeos-home-header::before {
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  width: auto;
+  height: 5px;
+  background: linear-gradient(90deg, var(--tile-cobalt) 0 18%, var(--tile-terracotta) 18% 37%, var(--tile-sun) 37% 55%, var(--tile-celadon) 55% 75%, var(--tile-rose) 75%);
+  z-index: 4;
+}
+.lifeos-home-header-content {
+  justify-content: center;
+  padding: 3rem 2.8rem 3.5rem;
+  background:
+    radial-gradient(ellipse at 10% 20%, rgba(200,91,63,.18), transparent 25%),
+    radial-gradient(ellipse at 92% 85%, rgba(111,159,141,.20), transparent 28%),
+    rgba(245,232,200,.98);
+  color: var(--tile-ink);
+  border: 10px solid #f7edda;
+  border-right: 0;
+  box-shadow: inset 0 0 0 2px rgba(40,82,122,.22), inset 0 0 35px rgba(90,62,31,.08);
+}
+.lifeos-home-header-content::before,
+.lifeos-home-header-content::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid var(--tile-cobalt);
+  opacity: .75;
+}
+.lifeos-home-header-content::before {
+  width: 74px;
+  height: 74px;
+  left: 18px;
+  top: 18px;
+  border-radius: 50%;
+  border-color: var(--tile-terracotta) var(--tile-cobalt) var(--tile-sun) var(--tile-celadon);
+  transform: rotate(17deg);
+}
+.lifeos-home-header-content::after {
+  width: 44px;
+  height: 44px;
+  right: 22px;
+  bottom: 24px;
+  border-radius: 50% 42% 50% 46%;
+  border-color: var(--tile-celadon) var(--tile-terracotta) var(--tile-cobalt) var(--tile-sun);
+}
+.lifeos-home-clock {
+  position: relative;
+  color: var(--tile-cobalt);
+  font-size: clamp(5rem, 9vw, 8.4rem);
+  line-height: .78;
+  letter-spacing: -.075em;
+  text-shadow: 2px 2px 0 rgba(200,91,63,.12);
+}
+.lifeos-home-date-large {
+  color: var(--tile-ink);
+  margin-top: 1.3rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+}
+.lifeos-home-header-photo {
+  position: relative;
+  inset: auto;
+  width: auto;
+  height: auto;
+  min-height: 314px;
+  opacity: 1;
+  filter: none;
+  background:
+    radial-gradient(circle at 22% 25%, var(--tile-sun) 0 5%, transparent 5.8%),
+    radial-gradient(circle at 72% 22%, var(--tile-celadon) 0 8%, transparent 8.8%),
+    radial-gradient(circle at 52% 70%, var(--tile-terracotta) 0 10%, transparent 10.8%),
+    radial-gradient(circle at 88% 74%, var(--tile-cobalt) 0 7%, transparent 7.8%),
+    repeating-conic-gradient(from 15deg at 50% 50%, var(--tile-cobalt) 0 8deg, #f4e5c5 8deg 16deg, var(--tile-terracotta) 16deg 24deg, #f4e5c5 24deg 32deg);
+  border: 10px solid #f7edda;
+  box-shadow: inset 0 0 0 2px rgba(40,82,122,.22), inset 0 0 40px rgba(90,62,31,.16);
+}
+.lifeos-home-header-photo::before {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 4px solid var(--tile-ink);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--tile-sun) 0 10%, transparent 10.8%),
+    conic-gradient(var(--tile-terracotta) 0 12.5%, var(--tile-cream) 12.5% 25%, var(--tile-celadon) 25% 37.5%, var(--tile-cream) 37.5% 50%, var(--tile-cobalt) 50% 62.5%, var(--tile-cream) 62.5% 75%, var(--tile-rose) 75% 87.5%, var(--tile-cream) 87.5% 100%);
+  box-shadow: inset 0 0 0 10px rgba(245,232,200,.72), 0 3px 0 rgba(38,51,58,.18);
+}
+.lifeos-home-header-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 44%, rgba(38,51,58,.08) 45% 46%, transparent 47%),
+    linear-gradient(135deg, transparent 49%, rgba(255,255,255,.28) 50%, transparent 51%);
+  opacity: .8;
+}
+.lifeos-home-search-wrap {
+  position: absolute;
+  right: 35px;
+  bottom: 34px;
+  z-index: 6;
+  width: min(300px, 34%);
+}
+.lifeos-home-header .lifeos-home-search {
+  width: 100%;
+  margin: 0;
+  padding: .7rem .85rem;
+  color: var(--tile-ink);
+  background: rgba(245,232,200,.94);
+  border: 2px solid var(--tile-cobalt);
+  border-radius: 2px;
+  box-shadow: 3px 3px 0 rgba(200,91,63,.28);
+}
+.lifeos-home-header .lifeos-home-search svg { color: var(--tile-terracotta); }
+.lifeos-home-header .lifeos-home-search input { color: var(--tile-ink) !important; }
+.lifeos-home-header .lifeos-home-search input::placeholder { color: rgba(38,51,58,.56); }
+.lifeos-home-search-results {
+  border: 2px solid var(--tile-cobalt);
+  border-radius: 2px;
+  background: #f8ecd5;
+  box-shadow: 5px 5px 0 rgba(200,91,63,.22);
+}
+.lifeos-home-search-results button { color: var(--tile-ink); border-bottom-color: rgba(40,82,122,.16); }
+.lifeos-home-search-results button:hover { background: rgba(111,159,141,.14); }
+.lifeos-home-search-results strong { color: var(--tile-cobalt); }
+.lifeos-home-search-results small { color: var(--tile-terracotta); }
+
+/* Navigation becomes a row of individual ceramic tiles. */
+.lifeos-home-actions {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 9px;
+  padding: 0 18px 18px;
+  border: 0;
+  background: #ead9b3;
+}
+.lifeos-home-actions button {
+  min-height: 78px;
+  position: relative;
+  justify-content: center;
+  flex-direction: column;
+  gap: .35rem;
+  padding: .7rem .4rem;
+  color: var(--tile-ink);
+  border: 3px solid #f7edda;
+  background: var(--tile-cream);
+  box-shadow: 3px 4px 0 rgba(75,54,32,.16);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .8rem;
+  font-weight: 600;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.lifeos-home-actions button:nth-child(1) { background: #f2d78f; border-color: var(--tile-terracotta); }
+.lifeos-home-actions button:nth-child(2) { background: #e9c8ca; border-color: var(--tile-rose); }
+.lifeos-home-actions button:nth-child(3) { background: #b9d4c8; border-color: var(--tile-celadon); }
+.lifeos-home-actions button:nth-child(4) { background: #d5c3dd; border-color: #76548b; }
+.lifeos-home-actions button:nth-child(5) { background: #b8cadc; border-color: var(--tile-cobalt); }
+.lifeos-home-actions button:nth-child(6) { background: #edc5a8; border-color: var(--tile-terracotta); }
+.lifeos-home-actions button:hover {
+  transform: translateY(-4px) rotate(-.6deg);
+  box-shadow: 5px 8px 0 rgba(75,54,32,.18);
+  color: var(--tile-ink);
+  background: #fff4df;
+}
+.lifeos-home-actions button::before { display: none; }
+.lifeos-home-actions svg { color: var(--tile-cobalt); }
+
+/* Content uses framed ceramic plaques instead of SaaS cards. */
+.lifeos-home-dashboard {
+  display: grid;
+  grid-template-columns: 1.12fr 1fr .82fr;
+  gap: 14px;
+  padding: 0 18px 18px;
+  margin: 0;
+  background: #ead9b3;
+  border: 0;
+}
+.lifeos-home-dashboard > section {
+  min-height: 270px;
+  padding: 1.5rem 1.45rem 1.7rem;
+  border: 5px solid #f7edda;
+  background:
+    linear-gradient(90deg, transparent 49%, rgba(40,82,122,.08) 50%, transparent 51%),
+    #f6e9cc;
+  box-shadow: 4px 5px 0 rgba(75,54,32,.15);
+  border-radius: 2px;
+}
+.lifeos-home-dashboard > section:nth-child(1) { border-color: var(--tile-terracotta); transform: rotate(-.25deg); }
+.lifeos-home-dashboard > section:nth-child(2) { border-color: var(--tile-celadon); transform: rotate(.2deg); background-color: #edf0d6; }
+.lifeos-home-dashboard > section:nth-child(3) { border-color: var(--tile-cobalt); transform: rotate(-.35deg); background-color: #e5edf1; }
+.lifeos-home-dashboard > section::after {
+  content: "";
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  right: 12px;
+  top: 10px;
+  border: 3px solid currentColor;
+  border-radius: 48% 52% 45% 55%;
+  opacity: .12;
+}
+.lifeos-home-panel-head {
+  min-height: 66px;
+  padding-bottom: .7rem;
+  border-bottom: 2px solid rgba(38,51,58,.16);
+}
+.lifeos-home-panel-kicker {
+  color: var(--tile-terracotta);
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  letter-spacing: .22em;
+}
+.lifeos-home-panel-head h2 {
+  color: var(--tile-cobalt);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+.lifeos-home-panel-head > button { color: var(--tile-terracotta); }
+.lifeos-home-today-count {
+  border: 2px solid var(--tile-terracotta);
+  color: var(--tile-terracotta);
+  background: rgba(255,255,255,.24);
+}
+.lifeos-home-checklist button,
+.lifeos-home-focus-list button,
+.lifeos-home-next-list button {
+  color: var(--tile-ink);
+  padding: .85rem .25rem;
+  border-top: 1px solid rgba(38,51,58,.14);
+}
+.lifeos-home-checklist button:hover,
+.lifeos-home-focus-list button:hover,
+.lifeos-home-next-list button:hover {
+  background: rgba(229,184,75,.16);
+  padding-left: .45rem;
+}
+.lifeos-home-check {
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--tile-terracotta);
+  background: var(--tile-sun);
+  box-shadow: inset 0 0 0 3px #f6e9cc;
+}
+.lifeos-home-checklist strong,
+.lifeos-home-focus-list strong,
+.lifeos-home-next-list strong,
+.lifeos-home-note-row strong {
+  color: var(--tile-cobalt);
+  font-weight: 650;
+}
+.lifeos-home-checklist small,
+.lifeos-home-focus-list small,
+.lifeos-home-next-list small,
+.lifeos-home-note-row small {
+  color: rgba(38,51,58,.62);
+}
+.lifeos-home-focus-mark {
+  width: 11px;
+  height: 11px;
+  background: var(--tile-celadon);
+  border: 2px solid var(--tile-cobalt);
+  box-shadow: none;
+}
+.lifeos-home-next-date { color: var(--tile-terracotta); font-weight: 700; }
+
+/* Notes and finds: painted ceramic shelves. */
+.lifeos-home-lower-grid {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 14px;
+  padding: 0 18px 18px;
+  margin: 0;
+  background: #ead9b3;
+  border: 0;
+}
+.lifeos-home-lower-grid > div {
+  padding: 1.5rem 1.45rem 1.8rem;
+  border: 5px solid #f7edda;
+  background: #f5e8ca;
+  box-shadow: 4px 5px 0 rgba(75,54,32,.13);
+}
+.lifeos-home-lower-grid > div:first-child { border-color: var(--tile-rose); }
+.lifeos-home-lower-grid > div:last-child { border-color: var(--tile-cobalt); }
+.lifeos-home-note-row {
+  color: var(--tile-ink);
+  border-top: 1px solid rgba(38,51,58,.14);
+}
+.lifeos-home-note-row:hover { background: rgba(184,92,104,.10); padding-left: .5rem; }
+.lifeos-home-find-grid { gap: 9px; }
+.lifeos-home-find-tile { color: var(--tile-ink); }
+.lifeos-home-find-image {
+  aspect-ratio: 1 / 1;
+  border: 4px solid #f7edda;
+  background:
+    repeating-conic-gradient(from 0deg, var(--tile-cobalt) 0 15deg, var(--tile-cream) 15deg 30deg, var(--tile-terracotta) 30deg 45deg, var(--tile-cream) 45deg 60deg);
+  box-shadow: 2px 3px 0 rgba(75,54,32,.14);
+}
+.lifeos-home-find-image::after {
+  inset: 8px;
+  border: 2px solid rgba(38,51,58,.45);
+}
+.lifeos-home-find-tile:nth-child(2) .lifeos-home-find-image { background: repeating-conic-gradient(var(--tile-celadon) 0 15deg, var(--tile-cream) 15deg 30deg, var(--tile-sun) 30deg 45deg, var(--tile-cream) 45deg 60deg); }
+.lifeos-home-find-tile:nth-child(3) .lifeos-home-find-image { background: repeating-conic-gradient(var(--tile-rose) 0 15deg, var(--tile-cream) 15deg 30deg, var(--tile-cobalt) 30deg 45deg, var(--tile-cream) 45deg 60deg); }
+.lifeos-home-find-tile:nth-child(4) .lifeos-home-find-image { background: repeating-conic-gradient(var(--tile-sun) 0 15deg, var(--tile-cream) 15deg 30deg, var(--tile-celadon) 30deg 45deg, var(--tile-cream) 45deg 60deg); }
+.lifeos-home-find-tile strong { color: var(--tile-cobalt); }
+.lifeos-home-find-tile small { color: var(--tile-terracotta); }
+
+/* Footer buttons become little ceramic fragments. */
+.lifeos-home-bottom-actions {
+  gap: 10px;
+  margin: 0;
+  padding: 0 18px 22px;
+  border: 0;
+  background: #ead9b3;
+}
+.lifeos-home-bottom-actions button {
+  padding: .55rem .8rem;
+  border: 2px solid rgba(40,82,122,.42);
+  background: #f5e8ca;
+  color: var(--tile-cobalt);
+  box-shadow: 2px 3px 0 rgba(75,54,32,.12);
+}
+.lifeos-home-bottom-actions button:hover {
+  border-color: var(--tile-terracotta);
+  color: var(--tile-terracotta);
+  transform: translateY(-2px);
+}
+
+/* Gentle handmade irregularity — restrained, not cartoonish. */
+.lifeos-home-actions button:nth-child(2n) { transform: rotate(.35deg); }
+.lifeos-home-actions button:nth-child(2n):hover { transform: translateY(-4px) rotate(.9deg); }
+.lifeos-home-lower-grid > div:nth-child(2) { transform: rotate(.18deg); }
+.lifeos-home-find-tile:nth-child(2) { transform: rotate(.45deg); }
+.lifeos-home-find-tile:nth-child(3) { transform: rotate(-.4deg); }
+
+@media (max-width: 900px) {
+  .lifeos-home-header {
+    min-height: 470px !important;
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+  .lifeos-home-header-content { min-height: 270px; border-right: 10px solid #f7edda; }
+  .lifeos-home-header-photo { min-height: 200px; }
+  .lifeos-home-search-wrap { left: 28px; right: 28px; bottom: 25px; width: auto; margin: 0; }
+  .lifeos-home-dashboard { grid-template-columns: 1fr; padding: 0 14px 14px; }
+  .lifeos-home-lower-grid { grid-template-columns: 1fr; padding: 0 14px 14px; }
+}
+@media (max-width: 650px) {
+  .lifeos-home-header { min-height: 500px !important; padding: 10px; }
+  .lifeos-home-header-content { padding: 2.1rem 1.4rem 5rem; }
+  .lifeos-home-clock { font-size: clamp(4.3rem, 19vw, 6.2rem); }
+  .lifeos-home-actions { grid-template-columns: repeat(3, 1fr); padding: 0 10px 10px; }
+  .lifeos-home-actions button { min-height: 72px; }
+  .lifeos-home-dashboard { padding: 0 10px 10px; }
+  .lifeos-home-lower-grid { padding: 0 10px 10px; }
+}
