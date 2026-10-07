@@ -244,6 +244,7 @@ export function HomePage() {
         <header className="lifeos-home-header">
           <div className="lifeos-home-header-photo" aria-hidden="true" />
           <div className="lifeos-home-header-content">
+            <div className="lifeos-home-title"><Sparkles size={22} strokeWidth={1.5} /><span>Home</span></div>
             <div className="lifeos-home-clock">{timeLabel}</div>
             <div className="lifeos-home-date-large">{dateLabel}</div>
           </div>
