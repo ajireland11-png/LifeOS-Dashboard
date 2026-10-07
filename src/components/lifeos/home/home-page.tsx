@@ -26,7 +26,7 @@ export function HomePage(){
  const results=useMemo(()=>{if(!term)return[];return [...projects.map(item=>({item,module:"projects" as const})),...notes.map(item=>({item,module:"notes" as const})),...tasks.map(item=>({item,module:"tasks" as const})),...subjects.map(item=>({item,module:"explore" as const})),...studio.map(item=>({item,module:"studio" as const}))].filter(x=>`${title(x.item)} ${x.item.description||""}`.toLowerCase().includes(term)).sort((a,b)=>stamp(b.item)-stamp(a.item)).slice(0,7)},[projects,notes,tasks,subjects,studio,term])
  const dateLabel=new Intl.DateTimeFormat(undefined,{weekday:"long",day:"numeric",month:"long"}).format(now),timeLabel=new Intl.DateTimeFormat(undefined,{hour:"numeric",minute:"2-digit"}).format(now)
  return <SectionPage eyebrow="Personal atlas" title="Home" description="" plain>
-  <div className="lifeos-home-rebuild">
+  <div className="lifeos-home-room lifeos-home-rebuild">
    <header className="lifeos-home-rebuild-top">
     <button className="lifeos-home-wordmark" onClick={()=>setActiveModule("home")}><i><Sparkles size={14}/></i><span>LIFE OS</span></button>
     <div className="lifeos-home-date"><span>{dateLabel}</span><strong>{timeLabel}</strong></div>
