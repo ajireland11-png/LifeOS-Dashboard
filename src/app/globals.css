@@ -4661,3 +4661,382 @@ select.lifeos-select option:hover {
   .lifeos-home-dashboard { padding: 0 10px 10px; }
   .lifeos-home-lower-grid { padding: 0 10px 10px; }
 }
+
+
+/* HOME — refined Italian ceramic influence
+   The mosaic is a material language, not the surface of the application. */
+.lifeos-home-room {
+  --tile-paper: #f4efe4;
+  --tile-paper-deep: #e7dfd0;
+  --tile-ink: #272b29;
+  --tile-cobalt: #315b70;
+  --tile-terracotta: #b75f4b;
+  --tile-sage: #718878;
+  --tile-ochre: #c59a4a;
+  color: var(--tile-ink);
+  background:
+    linear-gradient(rgba(39,43,41,.018), rgba(39,43,41,.018)),
+    var(--tile-paper);
+  box-shadow: none;
+  border: 1px solid rgba(39,43,41,.12);
+}
+
+/* Quiet architectural backdrop: no all-over faux mosaic. */
+.lifeos-home-room::before {
+  opacity: 1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 92%, rgba(49,91,112,.07) 92% 92.25%, transparent 92.25%),
+    linear-gradient(0deg, transparent 0 91%, rgba(183,95,75,.06) 91% 91.25%, transparent 91.25%),
+    var(--tile-paper);
+  box-shadow: inset 0 0 80px rgba(70,56,38,.06);
+}
+
+/* One restrained ceramic frieze. */
+.lifeos-home-room::after {
+  display: block;
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 8px;
+  background:
+    linear-gradient(90deg,
+      var(--tile-cobalt) 0 9%,
+      transparent 9% 10%,
+      var(--tile-terracotta) 10% 19%,
+      transparent 19% 20%,
+      var(--tile-ochre) 20% 29%,
+      transparent 29% 30%,
+      var(--tile-sage) 30% 39%,
+      transparent 39% 40%,
+      var(--tile-cobalt) 40% 49%,
+      transparent 49% 100%);
+  opacity: .9;
+}
+
+/* Header is a calm piece of architecture with a small ceramic detail. */
+.lifeos-home-header {
+  min-height: 300px !important;
+  grid-template-columns: 1.55fr .45fr;
+  padding: 0;
+  background: var(--tile-paper);
+  border: 0;
+}
+.lifeos-home-header-content {
+  min-height: 300px;
+  padding: 2.8rem 3rem 3rem;
+  justify-content: flex-end;
+  background: var(--tile-paper);
+  color: var(--tile-ink);
+  border: 0;
+  box-shadow: none;
+}
+.lifeos-home-header-content::before {
+  width: 54px;
+  height: 54px;
+  left: 2.25rem;
+  top: 2rem;
+  border: 1px solid var(--tile-cobalt);
+  border-radius: 50%;
+  opacity: .55;
+}
+.lifeos-home-header-content::after {
+  width: 28px;
+  height: 28px;
+  right: 2.5rem;
+  bottom: 2.2rem;
+  border: 1px solid var(--tile-terracotta);
+  border-radius: 50%;
+  opacity: .5;
+}
+.lifeos-home-clock {
+  color: var(--tile-ink);
+  font-size: clamp(4.6rem, 8vw, 7.5rem);
+  font-weight: 400;
+  letter-spacing: -.065em;
+  text-shadow: none;
+}
+.lifeos-home-date-large {
+  margin-top: 1rem;
+  color: #66645d;
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+/* Replace the giant faux-mosaic panel with a narrow ceramic/artistic accent. */
+.lifeos-home-header-photo {
+  min-height: 300px;
+  border: 0;
+  border-left: 1px solid rgba(39,43,41,.12);
+  background:
+    linear-gradient(135deg, rgba(49,91,112,.10), transparent 45%),
+    radial-gradient(circle at 50% 50%, transparent 0 34%, rgba(183,95,75,.22) 34.5% 35.5%, transparent 36%),
+    linear-gradient(135deg, var(--tile-paper-deep), #eee6d7);
+  box-shadow: none;
+}
+.lifeos-home-header-photo::before {
+  inset: 18% 22%;
+  border: 1px solid rgba(49,91,112,.45);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--tile-ochre) 0 5%, transparent 5.7%),
+    conic-gradient(from 0deg, transparent 0 12%, rgba(49,91,112,.42) 12% 13%, transparent 13% 25%, rgba(183,95,75,.35) 25% 26%, transparent 26% 100%);
+  box-shadow: none;
+}
+.lifeos-home-header-photo::after {
+  inset: 12%;
+  background:
+    linear-gradient(90deg, transparent 49.7%, rgba(39,43,41,.08) 50%, transparent 50.3%),
+    linear-gradient(0deg, transparent 49.7%, rgba(39,43,41,.08) 50%, transparent 50.3%);
+  opacity: .55;
+}
+.lifeos-home-search-wrap {
+  right: 2rem;
+  bottom: 1.5rem;
+  width: min(310px, 38%);
+}
+.lifeos-home-header .lifeos-home-search {
+  color: var(--tile-ink);
+  background: rgba(244,239,228,.96);
+  border: 1px solid rgba(39,43,41,.24);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 rgba(183,95,75,.12);
+}
+.lifeos-home-header .lifeos-home-search svg { color: var(--tile-cobalt); }
+.lifeos-home-search-results {
+  border: 1px solid rgba(39,43,41,.2);
+  border-radius: 0;
+  background: #f8f4ec;
+  box-shadow: 4px 4px 0 rgba(49,91,112,.10);
+}
+
+/* Shortcuts: a quiet row of individually coloured ceramic marks, not six cards. */
+.lifeos-home-actions {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  padding: 0;
+  background: var(--tile-paper);
+  border-top: 1px solid rgba(39,43,41,.12);
+  border-bottom: 1px solid rgba(39,43,41,.12);
+}
+.lifeos-home-actions button,
+.lifeos-home-actions button:nth-child(2n) {
+  min-height: 64px;
+  padding: .5rem .75rem;
+  flex-direction: row;
+  justify-content: flex-start;
+  border: 0;
+  border-right: 1px solid rgba(39,43,41,.12);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #444640;
+  font-family: inherit;
+  font-size: .72rem;
+  font-weight: 600;
+  transform: none;
+}
+.lifeos-home-actions button:last-child { border-right: 0; }
+.lifeos-home-actions button:nth-child(1) svg { color: var(--tile-terracotta); }
+.lifeos-home-actions button:nth-child(2) svg { color: var(--tile-ochre); }
+.lifeos-home-actions button:nth-child(3) svg { color: var(--tile-sage); }
+.lifeos-home-actions button:nth-child(4) svg { color: #7d647f; }
+.lifeos-home-actions button:nth-child(5) svg { color: var(--tile-cobalt); }
+.lifeos-home-actions button:nth-child(6) svg { color: var(--tile-terracotta); }
+.lifeos-home-actions button:hover,
+.lifeos-home-actions button:nth-child(2n):hover {
+  transform: none;
+  box-shadow: none;
+  background: rgba(49,91,112,.045);
+  color: var(--tile-ink);
+}
+
+/* Content is editorial: colour appears as borders, rules and tiny signals. */
+.lifeos-home-dashboard {
+  grid-template-columns: 1.15fr 1fr .85fr;
+  gap: 0;
+  padding: 0;
+  background: var(--tile-paper);
+}
+.lifeos-home-dashboard > section {
+  min-height: 250px;
+  padding: 1.5rem 1.6rem 1.7rem;
+  border: 0;
+  border-right: 1px solid rgba(39,43,41,.12);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none !important;
+}
+.lifeos-home-dashboard > section:last-child { border-right: 0; }
+.lifeos-home-dashboard > section:nth-child(1) { border-top: 3px solid var(--tile-terracotta); }
+.lifeos-home-dashboard > section:nth-child(2) { border-top: 3px solid var(--tile-sage); background: rgba(113,136,120,.025); }
+.lifeos-home-dashboard > section:nth-child(3) { border-top: 3px solid var(--tile-cobalt); background: rgba(49,91,112,.025); }
+.lifeos-home-dashboard > section::after { display: none; }
+.lifeos-home-panel-head {
+  min-height: 56px;
+  padding-bottom: .65rem;
+  border-bottom: 1px solid rgba(39,43,41,.13);
+}
+.lifeos-home-panel-kicker {
+  color: #817e74;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 8px;
+  letter-spacing: .2em;
+}
+.lifeos-home-panel-head h2 {
+  color: var(--tile-ink);
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+.lifeos-home-panel-head > button { color: #77756e; }
+.lifeos-home-today-count {
+  border: 1px solid var(--tile-terracotta);
+  color: var(--tile-terracotta);
+  background: transparent;
+}
+.lifeos-home-checklist button,
+.lifeos-home-focus-list button,
+.lifeos-home-next-list button {
+  color: var(--tile-ink);
+  padding: .78rem 0;
+  border-top: 1px solid rgba(39,43,41,.09);
+}
+.lifeos-home-checklist button:hover,
+.lifeos-home-focus-list button:hover,
+.lifeos-home-next-list button:hover {
+  background: rgba(49,91,112,.035);
+  padding-left: .3rem;
+}
+.lifeos-home-check {
+  border: 1px solid var(--tile-terracotta);
+  background: transparent;
+  box-shadow: none;
+}
+.lifeos-home-checklist strong,
+.lifeos-home-focus-list strong,
+.lifeos-home-next-list strong,
+.lifeos-home-note-row strong {
+  color: #30332f;
+  font-weight: 600;
+}
+.lifeos-home-checklist small,
+.lifeos-home-focus-list small,
+.lifeos-home-next-list small,
+.lifeos-home-note-row small { color: #87847a; }
+.lifeos-home-focus-mark {
+  background: var(--tile-sage);
+  border: 0;
+  box-shadow: none;
+}
+.lifeos-home-next-date {
+  color: var(--tile-cobalt);
+  font-weight: 600;
+}
+
+/* Notes/finds become part of the page rhythm rather than framed boxes. */
+.lifeos-home-lower-grid {
+  grid-template-columns: 1.05fr .95fr;
+  gap: 0;
+  padding: 0;
+  background: var(--tile-paper);
+  border-top: 1px solid rgba(39,43,41,.12);
+}
+.lifeos-home-lower-grid > div {
+  padding: 1.5rem 1.6rem 1.8rem;
+  border: 0;
+  border-right: 1px solid rgba(39,43,41,.12);
+  background: transparent;
+  box-shadow: none;
+  transform: none !important;
+}
+.lifeos-home-lower-grid > div:last-child { border-right: 0; }
+.lifeos-home-note-row {
+  color: var(--tile-ink);
+  border-top: 1px solid rgba(39,43,41,.09);
+}
+.lifeos-home-note-row:hover { background: rgba(183,95,75,.035); padding-left: .3rem; }
+.lifeos-home-find-grid { gap: 1rem; }
+.lifeos-home-find-image {
+  aspect-ratio: 1.15 / 1;
+  border: 1px solid rgba(39,43,41,.16);
+  background:
+    linear-gradient(135deg, rgba(49,91,112,.08), rgba(183,95,75,.04)),
+    #e8e0d1;
+  box-shadow: none;
+}
+.lifeos-home-find-image::after {
+  inset: 7px;
+  border: 1px solid rgba(49,91,112,.18);
+}
+.lifeos-home-find-tile:nth-child(2) .lifeos-home-find-image,
+.lifeos-home-find-tile:nth-child(3) .lifeos-home-find-image,
+.lifeos-home-find-tile:nth-child(4) .lifeos-home-find-image {
+  background:
+    linear-gradient(135deg, rgba(113,136,120,.10), rgba(197,154,74,.04)),
+    #e8e0d1;
+}
+.lifeos-home-find-tile:nth-child(3) .lifeos-home-find-image {
+  background:
+    linear-gradient(135deg, rgba(183,95,75,.10), rgba(49,91,112,.04)),
+    #e8e0d1;
+}
+.lifeos-home-find-tile:nth-child(4) .lifeos-home-find-image {
+  background:
+    linear-gradient(135deg, rgba(197,154,74,.10), rgba(113,136,120,.04)),
+    #e8e0d1;
+}
+.lifeos-home-find-tile strong { color: #30332f; }
+.lifeos-home-find-tile small { color: #77756e; }
+
+/* Footer is a simple material rail. */
+.lifeos-home-bottom-actions {
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgba(39,43,41,.12);
+  background: var(--tile-paper-deep);
+}
+.lifeos-home-bottom-actions button {
+  padding: .6rem .9rem;
+  border: 0;
+  border-right: 1px solid rgba(39,43,41,.12);
+  border-radius: 0;
+  background: transparent;
+  color: #66645d;
+  box-shadow: none;
+}
+.lifeos-home-bottom-actions button:hover {
+  border-color: rgba(39,43,41,.12);
+  color: var(--tile-ink);
+  background: rgba(255,255,255,.22);
+  transform: none;
+}
+
+@media (max-width: 900px) {
+  .lifeos-home-header {
+    min-height: 430px !important;
+    grid-template-columns: 1fr;
+  }
+  .lifeos-home-header-content {
+    min-height: 300px;
+    padding-bottom: 4.5rem;
+  }
+  .lifeos-home-header-photo {
+    min-height: 130px;
+    border-left: 0;
+    border-top: 1px solid rgba(39,43,41,.12);
+  }
+  .lifeos-home-search-wrap { left: 1.5rem; right: 1.5rem; bottom: 1.2rem; width: auto; }
+  .lifeos-home-dashboard > section {
+    border-right: 0;
+    border-bottom: 1px solid rgba(39,43,41,.12);
+  }
+  .lifeos-home-lower-grid > div {
+    border-right: 0;
+    border-bottom: 1px solid rgba(39,43,41,.12);
+  }
+}
