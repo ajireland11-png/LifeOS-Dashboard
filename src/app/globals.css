@@ -5348,3 +5348,342 @@ select.lifeos-select option:hover {
   .lifeos-home-actions{grid-template-columns:1fr}
   .lifeos-home-clock{font-size:clamp(4rem,22vw,5.8rem) !important}
 }
+
+
+/* ================================================================
+   HOME REBUILD — real artwork + editorial workspace
+   This replaces the previous dashboard/card composition.
+   ================================================================ */
+.lifeos-home-rebuild {
+  --home-ink: #18201d;
+  --home-paper: rgba(246, 241, 229, .94);
+  --home-paper-soft: rgba(246, 241, 229, .78);
+  --home-line: rgba(24, 32, 29, .20);
+  position: relative;
+  z-index: 0;
+  min-height: calc(100vh - 1rem);
+  margin: -1.5rem -1.5rem 0;
+  padding: 1.15rem 2rem 1rem;
+  overflow: hidden;
+  color: var(--home-ink);
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.lifeos-home-rebuild::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: rgba(245, 239, 226, .18);
+  pointer-events: none;
+}
+.lifeos-home-rebuild::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(247,242,231,.92) 0%, rgba(247,242,231,.82) 29%, rgba(247,242,231,.24) 58%, rgba(247,242,231,.40) 100%);
+  pointer-events: none;
+}
+.lifeos-home-rebuild-top {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto minmax(220px, 31%);
+  align-items: center;
+  gap: 2rem;
+  min-height: 3.6rem;
+  border-bottom: 1px solid var(--home-line);
+}
+.lifeos-home-wordmark,
+.lifeos-home-date,
+.lifeos-home-search-rebuild,
+.lifeos-home-quick-nav button,
+.lifeos-home-sheet button,
+.lifeos-home-bottom-strip button,
+.lifeos-home-rebuild-footer button,
+.lifeos-home-art-action {
+  font: inherit;
+}
+.lifeos-home-wordmark {
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  gap: .6rem;
+  border: 0;
+  background: transparent;
+  color: var(--home-ink);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .22em;
+  cursor: pointer;
+}
+.lifeos-home-wordmark-mark {
+  display: grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  place-items: center;
+  border: 1px solid var(--home-line);
+  border-radius: 50%;
+}
+.lifeos-home-date {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  white-space: nowrap;
+  font-size: .7rem;
+  letter-spacing: .06em;
+}
+.lifeos-home-date strong {
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+.lifeos-home-search-area { position: relative; }
+.lifeos-home-search-rebuild {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 2.25rem;
+  padding: 0 .75rem;
+  border-bottom: 1px solid var(--home-line);
+  color: rgba(24,32,29,.68);
+}
+.lifeos-home-search-rebuild input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--home-ink);
+  font-size: .82rem;
+}
+.lifeos-home-search-rebuild input::placeholder { color: rgba(24,32,29,.52); }
+.lifeos-home-search-popover {
+  position: absolute;
+  top: calc(100% + .5rem);
+  right: 0;
+  z-index: 20;
+  width: min(30rem, 90vw);
+  overflow: hidden;
+  border: 1px solid rgba(24,32,29,.18);
+  background: rgba(248,243,232,.97);
+  box-shadow: 0 18px 50px rgba(22,28,25,.16);
+}
+.lifeos-home-search-popover button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: .7rem .85rem;
+  border: 0;
+  border-bottom: 1px solid var(--home-line);
+  background: transparent;
+  color: var(--home-ink);
+  text-align: left;
+  cursor: pointer;
+}
+.lifeos-home-search-popover button:hover { background: rgba(255,255,255,.45); }
+.lifeos-home-search-popover b,.lifeos-home-search-popover small { display:block; }
+.lifeos-home-search-popover b { font-size:.78rem; }
+.lifeos-home-search-popover small { margin-top:.15rem; text-transform:uppercase; letter-spacing:.14em; opacity:.5; font-size:.55rem; }
+.lifeos-home-search-popover > span { display:block; padding:1rem; font-size:.75rem; }
+.lifeos-home-rebuild-grid {
+  display: grid;
+  grid-template-columns: minmax(15rem, 23%) minmax(0, 1fr);
+  min-height: calc(100vh - 8rem);
+}
+.lifeos-home-left-rail {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3.1rem 2rem 1.5rem .25rem;
+  border-right: 1px solid var(--home-line);
+}
+.lifeos-home-index,
+.lifeos-home-rail-note span,
+.lifeos-home-strip-title,
+.lifeos-home-sheet-heading,
+.lifeos-home-art-caption {
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: .57rem;
+  font-weight: 700;
+}
+.lifeos-home-intro h1 {
+  margin: .9rem 0 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.3rem, 4vw, 4.9rem);
+  line-height: .9;
+  font-weight: 400;
+  letter-spacing: -.055em;
+}
+.lifeos-home-intro h1 em { font-style: italic; }
+.lifeos-home-intro p {
+  max-width: 18rem;
+  margin: 0;
+  color: rgba(24,32,29,.68);
+  font-family: Georgia, serif;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+.lifeos-home-quick-nav { margin-top: 3rem; border-top: 1px solid var(--home-line); }
+.lifeos-home-quick-nav button {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr auto;
+  width: 100%;
+  align-items: center;
+  gap: .65rem;
+  padding: .65rem .1rem;
+  border: 0;
+  border-bottom: 1px solid var(--home-line);
+  background: transparent;
+  color: var(--home-ink);
+  text-align: left;
+  cursor: pointer;
+}
+.lifeos-home-quick-nav button svg { width: 1rem; height: 1rem; opacity: .7; }
+.lifeos-home-quick-nav button span { font-size: .76rem; }
+.lifeos-home-quick-nav button small { opacity: .45; }
+.lifeos-home-quick-nav button:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.lifeos-home-rail-note {
+  max-width: 12rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--home-line);
+}
+.lifeos-home-rail-note p { margin:.55rem 0 0; font: .78rem/1.45 Georgia,serif; color:rgba(24,32,29,.62); }
+.lifeos-home-rebuild-main { min-width:0; padding: 2rem 0 0 2rem; }
+.lifeos-home-art-stage {
+  position: relative;
+  min-height: min(43vh, 31rem);
+  overflow: hidden;
+  border: 1px solid rgba(24,32,29,.22);
+  background: rgba(235,226,209,.22);
+  box-shadow: 0 20px 45px rgba(27,32,29,.08);
+}
+.lifeos-home-art-image {
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg, rgba(20,29,27,.04), rgba(248,243,232,.18)), inherit;
+  opacity:.94;
+}
+.lifeos-home-art-stage::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(90deg, rgba(248,243,232,.06), transparent 60%, rgba(15,28,25,.08));
+  pointer-events:none;
+}
+.lifeos-home-art-caption {
+  position:absolute;
+  left:1rem;
+  bottom:1rem;
+  z-index:2;
+  display:flex;
+  gap:1rem;
+  color:rgba(255,250,238,.88);
+  text-shadow:0 1px 12px rgba(0,0,0,.28);
+}
+.lifeos-home-art-action {
+  position:absolute;
+  right:1rem;
+  bottom:1rem;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:.45rem;
+  padding:.55rem .7rem;
+  border:1px solid rgba(255,255,255,.5);
+  background:rgba(248,243,232,.76);
+  color:var(--home-ink);
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+}
+.lifeos-home-workbench {
+  display:grid;
+  grid-template-columns:1.1fr 1.35fr .85fr;
+  margin-top:1.2rem;
+  border-top:1px solid var(--home-line);
+  border-bottom:1px solid var(--home-line);
+}
+.lifeos-home-sheet { min-width:0; padding:1rem 1.15rem 1.1rem; border-right:1px solid var(--home-line); }
+.lifeos-home-sheet:last-child { border-right:0; }
+.lifeos-home-sheet-heading { display:flex; align-items:center; justify-content:space-between; min-height:1.6rem; }
+.lifeos-home-sheet-heading b { display:grid; width:1.5rem; height:1.5rem; place-items:center; border:1px solid var(--home-line); border-radius:50%; font-size:.6rem; }
+.lifeos-home-sheet-heading button,.lifeos-home-strip-title button { border:0; background:transparent; color:inherit; font-size:.58rem; letter-spacing:.08em; cursor:pointer; opacity:.55; }
+.lifeos-home-sheet-heading button:hover,.lifeos-home-strip-title button:hover { opacity:1; }
+.lifeos-home-task-lines button,.lifeos-home-project-line,.lifeos-home-next-line {
+  display:flex;
+  width:100%;
+  align-items:center;
+  gap:.6rem;
+  padding:.55rem 0;
+  border:0;
+  border-bottom:1px solid rgba(24,32,29,.11);
+  background:transparent;
+  color:var(--home-ink);
+  text-align:left;
+  cursor:pointer;
+}
+.lifeos-home-task-lines button:last-child,.lifeos-home-project-line:last-child,.lifeos-home-next-line:last-child { border-bottom:0; }
+.lifeos-home-task-lines button span:nth-child(2),.lifeos-home-project-line span,.lifeos-home-next-line span { min-width:0; font-size:.74rem; }
+.lifeos-home-task-lines button:hover,.lifeos-home-project-line:hover,.lifeos-home-next-line:hover { color:#563b5c; }
+.lifeos-home-checkbox { width:.75rem; height:.75rem; flex:none; border:1px solid rgba(24,32,29,.45); border-radius:50%; }
+.lifeos-home-task-lines svg,.lifeos-home-project-line svg { margin-left:auto; opacity:.35; }
+.lifeos-home-project-number { width:1.4rem; flex:none; opacity:.42; font-size:.57rem!important; letter-spacing:.08em; }
+.lifeos-home-project-line strong,.lifeos-home-project-line em { display:block; }
+.lifeos-home-project-line em { margin-top:.15rem; overflow:hidden; color:rgba(24,32,29,.52); font-size:.62rem; font-style:normal; text-overflow:ellipsis; white-space:nowrap; }
+.lifeos-home-next-line time { width:2.6rem; flex:none; font-size:.58rem; text-transform:uppercase; letter-spacing:.08em; opacity:.48; }
+.lifeos-home-open-line { display:flex; width:100%; align-items:center; justify-content:space-between; margin-top:.7rem; padding:.45rem 0; border:0; border-bottom:1px solid var(--home-line); background:transparent; color:var(--home-ink); font: .78rem Georgia,serif; cursor:pointer; }
+.lifeos-home-muted { margin:.9rem 0 .2rem; color:rgba(24,32,29,.5); font:.72rem Georgia,serif; }
+.lifeos-home-bottom-strip { display:grid; grid-template-columns:1fr 1fr; margin-top:1.25rem; border-top:1px solid var(--home-line); }
+.lifeos-home-notes-strip,.lifeos-home-finds-strip { min-width:0; padding:1rem 1.15rem 1rem 0; }
+.lifeos-home-finds-strip { padding-left:1.15rem; border-left:1px solid var(--home-line); }
+.lifeos-home-strip-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
+.lifeos-home-notes-strip>button:not(.lifeos-home-strip-title button),.lifeos-home-finds-strip>button,.lifeos-home-find-list button {
+  display:flex; width:100%; align-items:center; justify-content:space-between; gap:.7rem; padding:.45rem 0; border:0; border-bottom:1px solid rgba(24,32,29,.1); background:transparent; color:var(--home-ink); text-align:left; cursor:pointer; font-size:.72rem;
+}
+.lifeos-home-notes-strip time { font-size:.58rem; opacity:.42; }
+.lifeos-home-find-list { display:grid; grid-template-columns:1fr 1fr; gap:0 1rem; }
+.lifeos-home-find-list button { justify-content:flex-start; }
+.lifeos-home-find-dot { width:.45rem; height:.45rem; flex:none; border-radius:50%; background:#355b7a; }
+.lifeos-home-find-dot-studio { background:#bd6858; }
+.lifeos-home-rebuild-footer { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.8rem 0 0; font-size:.55rem; text-transform:uppercase; letter-spacing:.14em; opacity:.62; }
+.lifeos-home-rebuild-footer div { display:flex; gap:1.25rem; }
+.lifeos-home-rebuild-footer button { border:0; background:transparent; color:inherit; cursor:pointer; }
+.lifeos-home-rebuild-footer button:hover { text-decoration:underline; text-underline-offset:3px; }
+
+@media (max-width: 1050px) {
+  .lifeos-home-rebuild { margin-left:-1rem; margin-right:-1rem; padding-left:1.25rem; padding-right:1.25rem; }
+  .lifeos-home-rebuild-grid { grid-template-columns: 13rem minmax(0,1fr); }
+  .lifeos-home-left-rail { padding-right:1rem; }
+  .lifeos-home-rebuild-main { padding-left:1.25rem; }
+  .lifeos-home-workbench { grid-template-columns:1fr 1fr; }
+  .lifeos-home-upnext-sheet { grid-column:1 / -1; border-top:1px solid var(--home-line); border-right:0; }
+}
+@media (max-width: 760px) {
+  .lifeos-home-rebuild { margin:0 -.75rem; padding:.8rem .85rem; overflow:visible; }
+  .lifeos-home-rebuild-top { grid-template-columns:1fr auto; gap:.75rem; }
+  .lifeos-home-date { grid-column:1 / -1; grid-row:2; justify-content:space-between; padding:.55rem 0; border-top:1px solid var(--home-line); }
+  .lifeos-home-search-area { grid-column:2; grid-row:1; width:min(48vw,18rem); }
+  .lifeos-home-rebuild-grid { display:block; min-height:0; }
+  .lifeos-home-left-rail { padding:1.5rem 0 1rem; border-right:0; border-bottom:1px solid var(--home-line); }
+  .lifeos-home-intro h1 { font-size:3rem; }
+  .lifeos-home-intro p { max-width:28rem; }
+  .lifeos-home-quick-nav { display:grid; grid-template-columns:1fr 1fr; margin-top:1.5rem; }
+  .lifeos-home-rail-note { display:none; }
+  .lifeos-home-rebuild-main { padding:1rem 0 0; }
+  .lifeos-home-art-stage { min-height:55vh; }
+  .lifeos-home-workbench,.lifeos-home-bottom-strip { grid-template-columns:1fr; }
+  .lifeos-home-sheet { border-right:0; border-bottom:1px solid var(--home-line); }
+  .lifeos-home-upnext-sheet { grid-column:auto; }
+  .lifeos-home-finds-strip { padding-left:0; border-left:0; border-top:1px solid var(--home-line); }
+}
+@media (max-width: 480px) {
+  .lifeos-home-rebuild { padding-left:.65rem; padding-right:.65rem; }
+  .lifeos-home-wordmark span:last-child { display:none; }
+  .lifeos-home-search-area { width:48vw; }
+  .lifeos-home-art-stage { min-height:42vh; }
+  .lifeos-home-find-list { grid-template-columns:1fr; }
+  .lifeos-home-rebuild-footer { align-items:flex-start; flex-direction:column; }
+}
