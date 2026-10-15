@@ -849,3 +849,8 @@ input::placeholder,textarea::placeholder { color:#858d82; }
 .lo-family-related-form button:disabled { opacity:.4; cursor:not-allowed; }
 @media(max-width:900px) { .lo-family-related-form { grid-template-columns:minmax(0,1fr) minmax(0,1fr); } .lo-family-related-form select { grid-column:1/-1; } .lo-family-related-form button { justify-self:start; } }
 @media(max-width:560px) { .lo-family-related-form { grid-template-columns:minmax(0,1fr); } .lo-family-related-form select { grid-column:auto; } }
+
+.lo-studio-editor-tools { display:flex; align-items:center; gap:8px; }
+.lo-studio-editor-tools>button { display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid var(--lo-line); background:transparent; color:var(--lo-muted); font-size:10px; cursor:pointer; }
+.lo-studio-editor-tools>button:hover,.lo-studio-editor-tools>button.is-favorite { border-color:rgba(198,165,107,.5); color:var(--lo-brass); background:rgba(198,165,107,.07); }
+.lo-studio-filters button[aria-pressed="true"] { color:var(--lo-brass); border-color:rgba(198,165,107,.4); background:rgba(198,165,107,.08); }
