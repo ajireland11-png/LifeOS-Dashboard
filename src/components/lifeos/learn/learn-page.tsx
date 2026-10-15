@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ArrowUpRight, BookOpen, ChevronRight, Edit3, Plus, Search, Save, X } from 'lucide-react'
+import { ArrowUpRight, BookOpen, ChevronRight, Edit3, Plus, Search, Save, X } from 'lucide-react'
 import { useAppStore } from '@/stores/app-store'
 
 type Subject = { id: string; title: string; summary?: string | null; content: string; archived: boolean; updatedAt?: string }
