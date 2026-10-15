@@ -133,7 +133,7 @@ function RelativeTime({ dateStr }: { dateStr: string }) {
 }
 
 export function NotesPage() {
-  const { accentColor, newNoteRequest } = useAppStore()
+  const { accentColor, newNoteRequest, noteRequest, setNoteRequest } = useAppStore()
   const { t } = useTranslation()
   const accentHexMap: Record<string, string> = {
     emerald: '#10b981', teal: '#14b8a6', amber: '#f59e0b',
@@ -165,6 +165,12 @@ export function NotesPage() {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set())
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [newNote, setNewNote] = useState({ title: '', type: 'note' as Note['type'], folderId: '', tags: '' })
+
+  useEffect(() => {
+    if (!noteRequest || isLoading) return
+    if (notes.some(note => note.id === noteRequest)) setSelectedNoteId(noteRequest)
+    setNoteRequest(null)
+  }, [noteRequest, isLoading, notes, setNoteRequest])
 
   const selectedNote = useMemo(() => notes.find(n => n.id === selectedNoteId), [notes, selectedNoteId])
 
