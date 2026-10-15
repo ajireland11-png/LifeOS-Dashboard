@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowDownRight, ArrowRight, ArrowUpRight, BookOpen, CalendarDays, Compass, FlaskConical, Plus, Sparkles, Target } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, ArrowUpRight, BookOpen, CalendarDays, Compass, FlaskConical, Plus, Sparkles, Target, UsersRound, ChevronRight } from 'lucide-react'
 import { useAppStore } from '@/stores/app-store'
 
-type Item = { id: string; title?: string; name?: string; description?: string | null; summary?: string | null; status?: string; priority?: string; dueDate?: string | null; updatedAt?: string; createdAt?: string; completed?: boolean; archived?: boolean }
+type Item = { id: string; title?: string; name?: string; description?: string | null; summary?: string | null; status?: string; priority?: string; dueDate?: string | null; updatedAt?: string; createdAt?: string; completed?: boolean; archived?: boolean; birthday?: string | null; relationship?: string; photoUrl?: string | null }
+type ImportantDate = { id:string; personId:string; personName?:string; title:string; date:string; recurrence:string; kind:string; reminderDays:number }
+function nextAnnualDate(value:string) { const d=new Date(value.slice(0,10)+'T12:00:00'); if(Number.isNaN(d.getTime()))return null; const now=new Date();now.setHours(0,0,0,0);let n=new Date(now.getFullYear(),d.getMonth(),d.getDate(),12);if(n<now)n=new Date(now.getFullYear()+1,d.getMonth(),d.getDate(),12);return n }
 function list<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[]
   if (value && typeof value === 'object') {
@@ -25,16 +27,18 @@ export function OverviewPage() {
   const [papers,setPapers]=useState<Item[]>([])
   const [studio,setStudio]=useState<Item[]>([])
   const [subjects,setSubjects]=useState<Item[]>([])
+  const [people,setPeople]=useState<Item[]>([])
+  const [importantDates,setImportantDates]=useState<ImportantDate[]>([])
   const [loading,setLoading]=useState(true)
   const [now,setNow]=useState(()=>new Date())
 
   useEffect(()=>{const timer=setInterval(()=>setNow(new Date()),60_000);return()=>clearInterval(timer)},[])
   useEffect(()=>{
     let cancelled=false
-    const endpoints=['/api/tasks','/api/projects','/api/research/papers','/api/studio/items','/api/explore/subjects']
-    Promise.all(endpoints.map(async url=>{try{const res=await fetch(url);return res.ok?list<Item>(await res.json()):[]}catch{return []}})).then(([t,p,r,s,l])=>{
+    const endpoints=['/api/tasks','/api/projects','/api/research/papers','/api/studio/items','/api/explore/subjects','/api/people','/api/people/dates']
+    Promise.all(endpoints.map(async url=>{try{const res=await fetch(url);return res.ok?await res.json():[]}catch{return []}})).then(([t,p,r,s,l,peopleData,dateData])=>{
       if(cancelled)return
-      setTasks(t);setProjects(p);setPapers(r);setStudio(s);setSubjects(l);setLoading(false)
+      setTasks(list<Item>(t));setProjects(list<Item>(p));setPapers(list<Item>(r));setStudio(list<Item>(s));setSubjects(list<Item>(l));setPeople(list<Item>(peopleData));setImportantDates(list<ImportantDate>(dateData));setLoading(false)
     })
     return()=>{cancelled=true}
   },[])
