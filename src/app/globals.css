@@ -800,3 +800,31 @@ input::placeholder,textarea::placeholder { color:#858d82; }
 .lo-studio-item-collections input{accent-color:var(--lo-brass)}
 .lo-studio-item-collections p{margin:0;color:var(--lo-muted);font-size:10px}
 @media(max-width:800px){.lo-studio-header-actions{width:100%}.lo-studio-header-actions button{flex:1;justify-content:center}}
+
+/* Learn knowledge tree and layered explanations */
+.lo-learn-tree-row{display:flex;align-items:center;gap:2px;min-width:0;margin:2px 0}
+.lo-learn-tree-toggle,.lo-learn-tree-spacer{display:flex;align-items:center;justify-content:center;flex:none;width:18px;height:27px;color:#8b9588}
+.lo-learn-tree-toggle{border:0;background:transparent;cursor:pointer}.lo-learn-tree-row .lo-learn-subject{flex:1;min-width:0}
+.lo-learn-tree-row .lo-learn-subject-text{min-width:0;flex:1}.lo-learn-tree-row .lo-learn-subject-text strong,.lo-learn-tree-row .lo-learn-subject-text small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lo-learn-tree-row .lo-learn-subject-text small{margin-top:3px;color:var(--lo-muted);font-size:9px}
+.lo-learn-reorder{display:flex;flex:none;flex-direction:column;opacity:.2}.lo-learn-tree-row:hover .lo-learn-reorder{opacity:1}
+.lo-learn-reorder button{display:flex;align-items:center;justify-content:center;width:18px;height:13px;border:0;background:transparent;color:#90988e;cursor:pointer}
+.lo-learn-create-options{display:grid;grid-template-columns:1fr 1.3fr;gap:6px}.lo-learn-create-options select{min-width:0;padding:7px 3px;border:1px solid var(--lo-line);background:#292d29;color:var(--lo-parchment);font-size:10px}
+.lo-learn-create>button[type=submit]{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:7px;padding:8px;border:1px solid rgba(198,165,107,.45);background:rgba(198,165,107,.08);color:var(--lo-brass);font-size:10px;cursor:pointer}
+.lo-learn-reader-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.lo-learn-reader-actions select{max-width:135px;padding:6px;border:1px solid var(--lo-line);background:#292d29;color:var(--lo-parchment);font-size:10px}
+.lo-learn-reader-actions button{display:inline-flex;align-items:center;gap:6px}.lo-learn-reader-actions button.is-bookmarked{color:var(--lo-brass)}
+.lo-learn-edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 16px}.lo-learn-edit-grid label{display:block;color:var(--lo-muted);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.lo-learn-edit-grid input,.lo-learn-edit-grid select,.lo-learn-edit-grid textarea{display:block;width:100%;margin-top:6px;padding:9px 3px;border:0;border-bottom:1px solid var(--lo-line-strong);background:transparent;color:var(--lo-parchment);font-size:11px;letter-spacing:normal;text-transform:none;outline:none}
+.lo-learn-edit-grid .lo-learn-wide{grid-column:1/-1}.lo-learn-layer-editor,.lo-learn-relations-editor,.lo-learn-references-editor{margin-top:24px;padding-top:16px;border-top:1px solid var(--lo-line)}
+.lo-learn-edit-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px}.lo-learn-edit-section-heading strong{color:var(--lo-parchment);font:18px Georgia,serif}.lo-learn-edit-section-heading small{color:var(--lo-muted);font-size:9px}
+.lo-learn-layer-editor>label{display:block;margin:13px 0;color:var(--lo-muted);font-size:10px}.lo-learn-layer-editor>label>small{display:block;margin-top:3px;color:#7f897e;font-size:9px}
+.lo-learn-layer-editor textarea{display:block;width:100%;margin-top:7px;padding:9px;border:1px solid var(--lo-line);background:rgba(0,0,0,.08);color:var(--lo-parchment);font-size:11px;line-height:1.6;resize:vertical}
+.lo-learn-relation-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.lo-learn-relation-list label{display:flex;align-items:center;gap:7px;min-width:0;padding:7px;border:1px solid var(--lo-line);color:#c4c9bd;font-size:10px}.lo-learn-relation-list input,.lo-learn-bookmark-toggle input{accent-color:var(--lo-brass);flex:none}
+.lo-learn-references-editor .lo-learn-edit-section-heading button{display:flex;align-items:center;gap:5px;border:0;background:transparent;color:var(--lo-brass);font-size:10px;cursor:pointer}
+.lo-learn-reference-edit-row{display:grid;grid-template-columns:1fr 1.2fr 28px;gap:6px;margin:8px 0}.lo-learn-reference-edit-row input{min-width:0;padding:8px;border:1px solid var(--lo-line);background:rgba(0,0,0,.06);color:var(--lo-parchment);font-size:10px}
+.lo-learn-bookmark-toggle{display:flex;align-items:center;gap:8px;margin-top:22px;color:var(--lo-brass);font-size:10px}
+.lo-learn-layer-reading{margin:0 0 26px;padding:16px;border:1px solid var(--lo-line);background:rgba(233,224,207,.025)}.lo-learn-reading-label,.lo-learn-linked-records>span,.lo-learn-reference-reading>span{display:block;margin-bottom:9px;color:var(--lo-muted);font-size:8px;letter-spacing:.15em;text-transform:uppercase}
+.lo-learn-layer-reading details{border-top:1px solid var(--lo-line);padding:10px 0}.lo-learn-layer-reading summary{color:var(--lo-parchment);font:17px Georgia,serif;cursor:pointer}.lo-learn-layer-reading p{margin:9px 0 2px;color:#c8c9bf;font:13px/1.8 Georgia,serif;white-space:pre-wrap}
+.lo-learn-linked-records,.lo-learn-reference-reading{margin:20px 0;padding-top:14px;border-top:1px solid var(--lo-line)}.lo-learn-linked-records button{display:inline-flex;align-items:center;gap:6px;margin:3px 7px 3px 0;padding:7px 9px;border:1px solid var(--lo-line);background:rgba(233,224,207,.02);color:#c9cfc4;font-size:10px;cursor:pointer}
+.lo-learn-reference-reading a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;padding:10px 0;border-top:1px solid rgba(233,224,207,.08);color:var(--lo-parchment);text-decoration:none}.lo-learn-reference-reading a strong{font:15px Georgia,serif}.lo-learn-reference-reading a small{color:var(--lo-muted);font-size:9px;overflow-wrap:anywhere}
+@media(max-width:680px){.lo-learn-edit-grid,.lo-learn-relation-list{grid-template-columns:1fr}.lo-learn-edit-grid .lo-learn-wide{grid-column:auto}.lo-learn-reference-edit-row{grid-template-columns:1fr 28px}.lo-learn-reader-actions{width:100%}}
