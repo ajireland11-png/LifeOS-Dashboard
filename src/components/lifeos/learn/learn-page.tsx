@@ -1,11 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ArrowUpRight, BookOpen, Check, ChevronRight, Edit3, Plus, Search, Save, X } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, BookOpen, ChevronRight, Edit3, Plus, Search, Save, X } from 'lucide-react'
 import { useAppStore } from '@/stores/app-store'
 
 type Subject = { id: string; title: string; summary?: string | null; content: string; archived: boolean; updatedAt?: string }
-const asText = (v: unknown) => typeof v === 'string' ? v : ''
 
 export function LearnPage() {
   const [subjects, setSubjects] = useState<Subject[]>([])
