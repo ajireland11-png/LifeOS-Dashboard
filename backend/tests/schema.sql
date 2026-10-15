@@ -501,10 +501,22 @@ CREATE TABLE "ExploreSubject" (
     "title" TEXT NOT NULL,
     "summary" TEXT,
     "content" TEXT NOT NULL DEFAULT '',
+    "parentId" TEXT,
+    "kind" TEXT NOT NULL DEFAULT 'subject',
+    "status" TEXT NOT NULL DEFAULT 'not-started',
+    "bookmarked" BOOLEAN NOT NULL DEFAULT false,
+    "position" INTEGER NOT NULL DEFAULT 0,
+    "prerequisitesJson" TEXT NOT NULL DEFAULT '[]',
+    "relatedJson" TEXT NOT NULL DEFAULT '[]',
+    "referencesJson" TEXT NOT NULL DEFAULT '[]',
+    "layersJson" TEXT NOT NULL DEFAULT '{}',
     "archived" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" INTEGER NOT NULL,
-    "updatedAt" INTEGER NOT NULL
+    "updatedAt" INTEGER NOT NULL,
+    CONSTRAINT "ExploreSubject_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "ExploreSubject" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
+CREATE INDEX "ExploreSubject_parentId_position_idx" ON "ExploreSubject"("parentId","position");
+CREATE INDEX "ExploreSubject_status_idx" ON "ExploreSubject"("status");
 
 CREATE TABLE "StudioItem" (
     "id" TEXT NOT NULL PRIMARY KEY,
