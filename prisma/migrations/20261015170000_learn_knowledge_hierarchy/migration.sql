@@ -1,0 +1,11 @@
+ALTER TABLE "ExploreSubject" ADD COLUMN "parentId" TEXT REFERENCES "ExploreSubject" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ExploreSubject" ADD COLUMN "kind" TEXT NOT NULL DEFAULT 'subject';
+ALTER TABLE "ExploreSubject" ADD COLUMN "status" TEXT NOT NULL DEFAULT 'not-started';
+ALTER TABLE "ExploreSubject" ADD COLUMN "bookmarked" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "ExploreSubject" ADD COLUMN "position" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "ExploreSubject" ADD COLUMN "prerequisitesJson" TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE "ExploreSubject" ADD COLUMN "relatedJson" TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE "ExploreSubject" ADD COLUMN "referencesJson" TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE "ExploreSubject" ADD COLUMN "layersJson" TEXT NOT NULL DEFAULT '{}';
+CREATE INDEX "ExploreSubject_parentId_position_idx" ON "ExploreSubject"("parentId","position");
+CREATE INDEX "ExploreSubject_status_idx" ON "ExploreSubject"("status");
