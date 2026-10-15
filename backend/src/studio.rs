@@ -205,3 +205,144 @@ pub async fn delete_item(
         .await?;
     Ok(Json(serde_json::json!({ "success": true })))
 }
+
+
+pub async fn list_categories(
+    State(st): State<AppState>,
+) -> Result<Json<Vec<Value>>, AppError> {
+    let rows = sqlx::query("SELECT c.*, (SELECT COUNT(*) FROM StudioItem i WHERE i.category = c.name AND i.archived = 0) AS itemCount FROM StudioCategory c ORDER BY c.position ASC, c.name COLLATE NOCASE ASC")
+        .fetch_all(&st.db).await?;
+    let out = rows.iter().map(|r| -> Result<Value, sqlx::Error> { Ok(serde_json::json!({
+        "id":r.try_get::<String,_>("id")?,"name":r.try_get::<String,_>("name")?,
+        "description":r.try_get::<Option<String>,_>("description")?,"accent":r.try_get::<String,_>("accent")?,
+        "position":r.try_get::<i64,_>("position")?,"itemCount":r.try_get::<i64,_>("itemCount")?
+    })) }).collect::<Result<Vec<_>,_>>()?;
+    Ok(Json(out))
+}
+
+pub async fn create_category(
+    State(st): State<AppState>,
+    Json(body): Json<Value>,
+) -> Result<(StatusCode, Json<Value>), AppError> {
+    let name = body.get("name").and_then(Value::as_str).map(str::trim)
+        .filter(|s| !s.is_empty()).ok_or_else(|| AppError::BadRequest("Category name is required".into()))?;
+    let id = gen_id();
+    let now = now_ms();
+    sqlx::query("INSERT INTO StudioCategory (id,name,description,accent,position,createdAt,updatedAt) VALUES (?,?,?,?,?,?,?)")
+        .bind(&id).bind(name).bind(truthy_str(&body,"description"))
+        .bind(body.get("accent").and_then(Value::as_str).unwrap_or("sage"))
+        .bind(body.get("position").and_then(Value::as_i64).unwrap_or(0))
+        .bind(now).bind(now).execute(&st.db).await?;
+    Ok((StatusCode::CREATED,Json(serde_json::json!({"id":id,"name":name,"description":body.get("description"),"accent":body.get("accent").and_then(Value::as_str).unwrap_or("sage"),"position":body.get("position").and_then(Value::as_i64).unwrap_or(0),"itemCount":0}))))
+}
+
+pub async fn update_category(
+    State(st): State<AppState>, Path(id): Path<String>, Json(body): Json<Value>,
+) -> Result<Json<Value>, AppError> {
+    let old = sqlx::query("SELECT name FROM StudioCategory WHERE id = ?").bind(&id).fetch_optional(&st.db).await?
+        .ok_or_else(|| AppError::NotFound("Category not found".into()))?;
+    let old_name: String = old.try_get("name")?;
+    let new_name = body.get("name").and_then(Value::as_str).map(str::trim).filter(|s| !s.is_empty()).unwrap_or(&old_name).to_string();
+    let mut tx = st.db.begin().await?;
+    if new_name != old_name {
+        sqlx::query("UPDATE StudioItem SET category = ?, updatedAt = ? WHERE category = ?")
+            .bind(&new_name).bind(now_ms()).bind(&old_name).execute(&mut *tx).await?;
+    }
+    sqlx::query("UPDATE StudioCategory SET name = ?, description = COALESCE(?,description), accent = COALESCE(?,accent), position = COALESCE(?,position), updatedAt = ? WHERE id = ?")
+        .bind(&new_name).bind(truthy_str(&body,"description"))
+        .bind(body.get("accent").and_then(Value::as_str))
+        .bind(body.get("position").and_then(Value::as_i64))
+        .bind(now_ms()).bind(&id).execute(&mut *tx).await?;
+    tx.commit().await?;
+    let row = sqlx::query("SELECT c.*, (SELECT COUNT(*) FROM StudioItem i WHERE i.category=c.name AND i.archived=0) AS itemCount FROM StudioCategory c WHERE c.id=?")
+        .bind(&id).fetch_one(&st.db).await?;
+    Ok(Json(serde_json::json!({"id":id,"name":row.try_get::<String,_>("name")?,"description":row.try_get::<Option<String>,_>("description")?,"accent":row.try_get::<String,_>("accent")?,"position":row.try_get::<i64,_>("position")?,"itemCount":row.try_get::<i64,_>("itemCount")?})))
+}
+
+pub async fn delete_category(
+    State(st): State<AppState>, Path(id): Path<String>,
+) -> Result<Json<Value>, AppError> {
+    let row = sqlx::query("SELECT name FROM StudioCategory WHERE id = ?").bind(&id).fetch_optional(&st.db).await?
+        .ok_or_else(|| AppError::NotFound("Category not found".into()))?;
+    let name: String = row.try_get("name")?;
+    let mut tx = st.db.begin().await?;
+    sqlx::query("UPDATE StudioItem SET category = NULL, updatedAt = ? WHERE category = ?")
+        .bind(now_ms()).bind(&name).execute(&mut *tx).await?;
+    sqlx::query("DELETE FROM StudioCategory WHERE id = ?").bind(&id).execute(&mut *tx).await?;
+    tx.commit().await?;
+    Ok(Json(serde_json::json!({"success":true})))
+}
+
+pub async fn list_collections(
+    State(st): State<AppState>,
+) -> Result<Json<Vec<Value>>, AppError> {
+    let rows = sqlx::query("SELECT * FROM StudioCollection ORDER BY updatedAt DESC, name COLLATE NOCASE ASC")
+        .fetch_all(&st.db).await?;
+    let mut out = Vec::new();
+    for r in rows {
+        let id: String = r.try_get("id")?;
+        let item_rows = sqlx::query("SELECT itemId FROM StudioCollectionItem WHERE collectionId = ? ORDER BY createdAt DESC")
+            .bind(&id).fetch_all(&st.db).await?;
+        let items = item_rows.iter().map(|x| x.try_get::<String,_>("itemId")).collect::<Result<Vec<_>,_>>()?;
+        out.push(serde_json::json!({
+            "id":id,"name":r.try_get::<String,_>("name")?,"description":r.try_get::<Option<String>,_>("description")?,
+            "coverUrl":r.try_get::<Option<String>,_>("coverUrl")?,"items":items,"itemCount":items.len()
+        }));
+    }
+    Ok(Json(out))
+}
+
+pub async fn create_collection(
+    State(st): State<AppState>, Json(body): Json<Value>,
+) -> Result<(StatusCode, Json<Value>), AppError> {
+    let name = body.get("name").and_then(Value::as_str).map(str::trim)
+        .filter(|s| !s.is_empty()).ok_or_else(|| AppError::BadRequest("Collection name is required".into()))?;
+    let id=gen_id();let now=now_ms();
+    sqlx::query("INSERT INTO StudioCollection (id,name,description,coverUrl,createdAt,updatedAt) VALUES (?,?,?,?,?,?)")
+        .bind(&id).bind(name).bind(truthy_str(&body,"description")).bind(truthy_str(&body,"coverUrl")).bind(now).bind(now).execute(&st.db).await?;
+    Ok((StatusCode::CREATED,Json(serde_json::json!({"id":id,"name":name,"description":body.get("description"),"coverUrl":body.get("coverUrl"),"items":[],"itemCount":0}))))
+}
+
+pub async fn update_collection(
+    State(st): State<AppState>, Path(id): Path<String>, Json(body): Json<Value>,
+) -> Result<Json<Value>, AppError> {
+    let exists:i64=sqlx::query_scalar("SELECT COUNT(*) FROM StudioCollection WHERE id=?").bind(&id).fetch_one(&st.db).await?;
+    if exists==0{return Err(AppError::NotFound("Collection not found".into()))}
+    sqlx::query("UPDATE StudioCollection SET name=COALESCE(?,name),description=COALESCE(?,description),coverUrl=COALESCE(?,coverUrl),updatedAt=? WHERE id=?")
+        .bind(body.get("name").and_then(Value::as_str).map(str::trim).filter(|s|!s.is_empty()))
+        .bind(body.get("description").and_then(Value::as_str))
+        .bind(body.get("coverUrl").and_then(Value::as_str))
+        .bind(now_ms()).bind(&id).execute(&st.db).await?;
+    let row=sqlx::query("SELECT * FROM StudioCollection WHERE id=?").bind(&id).fetch_one(&st.db).await?;
+    let ids=sqlx::query("SELECT itemId FROM StudioCollectionItem WHERE collectionId=?").bind(&id).fetch_all(&st.db).await?;
+    let items=ids.iter().map(|r|r.try_get::<String,_>("itemId")).collect::<Result<Vec<_>,_>>()?;
+    Ok(Json(serde_json::json!({"id":id,"name":row.try_get::<String,_>("name")?,"description":row.try_get::<Option<String>,_>("description")?,"coverUrl":row.try_get::<Option<String>,_>("coverUrl")?,"items":items,"itemCount":items.len()})))
+}
+
+pub async fn delete_collection(
+    State(st): State<AppState>, Path(id): Path<String>,
+) -> Result<Json<Value>, AppError> {
+    let result=sqlx::query("DELETE FROM StudioCollection WHERE id=?").bind(&id).execute(&st.db).await?;
+    if result.rows_affected()==0{return Err(AppError::NotFound("Collection not found".into()))}
+    Ok(Json(serde_json::json!({"success":true})))
+}
+
+pub async fn link_collection_item(
+    State(st): State<AppState>, Path((collection_id,item_id)): Path<(String,String)>,
+) -> Result<(StatusCode,Json<Value>),AppError> {
+    let collection:i64=sqlx::query_scalar("SELECT COUNT(*) FROM StudioCollection WHERE id=?").bind(&collection_id).fetch_one(&st.db).await?;
+    if collection==0{return Err(AppError::NotFound("Collection not found".into()))}
+    let item:i64=sqlx::query_scalar("SELECT COUNT(*) FROM StudioItem WHERE id=?").bind(&item_id).fetch_one(&st.db).await?;
+    if item==0{return Err(AppError::NotFound("Studio item not found".into()))}
+    sqlx::query("INSERT OR IGNORE INTO StudioCollectionItem (collectionId,itemId,createdAt) VALUES (?,?,?)")
+        .bind(&collection_id).bind(&item_id).bind(now_ms()).execute(&st.db).await?;
+    Ok((StatusCode::CREATED,Json(serde_json::json!({"success":true,"collectionId":collection_id,"itemId":item_id}))))
+}
+
+pub async fn unlink_collection_item(
+    State(st): State<AppState>, Path((collection_id,item_id)): Path<(String,String)>,
+) -> Result<Json<Value>,AppError> {
+    sqlx::query("DELETE FROM StudioCollectionItem WHERE collectionId=? AND itemId=?").bind(&collection_id).bind(&item_id).execute(&st.db).await?;
+    Ok(Json(serde_json::json!({"success":true})))
+}
+
