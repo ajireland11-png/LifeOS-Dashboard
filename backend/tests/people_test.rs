@@ -75,3 +75,41 @@ async fn people_dates_and_shared_tasks_persist_without_duplicating_tasks() {
     assert_eq!(status, StatusCode::OK);
     assert_eq!(preserved_task["id"], task_id);
 }
+
+#[tokio::test]
+async fn people_relationships_are_bidirectional_and_removable_without_deleting_profiles() {
+    let (app, _temp_db) = common::setup_test_app().await;
+    let (status, alex) = send(&app, "POST", "/api/people", json!({"name":"Alex"})).await;
+    assert_eq!(status, StatusCode::CREATED);
+    let (status, sam) = send(&app, "POST", "/api/people", json!({"name":"Sam"})).await;
+    assert_eq!(status, StatusCode::CREATED);
+    let alex_id = alex["id"].as_str().unwrap();
+    let sam_id = sam["id"].as_str().unwrap();
+
+    let (status, _) = send(&app, "POST", &format!("/api/people/{alex_id}/relationships"), json!({
+        "relatedPersonId": sam_id,
+        "label": "Sibling"
+    })).await;
+    assert_eq!(status, StatusCode::CREATED);
+
+    let (status, alex_links) = send(&app, "GET", &format!("/api/people/{alex_id}/relationships"), Value::Null).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(alex_links.as_array().unwrap().len(), 1);
+    assert_eq!(alex_links[0]["name"], "Sam");
+    assert_eq!(alex_links[0]["label"], "Sibling");
+
+    let (status, sam_links) = send(&app, "GET", &format!("/api/people/{sam_id}/relationships"), Value::Null).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(sam_links.as_array().unwrap().len(), 1);
+    assert_eq!(sam_links[0]["name"], "Alex");
+
+    let (status, _) = send(&app, "DELETE", &format!("/api/people/{alex_id}/relationships/{sam_id}"), Value::Null).await;
+    assert_eq!(status, StatusCode::OK);
+    let (_, remaining) = send(&app, "GET", &format!("/api/people/{alex_id}/relationships"), Value::Null).await;
+    assert!(remaining.as_array().unwrap().is_empty());
+
+    let (status, still_there) = send(&app, "GET", &format!("/api/people/{sam_id}"), Value::Null).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(still_there["name"], "Sam");
+}
+
