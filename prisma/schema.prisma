@@ -754,9 +754,24 @@ model Person {
 
   dates          PersonDate[]
   taskLinks      PersonTaskLink[]
+  relationshipsFrom PersonRelationship[] @relation("PersonRelationshipFrom")
+  relationshipsTo   PersonRelationship[] @relation("PersonRelationshipTo")
 
   @@index([name])
   @@index([archived])
+}
+
+model PersonRelationship {
+  personId        String
+  relatedPersonId String
+  label           String   @default("Related")
+  createdAt       DateTime @default(now())
+
+  person        Person @relation("PersonRelationshipFrom", fields: [personId], references: [id], onDelete: Cascade)
+  relatedPerson Person @relation("PersonRelationshipTo", fields: [relatedPersonId], references: [id], onDelete: Cascade)
+
+  @@id([personId, relatedPersonId])
+  @@index([relatedPersonId])
 }
 
 model PersonDate {
