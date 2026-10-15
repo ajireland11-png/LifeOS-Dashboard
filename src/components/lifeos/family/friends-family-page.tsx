@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useAppStore } from '@/stores/app-store'
 import { CalendarDays, Cake, Check, ChevronRight, Gift, Heart, Link2, Mail, Phone, Plus, Search, Trash2, UsersRound, X } from 'lucide-react'
 
 type Person = {id:string;name:string;relationship:string;photoUrl?:string|null;birthday?:string|null;email?:string|null;phone?:string|null;interests?:string[];giftIdeas?:string[];notes?:string|null;updatedAt?:string}
@@ -18,6 +19,8 @@ function nextDate(v:string,recurrence:string){const d=new Date(v.slice(0,10)+'T1
 function daysAway(d:Date){const n=new Date();n.setHours(0,0,0,0);return Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()-n.getTime())/86400000)}
 
 export function FriendsFamilyPage(){
+ const familyPersonRequest=useAppStore(s=>s.familyPersonRequest)
+ const setFamilyPersonRequest=useAppStore(s=>s.setFamilyPersonRequest)
  const [people,setPeople]=useState<Person[]>([]),[allDates,setAllDates]=useState<PersonDate[]>([]),[selectedId,setSelectedId]=useState<string|null>(null),[dates,setDates]=useState<PersonDate[]>([]),[tasks,setTasks]=useState<Task[]>([]),[linked,setLinked]=useState<Task[]>([])
  const [query,setQuery]=useState(''),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[editing,setEditing]=useState(false),[creating,setCreating]=useState(false),[dateForm,setDateForm]=useState(false),[taskId,setTaskId]=useState('')
  const [error,setError]=useState(''),[notice,setNotice]=useState('')
@@ -25,7 +28,7 @@ export function FriendsFamilyPage(){
  const [dateDraft,setDateDraft]=useState({title:'',date:'',kind:'important',recurrence:'yearly',reminderDays:7,notes:''})
  const selected=people.find(p=>p.id===selectedId)||null
  const loadPeople=useCallback(async(keep?:string|null)=>{setLoading(true);try{const p=await api<Person[]>('/api/people');setPeople(p);setSelectedId(keep&&p.some(x=>x.id===keep)?keep:p[0]?.id||null);setError('')}catch(e){setError(e instanceof Error?e.message:'Could not load people')}finally{setLoading(false)}},[])
- useEffect(()=>{void loadPeople(null);void api<Task[]>('/api/tasks').then(setTasks).catch(()=>setTasks([]));void api<PersonDate[]>('/api/people/dates').then(setAllDates).catch(()=>setAllDates([]))},[loadPeople])
+ useEffect(()=>{void loadPeople(familyPersonRequest);if(familyPersonRequest)setFamilyPersonRequest(null);void api<Task[]>('/api/tasks').then(setTasks).catch(()=>setTasks([]));void api<PersonDate[]>('/api/people/dates').then(setAllDates).catch(()=>setAllDates([]))},[loadPeople,familyPersonRequest,setFamilyPersonRequest])
  useEffect(()=>{if(!selectedId){setDates([]);setLinked([]);return}let dead=false;Promise.all([api<PersonDate[]>('/api/people/'+selectedId+'/dates'),api<Task[]>('/api/people/'+selectedId+'/tasks')]).then(([d,t])=>{if(!dead){setDates(d);setLinked(t)}}).catch(e=>{if(!dead)setError(e instanceof Error?e.message:'Could not load profile')});return()=>{dead=true}},[selectedId])
  useEffect(()=>{if(!selected)return;setDraft({name:selected.name,relationship:selected.relationship||'Friend',photoUrl:selected.photoUrl||'',birthday:selected.birthday||'',email:selected.email||'',phone:selected.phone||'',interests:(selected.interests||[]).join(', '),giftIdeas:(selected.giftIdeas||[]).join(', '),notes:selected.notes||''});setEditing(false)},[selectedId,selected?.updatedAt])
  const visible=useMemo(()=>people.filter(p=>(p.name+' '+p.relationship+' '+(p.interests||[]).join(' ')).toLowerCase().includes(query.toLowerCase())),[people,query])
