@@ -11,6 +11,7 @@ export type ModuleId =
   | 'projects'
   | 'house'
   | 'research'
+  | 'family'
   | 'archive'
 
   // Existing modules — temporarily retained while we migrate functionality
