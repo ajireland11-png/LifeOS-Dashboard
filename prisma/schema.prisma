@@ -675,6 +675,7 @@ model StudioItem {
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  collectionLinks StudioCollectionItem[]
 }
 
 
@@ -783,4 +784,42 @@ model ResearchPaperTaskLink {
 
   @@id([paperId, taskId])
   @@index([taskId])
+}
+
+
+model StudioCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  accent      String   @default("sage")
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([position])
+}
+
+model StudioCollection {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  coverUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items       StudioCollectionItem[]
+
+  @@index([name])
+}
+
+model StudioCollectionItem {
+  collectionId String
+  itemId       String
+  createdAt    DateTime @default(now())
+
+  collection   StudioCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  item         StudioItem       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, itemId])
+  @@index([itemId])
 }
