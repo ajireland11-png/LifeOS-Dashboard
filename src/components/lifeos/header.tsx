@@ -51,7 +51,6 @@ export function Header() {
   const moduleLabels: Record<ModuleId, string> = {
    home: 'Overview',
     atlas: 'Atlas',
-    friends: 'Friends & Family',
     explore: 'Explore',
     studio: 'Studio',
     projects: 'Projects',
