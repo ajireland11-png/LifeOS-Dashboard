@@ -244,3 +244,78 @@ pub async fn unlink_task(
     sqlx::query("DELETE FROM PersonTaskLink WHERE personId = ? AND taskId = ?").bind(&person_id).bind(&task_id).execute(&st.db).await?;
     Ok(Json(json!({"success":true})))
 }
+
+/// List the people connected to a profile. Each relationship is stored in both
+/// directions so it can be navigated from either person's profile.
+pub async fn list_relationships(
+    State(st): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<Vec<Value>>, AppError> {
+    if !person_exists(&st.db, &id).await? {
+        return Err(AppError::NotFound("Person not found".into()));
+    }
+    let rows = sqlx::query(
+        "SELECT p.id, p.name, p.relationship, p.photoUrl, r.label, r.createdAt
+         FROM PersonRelationship r
+         JOIN Person p ON p.id = r.relatedPersonId
+         WHERE r.personId = ? AND p.archived = 0
+         ORDER BY p.name COLLATE NOCASE ASC"
+    ).bind(&id).fetch_all(&st.db).await?;
+    let items = rows.iter().map(|r| Ok(json!({
+        "id": r.try_get::<String, _>("id")?,
+        "name": r.try_get::<String, _>("name")?,
+        "relationship": r.try_get::<String, _>("relationship")?,
+        "photoUrl": r.try_get::<Option<String>, _>("photoUrl")?,
+        "label": r.try_get::<String, _>("label")?,
+        "createdAt": PrismaDateTime(r.try_get::<i64, _>("createdAt")?)
+    }))).collect::<Result<Vec<Value>, sqlx::Error>>()?;
+    Ok(Json(items))
+}
+
+pub async fn link_people(
+    State(st): State<AppState>,
+    Path(person_id): Path<String>,
+    Json(body): Json<Value>,
+) -> Result<(StatusCode, Json<Value>), AppError> {
+    let related_id = body.get("relatedPersonId").and_then(Value::as_str)
+        .map(str::trim).filter(|s| !s.is_empty())
+        .ok_or_else(|| AppError::BadRequest("A related person is required".into()))?;
+    if person_id == related_id {
+        return Err(AppError::BadRequest("A person cannot be related to themselves".into()));
+    }
+    if !person_exists(&st.db, &person_id).await? {
+        return Err(AppError::NotFound("Person not found".into()));
+    }
+    if !person_exists(&st.db, related_id).await? {
+        return Err(AppError::NotFound("Related person not found".into()));
+    }
+    let label = body.get("label").and_then(Value::as_str)
+        .map(str::trim).filter(|s| !s.is_empty()).unwrap_or("Related");
+    let now = now_ms();
+    let mut tx = st.db.begin().await?;
+    sqlx::query("INSERT OR IGNORE INTO PersonRelationship (personId, relatedPersonId, label, createdAt) VALUES (?,?,?,?)")
+        .bind(&person_id).bind(related_id).bind(label).bind(now).execute(&mut *tx).await?;
+    sqlx::query("INSERT OR IGNORE INTO PersonRelationship (personId, relatedPersonId, label, createdAt) VALUES (?,?,?,?)")
+        .bind(related_id).bind(&person_id).bind(label).bind(now).execute(&mut *tx).await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(json!({
+        "success": true,
+        "personId": person_id,
+        "relatedPersonId": related_id,
+        "label": label
+    }))))
+}
+
+pub async fn unlink_people(
+    State(st): State<AppState>,
+    Path((person_id, related_id)): Path<(String, String)>,
+) -> Result<Json<Value>, AppError> {
+    sqlx::query(
+        "DELETE FROM PersonRelationship
+         WHERE (personId = ? AND relatedPersonId = ?)
+            OR (personId = ? AND relatedPersonId = ?)"
+    ).bind(&person_id).bind(&related_id).bind(&related_id).bind(&person_id)
+     .execute(&st.db).await?;
+    Ok(Json(json!({"success": true})))
+}
+
