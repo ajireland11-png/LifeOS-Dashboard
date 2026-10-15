@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DATABASE_URL: file:./prisma/dev.db
+  DATABASE_URL: file:./dev.db
   BACKEND_DATABASE_URL: sqlite:../prisma/dev.db
   NEXT_TELEMETRY_DISABLED: 1
 
@@ -108,7 +108,7 @@ jobs:
       - name: Restore Rust cache
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: backend
+          workspaces: backend -> backend/target
 
       - name: Check formatting
         run: cargo fmt --check
@@ -180,7 +180,7 @@ jobs:
         run: nohup cargo run --release > backend.log 2>&1 &
         working-directory: backend
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DATABASE_URL: sqlite:../prisma/dev.db
 
       - name: Start frontend server
         run: nohup bun run dev > frontend.log 2>&1 &
