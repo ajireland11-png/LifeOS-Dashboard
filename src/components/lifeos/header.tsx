@@ -50,6 +50,7 @@ export function Header() {
 
   const moduleLabels: Record<ModuleId, string> = {
    home: 'Overview',
+  learn: 'Learn',
     atlas: 'Atlas',
     explore: 'Explore',
     studio: 'Studio',
