@@ -44,6 +44,8 @@ interface AppState {
   setLearnSubjectRequest: (id: string | null) => void
   studioItemRequest: string | null
   setStudioItemRequest: (id: string | null) => void
+  taskRequest: string | null
+  setTaskRequest: (id: string | null) => void
   newNoteRequest: number
   requestNewNote: () => void
   
@@ -129,6 +131,8 @@ export const useAppStore = create<AppState>()(
       setLearnSubjectRequest: (id) => set({ learnSubjectRequest: id }),
       studioItemRequest: null,
       setStudioItemRequest: (id) => set({ studioItemRequest: id }),
+      taskRequest: null,
+      setTaskRequest: (id) => set({ taskRequest: id }),
       newNoteRequest: 0,
       requestNewNote: () => set((state) => ({ newNoteRequest: state.newNoteRequest + 1 })),
       
