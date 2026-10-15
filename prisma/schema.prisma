@@ -701,6 +701,11 @@ model ResearchPaper {
   notes           String?
   figuresJson     String   @default("[]")
   tablesJson      String   @default("[]")
+  status          String   @default("reading")
+  targetJournal   String?
+  submissionDeadline String?
+  sectionsJson    String   @default("[]")
+  datasetsJson    String   @default("[]")
   archived        Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
