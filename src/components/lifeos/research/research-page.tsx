@@ -3,16 +3,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, ChevronRight, ExternalLink, FileImage, FlaskConical, Microscope, Plus, Save, Table2, Trash2, X } from 'lucide-react'
 
-type Figure = { id:string; title:string; dataUrl:string }
+type Checkpoint = { id:string; title:string; done:boolean }
+type Figure = { id:string; title:string; dataUrl:string; caption?:string; description?:string; status?:string; checkpoints?:Checkpoint[] }
 type TableBlock = { id:string; title:string; cells:string[][] }
+type ManuscriptSection = { id:string; title:string; checkpoints:Checkpoint[] }
+type Dataset = { id:string; title:string; fileName:string; mimeType:string; dataUrl:string; preview:string[][]; purpose:string; status:string }
 type Paper = {
   id:string; title:string; authors?:string|null; journal?:string|null; year?:number|null; doi?:string|null; sourceUrl?:string|null
   abstractText?:string|null; scientificQuestion?:string|null; background?:string|null; mechanisms?:string|null
   interpretation?:string|null; limitations?:string|null; openQuestions?:string|null; notes?:string|null
   figures:Figure[]; tables:TableBlock[]
 }
-const blank = { title:'', authors:'', journal:'', year:null, doi:'', sourceUrl:'', abstractText:'', scientificQuestion:'', background:'', mechanisms:'', interpretation:'', limitations:'', openQuestions:'', notes:'' }
+const blank = { title:'', authors:'', journal:'', year:null, doi:'', sourceUrl:'', abstractText:'', scientificQuestion:'', background:'', mechanisms:'', interpretation:'', limitations:'', openQuestions:'', notes:'', status:'reading', targetJournal:'', submissionDeadline:'', sections:[], datasets:[] }
 const val=(v?:string|null)=>v??''
+const CHECKPOINT_TITLES=['Outline prepared','First draft written','Scientific content checked','References reviewed','Feedback received','Revisions complete']
+function defaultSections():ManuscriptSection[]{return ['Abstract','Introduction','Results','Discussion','Methods','Conclusion'].map(title=>({id:crypto.randomUUID(),title,checkpoints:CHECKPOINT_TITLES.slice(0,5).map(label=>({id:crypto.randomUUID(),title:label,done:false}))}))}
+function parseCsv(text:string):string[][]{const rows:string[][]=[];let row:string[]=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const ch=text[i];if(ch==='"'&&quoted&&text[i+1]==='"'){cell+='"';i++}else if(ch==='"'){quoted=!quoted}else if(ch===','&&!quoted){row.push(cell);cell=''}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(v=>v!==''))rows.push(row);row=[];cell=''}else cell+=ch}row.push(cell);if(row.some(v=>v!==''))rows.push(row);return rows.slice(0,8).map(r=>r.slice(0,8))}
 
 export function ResearchPage(){
   const [papers,setPapers]=useState<Paper[]>([])
@@ -33,8 +39,8 @@ export function ResearchPage(){
   useEffect(()=>{void load()},[])
   const visible=useMemo(()=>papers.filter(p=>`${p.title} ${p.authors||''} ${p.journal||''} ${p.abstractText||''}`.toLowerCase().includes(query.toLowerCase())),[papers,query])
   const sections=useMemo(()=>[['scientificQuestion','Scientific question'],['abstractText','Abstract'],['background','Background'],['mechanisms','Mechanisms'],['interpretation','Interpretation'],['limitations','Limitations'],['openQuestions','Open questions'],['notes','Reading notes']] as const,[])
-  function open(p:Paper){setSelected(p);setDraft({...p,figures:p.figures??[],tables:p.tables??[]});setAdding(false);setError('')}
-  function startNew(){const p={...blank,id:'new',figures:[],tables:[]} as Paper;setSelected(p);setDraft(p);setAdding(true);setError('')}
+  function open(p:Paper){setSelected(p);setDraft({...p,figures:p.figures??[],tables:p.tables??[],sections:p.sections??[],datasets:p.datasets??[],status:p.status||'reading'});setAdding(false);setError('')}
+  function startNew(){const p={...blank,id:'new',figures:[],tables:[],sections:defaultSections(),datasets:[]} as Paper;setSelected(p);setDraft(p);setAdding(true);setError('')}
   function patch<K extends keyof Paper>(key:K,value:Paper[K]){setDraft(d=>d?({...d,[key]:value}):d)}
   async function save(){
     if(!draft?.title.trim())return
