@@ -533,3 +533,11 @@ body { background-image:radial-gradient(ellipse at 88% 3%,rgba(185,108,81,.10),t
 .lifeos-atlas-mosaic .rounded-full { background:#fffaf0 !important; box-shadow:0 0 0 4px rgba(243,239,229,.92) !important; }
 .lifeos-atlas-mosaic .text-foreground { color:#30382f !important; }
 .lifeos-atlas-mosaic .text-muted-foreground { color:#73796d !important; }
+
+.lo-research-search { display:flex; align-items:center; gap:8px; margin-bottom:10px; border:1px solid rgba(47,56,45,.18); background:#fffdf8; padding:8px 10px; color:#b96c51; }
+.lo-research-search input { width:100%; min-width:0; background:transparent; outline:none; color:#2b312b; font-size:11px; }
+.lo-research-search input::placeholder { color:#8b8c7e; }
+.lo-paper-heading-copy { min-width:0; flex:1; }
+.lo-module-hint { color:#777d70; font-size:10px; line-height:1.65; margin:-2px 0 12px; }
+.lo-studio-editor-head { flex-direction:row; align-items:center; justify-content:space-between; }
+.lo-studio-title:focus,.lo-paper-title:focus { border-bottom:1px solid rgba(88,118,95,.35); }
