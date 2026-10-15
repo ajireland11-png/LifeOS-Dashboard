@@ -24,6 +24,11 @@ pub struct ResearchPaper {
     notes: Option<String>,
     figures: Value,
     tables: Value,
+    status: String,
+    target_journal: Option<String>,
+    submission_deadline: Option<String>,
+    sections: Value,
+    datasets: Value,
     archived: bool,
     created_at: PrismaDateTime,
     updated_at: PrismaDateTime,
@@ -53,6 +58,11 @@ fn paper_from_row(r: &sqlx::sqlite::SqliteRow) -> Result<ResearchPaper, sqlx::Er
         notes: r.try_get("notes")?,
         figures: parse("figuresJson"),
         tables: parse("tablesJson"),
+        status: r.try_get("status")?,
+        target_journal: r.try_get("targetJournal")?,
+        submission_deadline: r.try_get("submissionDeadline")?,
+        sections: parse("sectionsJson"),
+        datasets: parse("datasetsJson"),
         archived: r.try_get("archived")?,
         created_at: PrismaDateTime(r.try_get::<i64, _>("createdAt")?),
         updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
@@ -82,13 +92,13 @@ pub async fn create_paper(State(st): State<AppState>, Json(body): Json<Value>) -
     let title = str_or(&body, "title", "").trim().to_string();
     if title.is_empty() { return Err(AppError::BadRequest("title is required".into())); }
     let id = gen_id(); let now = now_ms();
-    sqlx::query("INSERT INTO ResearchPaper (id,title,authors,journal,year,doi,sourceUrl,abstract,scientificQuestion,background,mechanisms,interpretation,limitations,openQuestions,notes,figuresJson,tablesJson,archived,createdAt,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+    sqlx::query("INSERT INTO ResearchPaper (id,title,authors,journal,year,doi,sourceUrl,abstract,scientificQuestion,background,mechanisms,interpretation,limitations,openQuestions,notes,figuresJson,tablesJson,status,targetJournal,submissionDeadline,sectionsJson,datasetsJson,archived,createdAt,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
         .bind(&id).bind(&title).bind(field(&body,"authors")).bind(field(&body,"journal"))
         .bind(body.get("year").and_then(|v| v.as_i64())).bind(field(&body,"doi")).bind(field(&body,"sourceUrl"))
         .bind(field(&body,"abstract")).bind(field(&body,"scientificQuestion")).bind(field(&body,"background"))
         .bind(field(&body,"mechanisms")).bind(field(&body,"interpretation")).bind(field(&body,"limitations"))
         .bind(field(&body,"openQuestions")).bind(field(&body,"notes")).bind(json_field(&body,"figures"))
-        .bind(json_field(&body,"tables")).bind(false).bind(now).bind(now).execute(&st.db).await?;
+        .bind(json_field(&body,"tables")).bind(str_or(&body,"status","reading")).bind(field(&body,"targetJournal")).bind(field(&body,"submissionDeadline")).bind(json_field(&body,"sections")).bind(json_field(&body,"datasets")).bind(false).bind(now).bind(now).execute(&st.db).await?;
     let row=sqlx::query("SELECT * FROM ResearchPaper WHERE id=?").bind(&id).fetch_one(&st.db).await?;
     Ok((StatusCode::CREATED,Json(paper_from_row(&row)?)))
 }
@@ -97,12 +107,12 @@ pub async fn update_paper(State(st): State<AppState>, Path(id): Path<String>, Js
     let exists=sqlx::query("SELECT id FROM ResearchPaper WHERE id=?").bind(&id).fetch_optional(&st.db).await?;
     if exists.is_none(){return Err(AppError::NotFound("Paper not found".into()));}
     let now=now_ms();
-    sqlx::query("UPDATE ResearchPaper SET title=COALESCE(?,title),authors=COALESCE(?,authors),journal=COALESCE(?,journal),year=COALESCE(?,year),doi=COALESCE(?,doi),sourceUrl=COALESCE(?,sourceUrl),abstract=COALESCE(?,abstract),scientificQuestion=COALESCE(?,scientificQuestion),background=COALESCE(?,background),mechanisms=COALESCE(?,mechanisms),interpretation=COALESCE(?,interpretation),limitations=COALESCE(?,limitations),openQuestions=COALESCE(?,openQuestions),notes=COALESCE(?,notes),figuresJson=COALESCE(?,figuresJson),tablesJson=COALESCE(?,tablesJson),archived=COALESCE(?,archived),updatedAt=? WHERE id=?")
+    sqlx::query("UPDATE ResearchPaper SET title=COALESCE(?,title),authors=COALESCE(?,authors),journal=COALESCE(?,journal),year=COALESCE(?,year),doi=COALESCE(?,doi),sourceUrl=COALESCE(?,sourceUrl),abstract=COALESCE(?,abstract),scientificQuestion=COALESCE(?,scientificQuestion),background=COALESCE(?,background),mechanisms=COALESCE(?,mechanisms),interpretation=COALESCE(?,interpretation),limitations=COALESCE(?,limitations),openQuestions=COALESCE(?,openQuestions),notes=COALESCE(?,notes),figuresJson=COALESCE(?,figuresJson),tablesJson=COALESCE(?,tablesJson),status=COALESCE(?,status),targetJournal=COALESCE(?,targetJournal),submissionDeadline=COALESCE(?,submissionDeadline),sectionsJson=COALESCE(?,sectionsJson),datasetsJson=COALESCE(?,datasetsJson),archived=COALESCE(?,archived),updatedAt=? WHERE id=?")
         .bind(field(&body,"title")).bind(field(&body,"authors")).bind(field(&body,"journal")).bind(body.get("year").and_then(|v| v.as_i64()))
         .bind(field(&body,"doi")).bind(field(&body,"sourceUrl")).bind(field(&body,"abstract")).bind(field(&body,"scientificQuestion"))
         .bind(field(&body,"background")).bind(field(&body,"mechanisms")).bind(field(&body,"interpretation")).bind(field(&body,"limitations"))
         .bind(field(&body,"openQuestions")).bind(field(&body,"notes")).bind(body.get("figures").map(|v|v.to_string()))
-        .bind(body.get("tables").map(|v|v.to_string())).bind(body.get("archived").and_then(|v|v.as_bool())).bind(now).bind(&id)
+        .bind(body.get("tables").map(|v|v.to_string())).bind(field(&body,"status")).bind(field(&body,"targetJournal")).bind(field(&body,"submissionDeadline")).bind(body.get("sections").map(|v|v.to_string())).bind(body.get("datasets").map(|v|v.to_string())).bind(body.get("archived").and_then(|v|v.as_bool())).bind(now).bind(&id)
         .execute(&st.db).await?;
     let row=sqlx::query("SELECT * FROM ResearchPaper WHERE id=?").bind(&id).fetch_one(&st.db).await?;
     Ok(Json(paper_from_row(&row)?))
