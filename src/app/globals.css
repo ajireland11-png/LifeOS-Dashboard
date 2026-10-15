@@ -5687,3 +5687,149 @@ select.lifeos-select option:hover {
   .lifeos-home-find-list { grid-template-columns:1fr; }
   .lifeos-home-rebuild-footer { align-items:flex-start; flex-direction:column; }
 }
+
+
+/* ============================================================
+   LIFEOS / DESIGN FOUNDATION — 2026
+   Shared visual grammar for the rebuilt personal environment.
+   ============================================================ */
+:root {
+  color-scheme: dark;
+  --lo-forest: #202321;
+  --lo-charcoal: #292d29;
+  --lo-graphite: #30342f;
+  --lo-parchment: #e9e0cf;
+  --lo-muted: #a9ada3;
+  --lo-brass: #c6a56b;
+  --lo-sage: #718575;
+  --lo-botanical: #a5b9a5;
+  --lo-terracotta: #a87568;
+  --lo-clay: #d5a68d;
+  --lo-lavender: #b5a4c7;
+  --lo-line: rgba(233, 224, 207, .13);
+  --lo-line-strong: rgba(233, 224, 207, .23);
+  --lo-surface: #252925;
+  --lo-surface-raised: #2b302b;
+  --lo-surface-soft: #202420;
+  --lo-text: #e9e0cf;
+  --lo-text-muted: #a9ada3;
+  --lo-focus: #d5b77e;
+  --background: #202321;
+  --foreground: #e9e0cf;
+  --card: #292d29;
+  --card-foreground: #e9e0cf;
+  --popover: #292d29;
+  --popover-foreground: #e9e0cf;
+  --primary: #c6a56b;
+  --primary-foreground: #202321;
+  --secondary: #30342f;
+  --secondary-foreground: #e9e0cf;
+  --muted: #30342f;
+  --muted-foreground: #a9ada3;
+  --accent: #353b34;
+  --accent-foreground: #e9e0cf;
+  --border: rgba(233, 224, 207, .13);
+  --input: rgba(233, 224, 207, .17);
+  --ring: #c6a56b;
+  --sidebar: #1c201d;
+  --sidebar-foreground: #e9e0cf;
+  --sidebar-primary: #c6a56b;
+  --sidebar-primary-foreground: #202321;
+  --sidebar-accent: #2a302a;
+  --sidebar-accent-foreground: #e9e0cf;
+  --sidebar-border: rgba(233, 224, 207, .11);
+  --sidebar-ring: #c6a56b;
+  --radius: .45rem;
+}
+html { background: var(--lo-forest); }
+body {
+  background: var(--lo-forest);
+  color: var(--lo-text);
+  font-family: Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, .font-serif {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-weight: 400;
+}
+::selection { background: rgba(198,165,107,.34); color: var(--lo-parchment); }
+:focus-visible { outline: 2px solid var(--lo-focus); outline-offset: 3px; }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+.dark { --background:#202321; --foreground:#e9e0cf; --card:#292d29; --card-foreground:#e9e0cf; --popover:#292d29; --popover-foreground:#e9e0cf; --primary:#c6a56b; --primary-foreground:#202321; --secondary:#30342f; --secondary-foreground:#e9e0cf; --muted:#30342f; --muted-foreground:#a9ada3; --accent:#353b34; --accent-foreground:#e9e0cf; --border:rgba(233,224,207,.13); --input:rgba(233,224,207,.17); --ring:#c6a56b; --sidebar:#1c201d; --sidebar-foreground:#e9e0cf; --sidebar-primary:#c6a56b; --sidebar-primary-foreground:#202321; --sidebar-accent:#2a302a; --sidebar-accent-foreground:#e9e0cf; --sidebar-border:rgba(233,224,207,.11); --sidebar-ring:#c6a56b; }
+.lifeos-shell {
+  background:
+    radial-gradient(ellipse at 82% 0%, rgba(113,133,117,.075), transparent 38rem),
+    var(--lo-forest);
+}
+.lifeos-shell main { scrollbar-gutter: stable; }
+.lifeos-sidebar {
+  background: rgba(28,32,29,.97);
+  border-color: var(--lo-line);
+}
+.lifeos-sidebar-brand {
+  color: var(--lo-parchment);
+  letter-spacing: .19em;
+  font-size: .8rem;
+}
+.lifeos-sidebar-caption {
+  color: #8f998d;
+  font-size: 9px;
+  letter-spacing: .2em;
+}
+.lifeos-nav-item {
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #a9ada3;
+  transition: color .18s ease, background .18s ease, border-color .18s ease;
+}
+.lifeos-nav-item:hover {
+  color: var(--lo-parchment);
+  background: rgba(233,224,207,.045);
+}
+.lifeos-nav-item[aria-current="page"] {
+  color: var(--lo-parchment);
+  background: linear-gradient(90deg, rgba(198,165,107,.12), rgba(198,165,107,.025));
+  border-color: rgba(198,165,107,.18);
+}
+.lifeos-nav-item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 9px;
+  bottom: 9px;
+  width: 2px;
+  background: var(--lo-brass);
+}
+.lifeos-app-header {
+  background: rgba(32,35,33,.92);
+  border-color: var(--lo-line);
+  backdrop-filter: blur(18px);
+}
+.lifeos-editorial {
+  --lifeos-ink: var(--lo-text);
+  --lifeos-paper: var(--lo-forest);
+  --lifeos-paper-deep: var(--lo-charcoal);
+  --lifeos-night: var(--lo-forest);
+  --lifeos-night-soft: #1c201d;
+  --lifeos-ivory: var(--lo-parchment);
+  --lifeos-muted: var(--lo-muted);
+  --lifeos-line: var(--lo-line);
+  --lifeos-accent: var(--lo-brass);
+  color: var(--lo-text);
+}
+.lifeos-editorial input,
+.lifeos-editorial textarea,
+.lifeos-editorial select {
+  color: var(--lo-text);
+  background-color: #252925;
+  border-color: var(--lo-line-strong);
+}
+.lifeos-editorial input::placeholder,
+.lifeos-editorial textarea::placeholder { color: #838a80; }
+.lifeos-editorial :is(button,a):focus-visible { outline-color: var(--lo-focus); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
