@@ -25,6 +25,7 @@ pub(crate) struct StudioItem {
     image_url: Option<String>,
     category: Option<String>,
     tags: Value,
+    is_favorite: bool,
     archived: bool,
     created_at: PrismaDateTime,
     updated_at: PrismaDateTime,
@@ -41,6 +42,7 @@ fn row_to_item(r: &sqlx::sqlite::SqliteRow) -> Result<StudioItem, sqlx::Error> {
         image_url: r.try_get("imageUrl")?,
         category: r.try_get("category")?,
         tags: r.try_get::<String, _>("tagsJson").ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or(Value::Array(vec![])),
+        is_favorite: r.try_get::<i64, _>("isFavorite").unwrap_or(0) != 0,
         archived: r.try_get::<i64, _>("archived")? != 0,
         created_at: PrismaDateTime(r.try_get::<i64, _>("createdAt")?),
         updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
@@ -105,8 +107,8 @@ pub async fn create_item(
     let now = now_ms();
 
     sqlx::query(
-        "INSERT INTO StudioItem (id, title, kind, summary, content, sourceUrl, imageUrl, category, tagsJson, archived, createdAt, updatedAt) \
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
+        "INSERT INTO StudioItem (id, title, kind, summary, content, sourceUrl, imageUrl, category, tagsJson, isFavorite, archived, createdAt, updatedAt) \
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)",
     )
     .bind(&id)
     .bind(&title)
@@ -173,6 +175,9 @@ pub async fn update_item(
     }
     if let Some(v) = body.get("tags") {
         crate::push_set!(qb, first, "tagsJson = ", v.to_string());
+    }
+    if let Some(v) = patch_bool(&body, "isFavorite") {
+        crate::push_set!(qb, first, "isFavorite = ", if v { 1_i64 } else { 0_i64 });
     }
     if let Some(v) = patch_bool(&body, "archived") {
         crate::push_set!(qb, first, "archived = ", if v { 1_i64 } else { 0_i64 });
