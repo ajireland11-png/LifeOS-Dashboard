@@ -17,8 +17,8 @@ use crate::AppState;
 /// entries and courses are deliberately left out for now — this is a first
 /// slice of Atlas, not the whole vision, and those two can be added later by
 /// copying the same query pattern used below.
-const ENTITY_TYPES: [&str; 9] = [
-    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge",
+const ENTITY_TYPES: [&str; 11] = [
+    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge", "person", "persondate",
 ];
 
 #[derive(Serialize, Clone)]
@@ -210,6 +210,33 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
         });
     }
 
+    // People — private relationship records are first-class Atlas nodes.
+    let rows = sqlx::query("SELECT id, name, relationship, updatedAt FROM Person WHERE archived = 0")
+        .fetch_all(&st.db).await?;
+    for r in &rows {
+        nodes.push(AtlasNode {
+            id: r.try_get("id")?,
+            node_type: "person".to_string(),
+            title: r.try_get("name")?,
+            description: r.try_get::<Option<String>, _>("relationship").ok().flatten(),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
+        });
+    }
+
+    // Important dates remain distinct records linked to their person.
+    let rows = sqlx::query("SELECT id, title, date, personId, updatedAt FROM PersonDate")
+        .fetch_all(&st.db).await?;
+    for r in &rows {
+        let date: String = r.try_get("date")?;
+        nodes.push(AtlasNode {
+            id: r.try_get("id")?,
+            node_type: "persondate".to_string(),
+            title: r.try_get("title")?,
+            description: Some(date),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
+        });
+    }
+
     let mut edges = Vec::new();
 
     // ── Explicit connections the user drew themselves ──────────────────────
@@ -259,6 +286,35 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
             target_id: r.try_get("targetNoteId")?,
             kind: "observed".to_string(),
             label: Some("linked note".to_string()),
+        });
+    }
+
+    // Shared task records appear on a person's profile without being duplicated.
+    let rows = sqlx::query("SELECT personId, taskId FROM PersonTaskLink")
+        .fetch_all(&st.db).await?;
+    for r in &rows {
+        edges.push(AtlasEdge {
+            id: format!("observed-persontask-{}-{}", r.try_get::<String, _>("personId")?, r.try_get::<String, _>("taskId")?),
+            source_type: "person".to_string(),
+            source_id: r.try_get("personId")?,
+            target_type: "task".to_string(),
+            target_id: r.try_get("taskId")?,
+            kind: "observed".to_string(),
+            label: Some("commitment for".to_string()),
+        });
+    }
+
+    let rows = sqlx::query("SELECT id, personId FROM PersonDate")
+        .fetch_all(&st.db).await?;
+    for r in &rows {
+        edges.push(AtlasEdge {
+            id: format!("observed-persondate-{}", r.try_get::<String, _>("id")?),
+            source_type: "person".to_string(),
+            source_id: r.try_get("personId")?,
+            target_type: "persondate".to_string(),
+            target_id: r.try_get("id")?,
+            kind: "observed".to_string(),
+            label: Some("important date".to_string()),
         });
     }
 
