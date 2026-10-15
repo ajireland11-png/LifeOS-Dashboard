@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowUpRight, BookOpen, ChevronRight, Edit3, Plus, Search, Save, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpRight, Bookmark, BookOpen, ChevronDown, ChevronRight, Edit3, Plus, Search, Save, X } from 'lucide-react'
 import { useAppStore } from '@/stores/app-store'
 
-type Subject = { id: string; title: string; summary?: string | null; content: string; archived: boolean; updatedAt?: string }
+type Reference = {id:string;title:string;url:string;kind:string}\ntype Subject = { id: string; title: string; summary?: string | null; content: string; parentId?:string|null; kind:string; status:string; bookmarked:boolean; position:number; prerequisites:string[]; related:string[]; references:Reference[]; layers:Record<string,string>; archived: boolean; updatedAt?: string }
 
 function headingId(value: string) {
   return value.toLocaleLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
@@ -13,10 +13,36 @@ function headingId(value: string) {
 function lessonBlocks(content: string) {
   return content.split(/\n{2,}/).map(block => block.trim()).filter(Boolean)
 }
+const LEARN_KINDS = ['subject','domain','topic','concept','lesson','subsection'] as const
+const LEARN_STATUSES = [{value:'not-started',label:'Not started'},{value:'read',label:'Read'},{value:'practised',label:'Practised'},{value:'understood',label:'Understood'}]
+const LAYER_FIELDS = [{key:'intuitive',label:'Intuitive explanation',hint:'The core idea without specialist assumptions.'},{key:'mechanism',label:'Underlying mechanism',hint:'What causes what, and why.'},{key:'technical',label:'Formal / technical detail',hint:'Equations, assumptions, definitions and derivations.'},{key:'examples',label:'Worked examples',hint:'Step-by-step examples or applications.'},{key:'applications',label:'Practical applications',hint:'Where this knowledge is useful.'},{key:'advanced',label:'Advanced notes & open questions',hint:'Limitations, unresolved questions and further depth.'}]
+function flattenSubjectTree(items:Subject[],expanded:Set<string>,query:string){
+ const byParent=new Map<string|null,Subject[]>()
+ items.forEach(item=>{const parent=item.parentId||null;const arr=byParent.get(parent)||[];arr.push(item);byParent.set(parent,arr)})
+ byParent.forEach(arr=>arr.sort((a,b)=>(a.position||0)-(b.position||0)||a.title.localeCompare(b.title)))
+ if(query.trim()){
+  const matches=items.filter(item=>(item.title+' '+(item.summary||'')+' '+item.content).toLowerCase().includes(query.toLowerCase()))
+  return matches.map(item=>{let depth=0,p=item.parentId;while(p&&depth<20){depth++;p=items.find(x=>x.id===p)?.parentId||null}return {item,depth,hasChildren:(byParent.get(item.id)||[]).length>0,expanded:expanded.has(item.id)}})
+ }
+ const out:{item:Subject;depth:number;hasChildren:boolean;expanded:boolean}[]=[]
+ const walk=(parent:string|null,depth:number)=>{for(const item of byParent.get(parent)||[]){const children=byParent.get(item.id)||[];out.push({item,depth,hasChildren:children.length>0,expanded:expanded.has(item.id)});if(children.length&&expanded.has(item.id))walk(item.id,depth+1)}}
+ walk(null,0);return out
+}
 
 export function LearnPage() {
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [expandedIds,setExpandedIds]=useState<Set<string>>(new Set())
+  const [kind,setKind]=useState('subject')
+  const [parentId,setParentId]=useState('')
+  const [status,setStatus]=useState('not-started')
+  const [bookmarked,setBookmarked]=useState(false)
+  const [prerequisites,setPrerequisites]=useState<string[]>([])
+  const [related,setRelated]=useState<string[]>([])
+  const [references,setReferences]=useState<Reference[]>([])
+  const [layers,setLayers]=useState<Record<string,string>>({})
+  const [newKind,setNewKind]=useState('subject')
+  const [newParentId,setNewParentId]=useState('')
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
@@ -37,6 +63,7 @@ export function LearnPage() {
       const data = await response.json()
       const items = Array.isArray(data) ? data as Subject[] : []
       setSubjects(items)
+      setExpandedIds(current => current.size ? current : new Set(items.filter(item=>!item.parentId).map(item=>item.id)))
       setSelectedId(current => preferId || (current && items.some(item => item.id === current) ? current : items[0]?.id || null))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load your library.')
@@ -49,10 +76,18 @@ export function LearnPage() {
     setTitle(selected?.title ?? '')
     setSummary(selected?.summary ?? '')
     setContent(selected?.content ?? '')
+    setKind(selected?.kind||'subject')
+    setParentId(selected?.parentId||'')
+    setStatus(selected?.status||'not-started')
+    setBookmarked(!!selected?.bookmarked)
+    setPrerequisites(selected?.prerequisites||[])
+    setRelated(selected?.related||[])
+    setReferences(selected?.references||[])
+    setLayers(selected?.layers||{})
     setEditing(false)
   }, [selectedId, selected?.updatedAt])
 
-  const filtered = useMemo(() => subjects.filter(item => `${item.title} ${item.summary ?? ''} ${item.content}`.toLowerCase().includes(query.toLowerCase())), [subjects, query])
+  const filtered = useMemo(() => flattenSubjectTree(subjects,expandedIds,query), [subjects,expandedIds,query])
   const readingBlocks = useMemo(() => lessonBlocks(selected?.content ?? ''), [selected?.content])
   const headings = useMemo(() => readingBlocks.flatMap(block => {
     const match = block.match(/^(#{1,3})\s+(.+)$/)
