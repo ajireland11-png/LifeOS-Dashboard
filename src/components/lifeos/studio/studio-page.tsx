@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Archive, ArrowUpRight, BookOpen, Brush, Image, Lightbulb, Plus, Save, Sparkles, Trash2 } from 'lucide-react'
+import { Archive, ArrowUpRight, BookOpen, Bookmark, Brush, FolderPlus, Image, Lightbulb, Pencil, Plus, Save, Sparkles, Trash2 } from 'lucide-react'
 
 type Item = { id:string; title:string; kind:string; summary?:string|null; content:string; sourceUrl?:string|null; imageUrl?:string|null; category?:string|null; tags?:string[]; archived:boolean; updatedAt:string }
 type Category = {id:string;name:string;description?:string|null;accent:string;position:number;itemCount:number}
@@ -79,6 +79,15 @@ export function StudioPage() {
     try{const r=await fetch('/api/studio/items/'+selected.id,{method:'DELETE'});if(!r.ok)throw new Error('Could not delete this entry.');setSelectedId(null);await load()}
     catch(e){setError(e instanceof Error?e.message:'Could not delete this entry.')}
   }
+
+
+  async function createCategory(e:React.FormEvent){e.preventDefault();if(!newCategoryName.trim())return;try{const r=await fetch('/api/studio/categories',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:newCategoryName.trim()})});if(!r.ok)throw new Error('Category name may already exist.');const item=await r.json() as Category;setNewCategoryName('');await load();setCategoryFilter(item.name)}catch(e){setError(e instanceof Error?e.message:'Could not create category.')}}
+  async function renameCategory(cat:Category){if(!editingCategoryName.trim())return;try{const r=await fetch('/api/studio/categories/'+cat.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:editingCategoryName.trim()})});if(!r.ok)throw new Error('Could not rename category.');if(categoryFilter===cat.name)setCategoryFilter(editingCategoryName.trim());setEditingCategoryId(null);await load()}catch(e){setError(e instanceof Error?e.message:'Could not rename category.')}}
+  async function deleteCategory(cat:Category){if(!window.confirm('Delete category “'+cat.name+'”? Items will be kept and become uncategorised.'))return;try{const r=await fetch('/api/studio/categories/'+cat.id,{method:'DELETE'});if(!r.ok)throw new Error('Could not delete category.');if(categoryFilter===cat.name)setCategoryFilter('all');await load()}catch(e){setError(e instanceof Error?e.message:'Could not delete category.')}}
+  async function createCollection(e:React.FormEvent){e.preventDefault();if(!newCollectionName.trim())return;try{const r=await fetch('/api/studio/collections',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:newCollectionName.trim()})});if(!r.ok)throw new Error('Could not create collection.');const col=await r.json() as Collection;setNewCollectionName('');await load();setSelectedCollectionId(col.id)}catch(e){setError(e instanceof Error?e.message:'Could not create collection.')}}
+  async function renameCollection(col:Collection){if(!editingCollectionName.trim())return;try{const r=await fetch('/api/studio/collections/'+col.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:editingCollectionName.trim()})});if(!r.ok)throw new Error('Could not rename collection.');setEditingCollectionId(null);await load()}catch(e){setError(e instanceof Error?e.message:'Could not rename collection.')}}
+  async function deleteCollection(col:Collection){if(!window.confirm('Delete collection “'+col.name+'”? Saved inspiration items will remain.'))return;try{const r=await fetch('/api/studio/collections/'+col.id,{method:'DELETE'});if(!r.ok)throw new Error('Could not delete collection.');if(selectedCollectionId===col.id)setSelectedCollectionId(null);await load()}catch(e){setError(e instanceof Error?e.message:'Could not delete collection.')}}
+  async function toggleCollection(collectionId:string,checked:boolean){if(!selected)return;try{const r=await fetch('/api/studio/collections/'+collectionId+'/items/'+selected.id,{method:checked?'POST':'DELETE',headers:{'Content-Type':'application/json'},body:checked?'{}':undefined});if(!r.ok)throw new Error('Could not update collection membership.');const res=await fetch('/api/studio/collections');if(res.ok)setCollections(await res.json())}catch(e){setError(e instanceof Error?e.message:'Could not update collection membership.')}}
 
   return <div className="lo-studio">
     <header className="lo-studio-header"><div><div className="lo-overline">LIFEOS / MAKING & COLLECTING</div><h1>Creative Studio.</h1><p>A place for sparks, materials, references and experiments. Not everything here needs to become a task.</p></div><button type="button" className="lo-studio-new-button" onClick={()=>{setNewKind("inspiration");document.getElementById("studio-capture")?.focus()}}><Sparkles size={15}/> Capture inspiration</button></header>
