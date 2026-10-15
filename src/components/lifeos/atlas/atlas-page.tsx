@@ -644,6 +644,7 @@ export function AtlasPage() {
                         const destination: Record<string, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", paper: "research", researchpaper: "research" }
                         if (result.type === "paper" || result.type === "researchpaper") useAppStore.getState().setResearchPaperRequest(result.id)
                         if (result.type === "subject") useAppStore.getState().setLearnSubjectRequest(result.id)
+                        if (result.type === "studioitem") useAppStore.getState().setStudioItemRequest(result.id)
                         setActiveModule((destination[result.type || ""] || "atlas") as any)
                       }}
                     >
@@ -668,6 +669,7 @@ export function AtlasPage() {
           const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", person: "family", persondate: "family", paper: "research", figure: "research", dataset: "research" }
           if(node.type === "paper") useAppStore.getState().setResearchPaperRequest(node.id)
           if(node.type === "subject") useAppStore.getState().setLearnSubjectRequest(node.id)
+          if(node.type === "studioitem") useAppStore.getState().setStudioItemRequest(node.id)
           if(node.type === "figure" || node.type === "dataset") {
             const [paperId, itemId] = node.id.split("::")
             if (paperId && itemId) useAppStore.getState().setResearchAssetRequest({ paperId, type: node.type, itemId })
