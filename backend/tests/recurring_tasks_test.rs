@@ -153,7 +153,6 @@ async fn process_recurring_tasks_for_test(pool: &SqlitePool) -> Result<usize, sq
     let mut created_count = 0;
     
     for row in rows {
-        let task_id: String = row.try_get("id")?;
         let status: String = row.try_get("status")?;
         let recurrence: Option<String> = row.try_get("recurrence")?;
         let completed_at: Option<i64> = row.try_get("completedAt")?;
