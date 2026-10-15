@@ -106,7 +106,7 @@ pub async fn update_person(
     let now = now_ms();
     let mut qb: QueryBuilder<Sqlite> = QueryBuilder::new("UPDATE Person SET ");
     let mut first = true;
-    macro_rules! set { ($column:literal, $value:expr) => {{ if !first { qb.push(", "); } first = false; qb.push($column).push(" = ").push_bind($value); }}; }
+    macro_rules! set { ($column:expr, $value:expr) => {{ if !first { qb.push(", "); } first = false; qb.push($column).push(" = ").push_bind($value); }}; }
     if let Some(v) = body.get("name").and_then(Value::as_str) { let v = v.trim(); if v.is_empty() { return Err(AppError::BadRequest("Name cannot be empty".into())); } set!("name", v.to_string()); }
     if let Some(v) = body.get("relationship").and_then(Value::as_str) { set!("relationship", v.to_string()); }
     for (key, column) in [("photoUrl","photoUrl"),("birthday","birthday"),("email","email"),("phone","phone"),("notes","notes")] {
