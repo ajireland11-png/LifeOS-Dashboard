@@ -55,11 +55,7 @@ async fn test_recurring_task_daily() {
 
 #[tokio::test]
 async fn test_recurring_task_weekly() {
-    let dir = tempdir().unwrap();
-    let db_path = dir.path().join("test.db");
-    let database_url = format!("sqlite:{}", db_path.display());
-
-    let pool = common::setup_test_db(&database_url).await;
+    let (pool, _temp_file) = common::setup_test_db().await;
 
     // Create a recurring weekly task completed 8 days ago
     let eight_days_ago = chrono::Utc::now() - chrono::Duration::days(8);
@@ -103,11 +99,7 @@ async fn test_recurring_task_weekly() {
 
 #[tokio::test]
 async fn test_recurring_task_not_completed() {
-    let dir = tempdir().unwrap();
-    let db_path = dir.path().join("test.db");
-    let database_url = format!("sqlite:{}", db_path.display());
-
-    let pool = common::setup_test_db(&database_url).await;
+    let (pool, _temp_file) = common::setup_test_db().await;
 
     // Create a recurring task that's NOT completed yet
     let yesterday = chrono::Utc::now() - chrono::Duration::days(1);
