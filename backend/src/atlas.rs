@@ -17,8 +17,8 @@ use crate::AppState;
 /// entries and courses are deliberately left out for now — this is a first
 /// slice of Atlas, not the whole vision, and those two can be added later by
 /// copying the same query pattern used below.
-const ENTITY_TYPES: [&str; 11] = [
-    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge", "person", "persondate",
+const ENTITY_TYPES: [&str; 12] = [
+    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge", "person", "persondate", "paper",
 ];
 
 #[derive(Serialize, Clone)]
@@ -210,6 +210,24 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
         });
     }
 
+    // Research papers are canonical records in the scientific workspace.
+    // Atlas points to the same paper ID rather than creating a second knowledge item.
+    let rows = sqlx::query("SELECT id, title, abstract, status, updatedAt FROM ResearchPaper WHERE archived = 0")
+        .fetch_all(&st.db)
+        .await?;
+    for r in &rows {
+        let abstract_text: Option<String> = r.try_get("abstract")?;
+        let status: String = r.try_get("status")?;
+        let description = abstract_text.filter(|s| !s.trim().is_empty()).or(Some(status));
+        nodes.push(AtlasNode {
+            id: r.try_get("id")?,
+            node_type: "paper".to_string(),
+            title: r.try_get("title")?,
+            description: description.map(|s| truncate(s.trim(), 180)),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
+        });
+    }
+
     // People — private relationship records are first-class Atlas nodes.
     let rows = sqlx::query("SELECT id, name, relationship, updatedAt FROM Person WHERE archived = 0")
         .fetch_all(&st.db).await?;
@@ -331,6 +349,22 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
             target_id: r.try_get("relatedPersonId")?,
             kind: "observed".to_string(),
             label: Some(r.try_get::<String, _>("label")?),
+        });
+    }
+
+    // Manuscript tasks are shared Task records linked to a canonical paper.
+    let rows = sqlx::query("SELECT paperId, taskId FROM ResearchPaperTaskLink")
+        .fetch_all(&st.db)
+        .await?;
+    for r in &rows {
+        edges.push(AtlasEdge {
+            id: format!("observed-papertask-{}-{}", r.try_get::<String, _>("paperId")?, r.try_get::<String, _>("taskId")?),
+            source_type: "paper".to_string(),
+            source_id: r.try_get("paperId")?,
+            target_type: "task".to_string(),
+            target_id: r.try_get("taskId")?,
+            kind: "observed".to_string(),
+            label: Some("manuscript task".to_string()),
         });
     }
 
