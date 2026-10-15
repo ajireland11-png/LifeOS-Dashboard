@@ -12,13 +12,40 @@ type Paper = {
   id:string; title:string; authors?:string|null; journal?:string|null; year?:number|null; doi?:string|null; sourceUrl?:string|null
   abstractText?:string|null; scientificQuestion?:string|null; background?:string|null; mechanisms?:string|null
   interpretation?:string|null; limitations?:string|null; openQuestions?:string|null; notes?:string|null
-  figures:Figure[]; tables:TableBlock[]
+  figures:Figure[]; tables:TableBlock[]; status:string; targetJournal?:string|null; submissionDeadline?:string|null; sections:ManuscriptSection[]; datasets:Dataset[]
 }
 const blank = { title:'', authors:'', journal:'', year:null, doi:'', sourceUrl:'', abstractText:'', scientificQuestion:'', background:'', mechanisms:'', interpretation:'', limitations:'', openQuestions:'', notes:'', status:'reading', targetJournal:'', submissionDeadline:'', sections:[], datasets:[] }
 const val=(v?:string|null)=>v??''
 const CHECKPOINT_TITLES=['Outline prepared','First draft written','Scientific content checked','References reviewed','Feedback received','Revisions complete']
 function defaultSections():ManuscriptSection[]{return ['Abstract','Introduction','Results','Discussion','Methods','Conclusion'].map(title=>({id:crypto.randomUUID(),title,checkpoints:CHECKPOINT_TITLES.slice(0,5).map(label=>({id:crypto.randomUUID(),title:label,done:false}))}))}
 function parseCsv(text:string):string[][]{const rows:string[][]=[];let row:string[]=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const ch=text[i];if(ch==='"'&&quoted&&text[i+1]==='"'){cell+='"';i++}else if(ch==='"'){quoted=!quoted}else if(ch===','&&!quoted){row.push(cell);cell=''}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(v=>v!==''))rows.push(row);row=[];cell=''}else cell+=ch}row.push(cell);if(row.some(v=>v!==''))rows.push(row);return rows.slice(0,8).map(r=>r.slice(0,8))}
+async function readZipText(buffer:ArrayBuffer,wanted:string):Promise<string>{
+ const view=new DataView(buffer);let end=-1
+ for(let i=view.byteLength-22;i>=Math.max(0,view.byteLength-65557);i--){if(view.getUint32(i,true)===0x06054b50){end=i;break}}
+ if(end<0)throw new Error('Invalid XLSX archive')
+ const count=view.getUint16(end+10,true);let offset=view.getUint32(end+16,true);const decoder=new TextDecoder()
+ for(let i=0;i<count;i++){
+  if(view.getUint32(offset,true)!==0x02014b50)break
+  const method=view.getUint16(offset+10,true),compressed=view.getUint32(offset+20,true),nameLength=view.getUint16(offset+28,true),extraLength=view.getUint16(offset+30,true),commentLength=view.getUint16(offset+32,true),local=view.getUint32(offset+42,true)
+  const name=decoder.decode(new Uint8Array(buffer,offset+46,nameLength))
+  if(name===wanted){
+   const localName=view.getUint16(local+26,true),localExtra=view.getUint16(local+28,true),begin=local+30+localName+localExtra,data=new Uint8Array(buffer,begin,compressed)
+   if(method===0)return decoder.decode(data)
+   if(method===8){const bytes=data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength) as ArrayBuffer;const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));return await new Response(stream).text()}
+   throw new Error('Unsupported XLSX compression')
+  }
+  offset+=46+nameLength+extraLength+commentLength
+ }
+ throw new Error('XLSX entry not found: '+wanted)
+}
+async function parseXlsxPreview(file:File):Promise<string[][]>{
+ const buffer=await file.arrayBuffer();let shared:string[]=[]
+ try{const xml=await readZipText(buffer,'xl/sharedStrings.xml');const doc=new DOMParser().parseFromString(xml,'application/xml');shared=Array.from(doc.getElementsByTagNameNS('*','si')).map(si=>Array.from(si.getElementsByTagNameNS('*','t')).map(t=>t.textContent||'').join(''))}catch{}
+ const sheet=await readZipText(buffer,'xl/worksheets/sheet1.xml');const doc=new DOMParser().parseFromString(sheet,'application/xml')
+ const colIndex=(ref:string)=>{let n=0;for(const ch of ref.replace(/[0-9]/g,''))n=n*26+ch.charCodeAt(0)-64;return n-1}
+ const rows=Array.from(doc.getElementsByTagNameNS('*','row')).slice(0,8).map(row=>{const cells=Array.from(row.getElementsByTagNameNS('*','c'));const result:string[]=[];for(const cell of cells){const ref=cell.getAttribute('r')||'A1',col=colIndex(ref),type=cell.getAttribute('t');const value=cell.getElementsByTagNameNS('*','v')[0]?.textContent||'';const inline=Array.from(cell.getElementsByTagNameNS('*','t')).map(t=>t.textContent||'').join('');result[col]=type==='s'?(shared[Number(value)]||''):type==='inlineStr'?inline:value}return result.slice(0,8).map(v=>v||'')})
+ return rows
+}
 
 export function ResearchPage(){
   const [papers,setPapers]=useState<Paper[]>([])
@@ -68,7 +95,7 @@ export function ResearchPage(){
     if(!draft)return
     if(file.size>8*1024*1024){setError('Please choose a dataset smaller than 8 MB.');return}
     const reader=new FileReader()
-    reader.onload=async()=>{let preview:string[][]=[];if(file.name.toLowerCase().endsWith('.csv')){try{preview=parseCsv(await file.text())}catch{preview=[]}};patch('datasets',[...(draft.datasets??[]),{id:crypto.randomUUID(),title:file.name.replace(/\.[^/.]+$/,''),fileName:file.name,mimeType:file.type||'application/octet-stream',dataUrl:String(reader.result),preview,purpose:'',status:'source'}])}
+    reader.onload=async()=>{let preview:string[][]=[];if(file.name.toLowerCase().endsWith('.csv')){try{preview=parseCsv(await file.text())}catch{preview=[]}}else if(file.name.toLowerCase().endsWith('.xlsx')){try{preview=await parseXlsxPreview(file)}catch{preview=[]}};patch('datasets',[...(draft.datasets??[]),{id:crypto.randomUUID(),title:file.name.replace(/\.[^/.]+$/,''),fileName:file.name,mimeType:file.type||'application/octet-stream',dataUrl:String(reader.result),preview,purpose:'',status:'source'}])}
     reader.readAsDataURL(file)
   }
   function updateSection(id:string,fn:(s:ManuscriptSection)=>ManuscriptSection){if(draft)patch('sections',draft.sections.map(s=>s.id===id?fn(s):s))}
@@ -119,7 +146,7 @@ export function ResearchPage(){
                 <button type="button" className="lo-add-module" onClick={addTable}><Table2 size={15}/> Add table</button>
               </div></section>
               <section className="lo-lab-module lo-dataset-module"><div className="lo-module-heading"><span>Source datasets</span><i/></div><p className="lo-module-hint">Original files stay intact. CSV previews are derived for inspection; source files are kept separately from any edited tables.</p>
-                {draft.datasets.map(d=><article className="lo-dataset-card" key={d.id}><div className="lo-dataset-card-head"><strong>{d.title}</strong><a href={d.dataUrl} download={d.fileName}>Download source</a><button type="button" onClick={()=>patch('datasets',draft.datasets.filter(x=>x.id!==d.id))} aria-label="Remove dataset"><X size={12}/></button></div><input className="lo-dataset-title" value={d.title} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,title:e.target.value}:x))} aria-label="Dataset title"/><label>Purpose<input value={d.purpose} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,purpose:e.target.value}:x))} placeholder="What does this dataset support?"/></label><label>Analysis state<select value={d.status} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,status:e.target.value}:x))}><option value="source">Source / unmodified</option><option value="quality-check">Quality check</option><option value="analysing">Analysis in progress</option><option value="derived">Derived data produced</option><option value="used">Used in manuscript</option></select></label><small className="lo-dataset-source-name">Original file: {d.fileName} · {Math.round(d.dataUrl.length*0.75/1024)} KB encoded</small>{d.preview.length>0?<div className="lo-dataset-preview"><table><tbody>{d.preview.map((row,ri)=><tr key={ri}>{row.map((cell,ci)=><td key={ci}>{cell}</td>)}</tr>)}</tbody></table><small>CSV preview · first {d.preview.length} rows, up to 8 columns</small></div>:<p className="lo-dataset-no-preview">The original workbook is preserved. Inline preview is currently available for CSV files.</p>}</article>)}
+                {draft.datasets.map(d=><article className="lo-dataset-card" key={d.id}><div className="lo-dataset-card-head"><strong>{d.title}</strong><a href={d.dataUrl} download={d.fileName}>Download source</a><button type="button" onClick={()=>patch('datasets',draft.datasets.filter(x=>x.id!==d.id))} aria-label="Remove dataset"><X size={12}/></button></div><input className="lo-dataset-title" value={d.title} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,title:e.target.value}:x))} aria-label="Dataset title"/><label>Purpose<input value={d.purpose} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,purpose:e.target.value}:x))} placeholder="What does this dataset support?"/></label><label>Analysis state<select value={d.status} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,status:e.target.value}:x))}><option value="source">Source / unmodified</option><option value="quality-check">Quality check</option><option value="analysing">Analysis in progress</option><option value="derived">Derived data produced</option><option value="used">Used in manuscript</option></select></label><small className="lo-dataset-source-name">Original file: {d.fileName} · {Math.round(d.dataUrl.length*0.75/1024)} KB encoded</small>{d.preview.length>0?<div className="lo-dataset-preview"><table><tbody>{d.preview.map((row,ri)=><tr key={ri}>{row.map((cell,ci)=><td key={ci}>{cell}</td>)}</tr>)}</tbody></table><small>CSV preview · first {d.preview.length} rows, up to 8 columns</small></div>:<p className="lo-dataset-no-preview">The original workbook is preserved. Inline preview could not be read from this workbook; the original file is still preserved.</p>}</article>)}
                 <button type="button" className="lo-dropzone lo-dataset-dropzone" onClick={()=>datasetInput.current?.click()}><Table2 size={20}/><strong>Add CSV / Excel source</strong><span>CSV or XLSX · original file retained · up to 8 MB</span></button><input ref={datasetInput} type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden onChange={e=>{const file=e.target.files?.[0];if(file)void addDataset(file);e.currentTarget.value=''}}/>
               </section>
             </div>
