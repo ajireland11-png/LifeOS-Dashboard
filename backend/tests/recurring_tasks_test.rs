@@ -164,7 +164,9 @@ async fn process_recurring_tasks_for_test(pool: &SqlitePool) -> Result<usize, sq
         let Some(rec) = recurrence else { continue };
         let Some(completed_ms) = completed_at else { continue };
         
-        let days_since = (today_start_ms - completed_ms) / (1000 * 60 * 60 * 24);
+        let completed_date = chrono::DateTime::from_timestamp_millis(completed_ms).unwrap_or_default().date_naive();
+        let today_date = chrono::DateTime::from_timestamp_millis(today_start_ms).unwrap_or_default().date_naive();
+        let days_since = (today_date - completed_date).num_days();
         
         let should_create = match rec.as_str() {
             "daily" => days_since >= 1,
