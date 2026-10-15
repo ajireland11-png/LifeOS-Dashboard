@@ -135,7 +135,7 @@ pub async fn get_activity(State(st): State<AppState>) -> Result<Json<serde_json:
         ));
     }
 
-    items.sort_by(|a, b| b.0.cmp(&a.0));
+    items.sort_by_key(|item| std::cmp::Reverse(item.0));
     let activities: Vec<ActivityItem> = items.into_iter().take(15).map(|(_, item)| item).collect();
 
     Ok(Json(serde_json::json!({ "activities": activities })))
