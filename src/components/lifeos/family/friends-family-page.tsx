@@ -6,7 +6,8 @@ import { CalendarDays, Cake, Check, ChevronRight, Gift, Pencil, Heart, Link2, Ma
 
 type Person = {id:string;name:string;relationship:string;photoUrl?:string|null;birthday?:string|null;email?:string|null;phone?:string|null;interests?:string[];giftIdeas?:string[];notes?:string|null;updatedAt?:string}
 type PersonDate = {id:string;personId:string;personName?:string;title:string;date:string;kind:string;recurrence:string;reminderDays:number;notes?:string|null}
-type Task = {id:string;title:string;description?:string|null;status:string;priority:string;dueDate?:string|null}\ntype PersonRelationship = {id:string;name:string;relationship:string;photoUrl?:string|null;label:string}
+type Task = {id:string;title:string;description?:string|null;status:string;priority:string;dueDate?:string|null}
+type PersonRelationship = {id:string;name:string;relationship:string;photoUrl?:string|null;label:string}
 
 async function api<T>(url:string,init?:RequestInit):Promise<T>{
  const r=await fetch(url,{...init,headers:{'Content-Type':'application/json',...(init?.headers||{})}})
