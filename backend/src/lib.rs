@@ -121,6 +121,7 @@ pub fn build_app(pool: SqlitePool) -> Router {
         )
         // Friends & Family — profiles, important dates, and links to shared tasks
         .route("/api/people", get(people::list_people).post(people::create_person))
+        .route("/api/people/dates", get(people::list_all_dates))
         .route("/api/people/{id}", get(people::get_person).patch(people::update_person).delete(people::delete_person))
         .route("/api/people/{id}/dates", get(people::list_dates).post(people::create_date))
         .route("/api/people/{person_id}/dates/{date_id}", patch(people::update_date).delete(people::delete_date))
