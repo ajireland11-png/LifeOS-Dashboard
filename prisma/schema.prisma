@@ -138,6 +138,7 @@ model Task {
   calendarEvents CalendarEvent[]
   pomodoroSessions PomodoroSession[]
   personLinks PersonTaskLink[]
+  paperLinks ResearchPaperTaskLink[]
 }
 
 model TaskTag {
@@ -712,6 +713,8 @@ model ResearchPaper {
 
   @@index([archived])
   @@index([updatedAt])
+
+  taskLinks ResearchPaperTaskLink[]
 }
 
 
@@ -766,5 +769,18 @@ model PersonTaskLink {
   task      Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@id([personId, taskId])
+  @@index([taskId])
+}
+
+
+model ResearchPaperTaskLink {
+  paperId   String
+  taskId    String
+  createdAt DateTime @default(now())
+
+  paper     ResearchPaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  task      Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([paperId, taskId])
   @@index([taskId])
 }
