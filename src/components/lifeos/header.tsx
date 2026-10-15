@@ -57,6 +57,7 @@ export function Header() {
     projects: 'Projects',
     house: 'House',
     research: 'Research',
+    family: 'Friends & Family',
     archive: 'Archive',
 
     // Legacy modules retained for compatibility
@@ -82,6 +83,7 @@ export function Header() {
   projects: 'Projects',
   house: 'Life',
   research: 'Research',
+  family: 'Life',
   archive: 'Archive',
 
   // Legacy modules retained for compatibility
