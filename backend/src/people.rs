@@ -136,6 +136,20 @@ pub async fn delete_person(
     Ok(Json(json!({"success":true})))
 }
 
+
+pub async fn list_all_dates(
+    State(st): State<AppState>,
+) -> Result<Json<Vec<Value>>, AppError> {
+    let rows = sqlx::query("SELECT d.*, p.name AS personName FROM PersonDate d JOIN Person p ON p.id = d.personId WHERE p.archived = 0 ORDER BY d.date ASC")
+        .fetch_all(&st.db).await?;
+    let dates = rows.iter().map(|r| -> Result<Value, sqlx::Error> {
+        let mut item = date_json(r)?;
+        item["personName"] = json!(r.try_get::<String, _>("personName")?);
+        Ok(item)
+    }).collect::<Result<Vec<_>, _>>()?;
+    Ok(Json(dates))
+}
+
 pub async fn list_dates(
     State(st): State<AppState>, Path(id): Path<String>,
 ) -> Result<Json<Vec<Value>>, AppError> {
