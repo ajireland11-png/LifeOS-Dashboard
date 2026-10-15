@@ -495,3 +495,81 @@ CREATE UNIQUE INDEX "HabitLog_habitId_date_key" ON "HabitLog"("habitId", "date")
 -- CreateIndex
 CREATE UNIQUE INDEX "JournalTag_entryId_tagId_key" ON "JournalTag"("entryId", "tagId");
 
+-- New LifeOS workspace tables kept in sync with prisma/schema.prisma.
+CREATE TABLE "ExploreSubject" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "summary" TEXT,
+    "content" TEXT NOT NULL DEFAULT '',
+    "archived" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" INTEGER NOT NULL,
+    "updatedAt" INTEGER NOT NULL
+);
+
+CREATE TABLE "StudioItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'idea',
+    "summary" TEXT,
+    "content" TEXT NOT NULL DEFAULT '',
+    "sourceUrl" TEXT,
+    "imageUrl" TEXT,
+    "category" TEXT,
+    "tagsJson" TEXT NOT NULL DEFAULT '[]',
+    "archived" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" INTEGER NOT NULL,
+    "updatedAt" INTEGER NOT NULL
+);
+
+CREATE TABLE "KnowledgeItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "type" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "summary" TEXT,
+    "content" TEXT NOT NULL DEFAULT '',
+    "sourceUrl" TEXT,
+    "archived" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" INTEGER NOT NULL,
+    "updatedAt" INTEGER NOT NULL
+);
+
+CREATE TABLE "AtlasConnection" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "sourceType" TEXT NOT NULL,
+    "sourceId" TEXT NOT NULL,
+    "targetType" TEXT NOT NULL,
+    "targetId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'connected',
+    "label" TEXT,
+    "createdAt" INTEGER NOT NULL,
+    "updatedAt" INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX "AtlasConnection_sourceType_sourceId_targetType_targetId_kind_key"
+    ON "AtlasConnection"("sourceType", "sourceId", "targetType", "targetId", "kind");
+CREATE INDEX "AtlasConnection_sourceType_sourceId_idx" ON "AtlasConnection"("sourceType", "sourceId");
+CREATE INDEX "AtlasConnection_targetType_targetId_idx" ON "AtlasConnection"("targetType", "targetId");
+
+CREATE TABLE "ResearchPaper" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "authors" TEXT,
+    "journal" TEXT,
+    "year" INTEGER,
+    "doi" TEXT,
+    "sourceUrl" TEXT,
+    "abstract" TEXT,
+    "scientificQuestion" TEXT,
+    "background" TEXT,
+    "mechanisms" TEXT,
+    "interpretation" TEXT,
+    "limitations" TEXT,
+    "openQuestions" TEXT,
+    "notes" TEXT,
+    "figuresJson" TEXT NOT NULL DEFAULT '[]',
+    "tablesJson" TEXT NOT NULL DEFAULT '[]',
+    "archived" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" INTEGER NOT NULL,
+    "updatedAt" INTEGER NOT NULL
+);
+CREATE INDEX "ResearchPaper_archived_idx" ON "ResearchPaper"("archived");
+CREATE INDEX "ResearchPaper_updatedAt_idx" ON "ResearchPaper"("updatedAt");
