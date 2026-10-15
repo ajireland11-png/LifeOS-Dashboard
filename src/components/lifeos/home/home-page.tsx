@@ -1,5 +1,7 @@
 "use client"
 
+import "./home-page.css"
+
 import { useEffect, useMemo, useState } from "react"
 import { ArrowUpRight, BookOpen, CalendarDays, Compass, House, Search, Sparkles } from "lucide-react"
 import { SectionPage } from "@/components/lifeos/shared/section-page"
