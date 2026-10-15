@@ -30,6 +30,7 @@ export function ResearchPage(){
   const [query,setQuery]=useState('')
   const [error,setError]=useState('')
   const fileInput=useRef<HTMLInputElement>(null)
+  const datasetInput=useRef<HTMLInputElement>(null)
 
   async function load(){
     setLoading(true)
@@ -74,6 +75,10 @@ export function ResearchPage(){
   function addSection(){if(draft)patch('sections',[...draft.sections,{id:crypto.randomUUID(),title:'New section',checkpoints:CHECKPOINT_TITLES.slice(0,3).map(title=>({id:crypto.randomUUID(),title,done:false}))}])}
   function addTable(){if(draft)patch('tables',[...(draft.tables??[]),{id:crypto.randomUUID(),title:'New table',cells:[['Column 1','Column 2'],['','']]}])}
   function updateTable(id:string,fn:(t:TableBlock)=>TableBlock){if(draft)patch('tables',draft.tables.map(t=>t.id===id?fn(t):t))}
+  function updateFigure(id:string,fn:(f:Figure)=>Figure){if(draft)patch('figures',draft.figures.map(f=>f.id===id?fn(f):f))}
+  const checkpointTotal=draft?.sections.reduce((n,s)=>n+s.checkpoints.length,0)||0
+  const checkpointDone=draft?.sections.reduce((n,s)=>n+s.checkpoints.filter(c=>c.done).length,0)||0
+  const progress=checkpointTotal?Math.round(checkpointDone/checkpointTotal*100):0
 
   return <div className="lo-research-page">
     <header className="lo-research-header">
@@ -91,9 +96,10 @@ export function ResearchPage(){
       <main className="lo-lab-bench">
         {!draft?<div className="lo-lab-empty"><Microscope size={34}/><strong>Read beyond the abstract.</strong><span>Keep the question, mechanism, evidence and limitations in view as you work through a paper.</span><button type="button" onClick={startNew}>Add a paper <ChevronRight size={14}/></button></div>:<>
           <div className="lo-paper-header">
-            <div className="lo-paper-heading-copy"><div className="lo-overline">{adding?'NEW PAPER / LAB NOTE':'PAPER / READING NOTES'}</div><input className="lo-paper-title" value={draft.title} onChange={e=>patch('title',e.target.value)} placeholder="Paper title…"/><div className="lo-paper-meta"><input value={val(draft.authors)} onChange={e=>patch('authors',e.target.value)} placeholder="Authors"/><input value={val(draft.journal)} onChange={e=>patch('journal',e.target.value)} placeholder="Journal"/><input value={draft.year??''} onChange={e=>patch('year',e.target.value?Number(e.target.value):null)} placeholder="Year" type="number"/></div></div>
+            <div className="lo-paper-heading-copy"><div className="lo-overline">{adding?'NEW PAPER / LAB NOTE':'PAPER / READING NOTES'}</div><input className="lo-paper-title" value={draft.title} onChange={e=>patch('title',e.target.value)} placeholder="Paper title…"/><div className="lo-paper-meta"><input value={val(draft.authors)} onChange={e=>patch('authors',e.target.value)} placeholder="Authors"/><input value={val(draft.journal)} onChange={e=>patch('journal',e.target.value)} placeholder="Journal"/><input value={draft.year??''} onChange={e=>patch('year',e.target.value?Number(e.target.value):null)} placeholder="Year" type="number"/></div><div className="lo-paper-workflow-meta"><label>Stage<select value={draft.status||'reading'} onChange={e=>patch('status',e.target.value)}><option value="reading">Reading</option><option value="analysing">Analysing</option><option value="drafting">Drafting</option><option value="review">In review</option><option value="submitted">Submitted</option><option value="published">Published</option></select></label><label>Target journal<input value={val(draft.targetJournal)} onChange={e=>patch('targetJournal',e.target.value)} placeholder="Optional"/></label><label>Target submission<input type="date" value={val(draft.submissionDeadline)} onChange={e=>patch('submissionDeadline',e.target.value)}/></label></div></div>
             <div className="lo-paper-actions"><button type="button" onClick={save} disabled={saving||!draft.title.trim()}><Save size={14}/>{saving?'Saving…':'Save'}</button>{draft.id!=='new'&&<button type="button" className="lo-icon-danger" onClick={remove} aria-label="Delete paper"><Trash2 size={14}/></button>}<button type="button" onClick={()=>{setDraft(null);setSelected(null)}} aria-label="Close paper"><X size={14}/></button></div>
           </div>
+          <div className="lo-paper-progress"><div className="lo-paper-progress-ring" style={{background:'conic-gradient(#c6a56b '+(progress*3.6)+'deg, #343a33 0deg)'}}><span>{progress}%</span></div><div className="lo-paper-progress-copy"><strong>Manuscript progress</strong><small>{checkpointDone} of {checkpointTotal} configured checkpoints complete</small><div className="lo-paper-progress-track"><span style={{width:progress+'%'}}/></div></div><span className={'lo-paper-status status-'+(draft.status||'reading')}>{(draft.status||'reading').replace('-',' ')}</span></div>
           <div className="lo-paper-grid">
             <div className="lo-lab-column">
               {sections.map(([key,label])=><section key={key} className="lo-lab-module"><div className="lo-module-heading"><span>{label}</span><i/></div><textarea value={val(draft[key])} onChange={e=>patch(key,e.target.value as never)} placeholder={key==='scientificQuestion'?'What is the paper trying to explain or test?':'Capture '+label.toLowerCase()+'…'} rows={key==='abstractText'?7:5}/></section>)}
