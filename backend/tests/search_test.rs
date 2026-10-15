@@ -74,15 +74,15 @@ async fn test_search_across_entities() {
 
     // Verify results contain our created items
     let tasks = results["tasks"].as_array().unwrap();
-    assert!(tasks.len() > 0);
+    assert!(!tasks.is_empty());
     assert!(tasks.iter().any(|t| t["title"].as_str().unwrap().contains("Rust")));
 
     let notes = results["notes"].as_array().unwrap();
-    assert!(notes.len() > 0);
+    assert!(!notes.is_empty());
     assert!(notes.iter().any(|n| n["title"].as_str().unwrap().contains("Rust")));
 
     let projects = results["projects"].as_array().unwrap();
-    assert!(projects.len() > 0);
+    assert!(!projects.is_empty());
     assert!(projects.iter().any(|p| p["name"].as_str().unwrap().contains("Rust")));
 }
 
@@ -326,9 +326,9 @@ async fn test_search_multiple_entities() {
     let results: Value = serde_json::from_slice(&body_bytes).unwrap();
 
     // Should find results in multiple entity types
-    assert!(results["tasks"].as_array().unwrap().len() > 0);
-    assert!(results["notes"].as_array().unwrap().len() > 0);
-    assert!(results["goals"].as_array().unwrap().len() > 0);
+    assert!(!results["tasks"].as_array().unwrap().is_empty());
+    assert!(!results["notes"].as_array().unwrap().is_empty());
+    assert!(!results["goals"].as_array().unwrap().is_empty());
 }
 
 #[tokio::test]
