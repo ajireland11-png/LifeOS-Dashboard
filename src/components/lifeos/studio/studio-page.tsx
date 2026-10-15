@@ -57,7 +57,7 @@ export function StudioPage() {
   }
 
   return <div className="lo-studio">
-    <header className="lo-studio-header"><div><div className="lo-overline">LIFEOS / MAKING & COLLECTING</div><h1>Creative Studio.</h1><p>A place for sparks, materials, references and experiments. Not everything here needs to become a task.</p></div><div className="lo-studio-new-button"><Sparkles size={15}/> An open workbench</div></header>
+    <header className="lo-studio-header"><div><div className="lo-overline">LIFEOS / MAKING & COLLECTING</div><h1>Creative Studio.</h1><p>A place for sparks, materials, references and experiments. Not everything here needs to become a task.</p></div><button type="button" className="lo-studio-new-button" onClick={()=>{setNewKind("inspiration");document.getElementById("studio-capture")?.focus()}}><Sparkles size={15}/> Capture inspiration</button></header>
     <div className="lo-studio-main">
       <aside className="lo-studio-library">
         <div className="lo-learn-index-title"><span>COLLECTED MATERIAL</span><span>{items.length.toString().padStart(2,'0')}</span></div>
