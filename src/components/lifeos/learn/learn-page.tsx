@@ -55,6 +55,8 @@ export function LearnPage() {
   const [content, setContent] = useState('')
   const [newTitle, setNewTitle] = useState('')
   const setActiveModule = useAppStore(s => s.setActiveModule)
+  const learnSubjectRequest = useAppStore(s => s.learnSubjectRequest)
+  const setLearnSubjectRequest = useAppStore(s => s.setLearnSubjectRequest)
 
   const load = useCallback(async (preferId?: string) => {
     setLoading(true)
@@ -72,6 +74,23 @@ export function LearnPage() {
   }, [])
 
   useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    if (!learnSubjectRequest || loading) return
+    const target = subjects.find(item => item.id === learnSubjectRequest)
+    if (target) {
+      setSelectedId(target.id)
+      setExpandedIds(current => {
+        const next = new Set(current)
+        let parentId = target.parentId
+        while (parentId) {
+          next.add(parentId)
+          parentId = subjects.find(item => item.id === parentId)?.parentId ?? null
+        }
+        return next
+      })
+    }
+    setLearnSubjectRequest(null)
+  }, [learnSubjectRequest, loading, subjects, setLearnSubjectRequest])
   const selected = subjects.find(item => item.id === selectedId) ?? null
   useEffect(() => {
     setTitle(selected?.title ?? '')
