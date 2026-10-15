@@ -541,3 +541,14 @@ body { background-image:radial-gradient(ellipse at 88% 3%,rgba(185,108,81,.10),t
 .lo-module-hint { color:#777d70; font-size:10px; line-height:1.65; margin:-2px 0 12px; }
 .lo-studio-editor-head { flex-direction:row; align-items:center; justify-content:space-between; }
 .lo-studio-title:focus,.lo-paper-title:focus { border-bottom:1px solid rgba(88,118,95,.35); }
+
+/* Real photographic material gives the overview texture, not decorative CSS tiles. */
+.lo-overview-area { isolation:isolate; }
+.lo-overview-area::before { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(249,246,237,.36),rgba(249,246,237,.88) 62%,rgba(249,246,237,.97)); }
+.lo-area-photo { position:absolute; inset:0; z-index:-2; display:block; width:100%; height:100%; object-fit:cover; opacity:.58; filter:saturate(.78) contrast(.92); transition:transform .45s ease, opacity .3s ease; }
+.lo-overview-area:hover .lo-area-photo { transform:scale(1.035); opacity:.72; }
+.lo-area-research::before { background:linear-gradient(180deg,rgba(232,239,225,.30),rgba(245,242,231,.87) 66%,rgba(245,242,231,.97)); }
+.lo-area-studio::before { background:linear-gradient(180deg,rgba(248,227,216,.26),rgba(247,239,226,.87) 66%,rgba(247,239,226,.97)); }
+.lo-area-learn::before { background:linear-gradient(180deg,rgba(234,227,242,.24),rgba(246,241,231,.87) 66%,rgba(246,241,231,.97)); }
+.lo-area-atlas::before { background:linear-gradient(180deg,rgba(237,229,206,.25),rgba(246,241,228,.87) 66%,rgba(246,241,228,.97)); }
+.lo-overview-area .lo-area-head,.lo-overview-area h2,.lo-overview-area .lo-area-foot { position:relative; z-index:1; }
