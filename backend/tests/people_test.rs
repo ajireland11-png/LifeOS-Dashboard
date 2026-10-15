@@ -73,5 +73,5 @@ async fn people_dates_and_shared_tasks_persist_without_duplicating_tasks() {
     assert_eq!(status, StatusCode::OK);
     let (status, preserved_task) = send(&app, "GET", &format!("/api/tasks/{}", task_id), Value::Null).await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(preserved_task["task"]["id"], task_id);
+    assert_eq!(preserved_task["id"], task_id);
 }
