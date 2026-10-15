@@ -297,6 +297,7 @@ function AtlasLandscape({
       </div>
 
       <div className="lo-atlas-canvas-scroll">
+        {filtered.length === 0 && <p className="lo-atlas-no-matches">No nodes match this view or search. Try a broader term or choose World view.</p>}
         <div className="lo-atlas-canvas" style={{ height: canvasHeight, transform: "scale(" + zoom + ")", transformOrigin: "top left", width: 1000 }}>
           <svg className="lo-atlas-edges" viewBox={"0 0 1000 " + canvasHeight} preserveAspectRatio="none" aria-hidden="true">
             {lines.map(({ edge, source, target }) => {
@@ -620,26 +621,21 @@ export function AtlasPage() {
               {searchResults.length > 0 ? (
                 <div className="divide-y divide-white/10">
                   {searchResults.slice(0, 8).map((result, index) => (
-                    <div
+                    <button
+                      type="button"
                       key={`${result.id}-${index}`}
-                      className="flex items-center justify-between py-4"
+                      className="lo-atlas-search-result"
+                      onClick={() => {
+                        const destination: Record<string, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", paper: "research", researchpaper: "research" }
+                        setActiveModule((destination[result.type || ""] || "atlas") as any)
+                      }}
                     >
-                      <div>
-                        <div className="font-serif text-lg">
-                          {displayTitle(result.title)}
-                        </div>
-
-                        {result.description && (
-                          <div className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                            {result.description}
-                          </div>
-                        )}
-                      </div>
-
-                      <span className="ml-6 text-[10px] uppercase tracking-[0.15em] text-muted-foreground/70">
-                        {result.type || "record"}
+                      <span className="lo-atlas-search-result-copy">
+                        <strong>{displayTitle(result.title)}</strong>
+                        {result.description && <small>{result.description}</small>}
                       </span>
-                    </div>
+                      <span className="lo-atlas-search-result-type">{result.type || "record"} <ArrowUpRight size={14}/></span>
+                    </button>
                   ))}
                 </div>
               ) : !searching ? (
