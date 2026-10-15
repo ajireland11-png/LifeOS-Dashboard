@@ -125,6 +125,8 @@ pub fn build_app(pool: SqlitePool) -> Router {
         .route("/api/people/{id}", get(people::get_person).patch(people::update_person).delete(people::delete_person))
         .route("/api/people/{id}/dates", get(people::list_dates).post(people::create_date))
         .route("/api/people/{person_id}/dates/{date_id}", patch(people::update_date).delete(people::delete_date))
+        .route("/api/people/{id}/relationships", get(people::list_relationships).post(people::link_people))
+        .route("/api/people/{person_id}/relationships/{related_id}", delete(people::unlink_people))
         .route("/api/people/{id}/tasks", get(people::list_person_tasks))
         .route("/api/people/{person_id}/tasks/{task_id}", post(people::link_task).delete(people::unlink_task))
         // Tags
