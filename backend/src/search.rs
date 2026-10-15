@@ -296,6 +296,6 @@ pub async fn search(
         });
     }
 
-    results.sort_by(|a, b| b.updated_at.0.cmp(&a.updated_at.0));
+    results.sort_by_key(|result| std::cmp::Reverse(result.updated_at.0));
     Ok(Json(serde_json::json!({ "results": results, "query": q })))
 }
