@@ -11,6 +11,7 @@ import {
   Settings,
   Sparkles,
   Warehouse,
+  UsersRound,
 } from 'lucide-react'
 
 import { useAppStore, type ModuleId } from '@/stores/app-store'
@@ -24,6 +25,7 @@ const primaryNavigation: {
   { id: 'research', label: 'Research', icon: FlaskConical },
   { id: 'studio', label: 'Creative Studio', icon: Sparkles },
   { id: 'learn', label: 'Learn', icon: BookOpen },
+  { id: 'family', label: 'Friends & Family', icon: UsersRound },
   { id: 'atlas', label: 'Atlas', icon: Library },
 ]
 
