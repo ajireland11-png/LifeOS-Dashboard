@@ -854,3 +854,17 @@ input::placeholder,textarea::placeholder { color:#858d82; }
 .lo-studio-editor-tools>button { display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid var(--lo-line); background:transparent; color:var(--lo-muted); font-size:10px; cursor:pointer; }
 .lo-studio-editor-tools>button:hover,.lo-studio-editor-tools>button.is-favorite { border-color:rgba(198,165,107,.5); color:var(--lo-brass); background:rgba(198,165,107,.07); }
 .lo-studio-filters button[aria-pressed="true"] { color:var(--lo-brass); border-color:rgba(198,165,107,.4); background:rgba(198,165,107,.08); }
+
+/* Profile photo capture — actual user-supplied images, not decorative placeholders. */
+.lo-family-photo-field{min-width:0}
+.lo-family-photo-label{display:block;color:var(--lo-muted);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.lo-family-photo-controls{display:flex;align-items:flex-start;gap:12px;margin-top:8px}
+.lo-family-photo-preview{display:flex;align-items:center;justify-content:center;flex:none;width:54px;height:54px;overflow:hidden;border:1px solid rgba(213,166,141,.35);border-radius:50%;background:#3a302c;color:#e4bca9;font:16px Georgia,serif}
+.lo-family-photo-preview img{width:100%;height:100%;object-fit:cover}
+.lo-family-photo-actions{flex:1;min-width:0}
+.lo-family-photo-actions>input{display:block;width:100%;min-width:0;padding:7px 2px;border-bottom:1px solid var(--lo-line-strong);background:transparent;color:var(--lo-parchment);font:inherit;font-size:12px}
+.lo-family-photo-actions>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.lo-family-photo-actions button{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid var(--lo-line);background:rgba(255,255,255,.025);color:var(--lo-parchment);font-size:10px}
+.lo-family-photo-actions button:hover{border-color:rgba(213,166,141,.55);background:rgba(213,166,141,.08)}
+.lo-family-photo-actions small{display:block;margin-top:6px;color:var(--lo-muted);font-size:9px}
+@media(max-width:760px){.lo-family-photo-controls{align-items:flex-start}}
