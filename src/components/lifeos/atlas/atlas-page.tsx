@@ -655,6 +655,7 @@ export function AtlasPage() {
         <AtlasLandscape nodes={nodes} edges={edges} query={search} onOpen={(node) => {
           const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", person: "family", persondate: "family" }
           if(node.type === "person") useAppStore.getState().setFamilyPersonRequest(node.id)
+          if(node.type === "persondate") useAppStore.getState().setFamilyDateRequest(node.id)
           setActiveModule(destination[node.type] as any)
         }} />
 
