@@ -349,8 +349,8 @@ pub fn build_app(pool: SqlitePool) -> Router {
         // Outermost layers (apply to every route, including /health)
         .layer(cors)
         .layer(TraceLayer::new_for_http())
-        // Reject bodies larger than 10 MB (protects the /api/data/import endpoint)
-        .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
+        // Keep a hard upload cap while allowing base64-encoded scientific figures and datasets.
+        .layer(DefaultBodyLimit::max(32 * 1024 * 1024))
         // Limit maximum in-flight requests to prevent accidental overload
         .layer(ConcurrencyLimitLayer::new(200))
 }
