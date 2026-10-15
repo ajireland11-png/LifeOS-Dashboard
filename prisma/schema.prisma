@@ -645,13 +645,28 @@ model AtlasConnection {
 // experiments) is intentionally left for a later pass rather than guessed
 // at here.
 model ExploreSubject {
-  id        String   @id @default(cuid())
-  title     String
-  summary   String?
-  content   String   @default("")
-  archived  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  title           String
+  summary         String?
+  content         String   @default("")
+  parentId        String?
+  kind            String   @default("subject")
+  status          String   @default("not-started")
+  bookmarked      Boolean  @default(false)
+  position        Int      @default(0)
+  prerequisitesJson String @default("[]")
+  relatedJson     String   @default("[]")
+  referencesJson  String   @default("[]")
+  layersJson      String   @default("{}")
+  archived        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  parent          ExploreSubject?  @relation("SubjectTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children        ExploreSubject[] @relation("SubjectTree")
+
+  @@index([parentId, position])
+  @@index([status])
 }
 
 // ============================================
