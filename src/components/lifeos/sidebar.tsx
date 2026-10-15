@@ -24,7 +24,7 @@ const primaryNavigation: {
   { id: 'home', label: 'Overview', icon: Home },
   { id: 'research', label: 'Research', icon: FlaskConical },
   { id: 'studio', label: 'Creative Studio', icon: Sparkles },
-  { id: 'learning', label: 'Learn', icon: BookOpen },
+  { id: 'learn', label: 'Learn', icon: BookOpen },
   { id: 'atlas', label: 'Atlas', icon: Library },
 ]
 
@@ -34,7 +34,6 @@ const otherSpaces: {
   icon: React.ComponentType<{ className?: string }>
 }[] = [
   { id: 'projects', label: 'Projects', icon: FolderKanban },
-  { id: 'explore', label: 'Explore', icon: Compass },
   { id: 'house', label: 'House', icon: Warehouse },
   { id: 'archive', label: 'Archive', icon: Archive },
 ]
