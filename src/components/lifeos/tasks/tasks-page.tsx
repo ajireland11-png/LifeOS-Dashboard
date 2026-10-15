@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   Plus,
   Search,
@@ -372,6 +372,8 @@ const accentHexMap: Record<string, string> = {
 export function TasksPage() {
   const { taskView, setTaskView, taskFilter, setTaskFilter } = useTaskStore()
   const accentColor = useAppStore((s) => s.accentColor)
+  const taskRequest = useAppStore((s) => s.taskRequest)
+  const setTaskRequest = useAppStore((s) => s.setTaskRequest)
   const { t } = useTranslation()
   const statusLabels: Record<string, string> = useMemo(() => ({
     'todo': t('tasks.todo'),
@@ -408,6 +410,11 @@ export function TasksPage() {
   const isMobile = useIsMobile()
 
   const selectedTask = useMemo(() => tasks.find(t => t.id === selectedTaskId), [tasks, selectedTaskId])
+  useEffect(() => {
+    if (!taskRequest || isLoading) return
+    if (tasks.some(task => task.id === taskRequest)) setSelectedTaskId(taskRequest)
+    setTaskRequest(null)
+  }, [taskRequest, isLoading, tasks, setTaskRequest])
 
   const filteredTasks = useMemo(() => {
     let result = tasks
