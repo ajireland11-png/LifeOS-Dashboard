@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Archive, CheckCircle2, Circle, FolderKanban, Plus, Trash2 } from 'lucide-react'
 import { SectionPage } from '../shared/section-page'
+import { useAppStore } from '@/stores/app-store'
 
 type Task = {
   id: string
@@ -41,6 +42,8 @@ function formatDate(value?: string): string {
 }
 
 export function ProjectsPage() {
+  const projectRequest = useAppStore(s => s.projectRequest)
+  const setProjectRequest = useAppStore(s => s.setProjectRequest)
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -73,6 +76,11 @@ export function ProjectsPage() {
   useEffect(() => {
     loadList()
   }, [loadList])
+  useEffect(() => {
+    if (!projectRequest || loading) return
+    if (projects.some(project => project.id === projectRequest)) setSelectedId(projectRequest)
+    setProjectRequest(null)
+  }, [projectRequest, loading, projects, setProjectRequest])
 
   const loadDetail = useCallback(async (id: string) => {
     setDetailLoading(true)
