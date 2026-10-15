@@ -38,6 +38,8 @@ interface AppState {
   setFamilyDateRequest: (id: string | null) => void
   researchPaperRequest: string | null
   setResearchPaperRequest: (id: string | null) => void
+  researchAssetRequest: { paperId: string; type: 'figure' | 'dataset'; itemId: string } | null
+  setResearchAssetRequest: (request: { paperId: string; type: 'figure' | 'dataset'; itemId: string } | null) => void
   newNoteRequest: number
   requestNewNote: () => void
   
@@ -117,6 +119,8 @@ export const useAppStore = create<AppState>()(
       setFamilyDateRequest: (id) => set({ familyDateRequest: id }),
       researchPaperRequest: null,
       setResearchPaperRequest: (id) => set({ researchPaperRequest: id }),
+      researchAssetRequest: null,
+      setResearchAssetRequest: (request) => set({ researchAssetRequest: request }),
       newNoteRequest: 0,
       requestNewNote: () => set((state) => ({ newNoteRequest: state.newNoteRequest + 1 })),
       
