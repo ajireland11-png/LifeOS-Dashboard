@@ -1,0 +1,102 @@
+/* LifeOS Home — an image-led, tactile personal studio rather than a generic dashboard. */
+.lifeos-home-room.lifeos-home-rebuild{
+  --home-ink:#f4eddf;--home-muted:#c0b9a9;--home-line:rgba(244,237,223,.18);
+  width:100%;min-height:calc(100vh - 7rem);padding:clamp(18px,3vw,38px);
+  color:var(--home-ink);background:
+    radial-gradient(ellipse at 7% 3%,rgba(156,91,61,.16),transparent 34rem),
+    radial-gradient(ellipse at 90% 52%,rgba(105,127,92,.12),transparent 32rem),
+    #1d211d;position:relative;isolation:isolate;overflow:hidden;
+  border:1px solid rgba(218,193,150,.17);box-shadow:0 24px 80px rgba(0,0,0,.17);
+}
+.lifeos-home-rebuild:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.16;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.17'/%3E%3C/svg%3E")}
+.lifeos-home-rebuild button{font:inherit;color:inherit;cursor:pointer}
+.lifeos-home-rebuild button:focus-visible{outline:2px solid #e4bd83;outline-offset:3px}
+.lifeos-home-rebuild-top{display:grid;grid-template-columns:1fr auto minmax(180px,.72fr);align-items:center;gap:28px;padding-bottom:22px;border-bottom:1px solid var(--home-line)}
+.lifeos-home-wordmark{display:inline-flex;align-items:center;gap:11px;width:max-content;padding:0;border:0;background:transparent;letter-spacing:.24em;font-size:10px;font-weight:700}
+.lifeos-home-wordmark i{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(219,185,128,.55);border-radius:50%;color:#e1b97c;font-style:normal}
+.lifeos-home-date{display:flex;align-items:center;gap:17px}
+.lifeos-home-date span{color:var(--home-muted);font:italic 15px Georgia,serif}
+.lifeos-home-date strong{font:400 25px Georgia,serif;letter-spacing:-.04em}
+.lifeos-home-search-area{position:relative}
+.lifeos-home-search-rebuild{display:flex;align-items:center;gap:10px;min-height:42px;padding:0 13px;border:1px solid var(--home-line);background:rgba(255,255,255,.035);color:#d5b681}
+.lifeos-home-search-rebuild:focus-within{border-color:rgba(219,185,128,.72);background:rgba(255,255,255,.055)}
+.lifeos-home-search-rebuild input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--home-ink);font-size:12px}
+.lifeos-home-search-rebuild input::placeholder{color:#aaa99b}
+.lifeos-home-search-popover{position:absolute;z-index:20;top:calc(100% + 7px);left:0;right:0;padding:5px;border:1px solid #55564b;background:#262b25;box-shadow:0 16px 38px #0008}
+.lifeos-home-search-popover button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:10px;border:0;border-bottom:1px solid #ffffff12;background:transparent;text-align:left}
+.lifeos-home-search-popover button:hover{background:#ffffff0b}
+.lifeos-home-search-popover button span,.lifeos-home-search-popover b,.lifeos-home-search-popover small{display:block;min-width:0}
+.lifeos-home-search-popover b{font-size:12px;font-weight:500}
+.lifeos-home-search-popover small,.lifeos-home-search-popover>span{color:#b3ad9e;font-size:10px}
+.lifeos-home-search-popover small{margin-top:3px;text-transform:capitalize}
+.lifeos-home-rebuild-grid{display:grid;grid-template-columns:minmax(190px,.7fr) minmax(0,2.2fr);gap:clamp(28px,5vw,74px);padding-top:clamp(28px,4vw,48px)}
+.lifeos-home-left-rail{display:flex;flex-direction:column;min-width:0}
+.lifeos-home-intro{padding:6px 0 30px}
+.lifeos-home-index{color:#d7ae75;font-size:9px;letter-spacing:.22em}
+.lifeos-home-intro h1{margin:23px 0 16px;font:400 clamp(35px,4.3vw,61px)/.99 Georgia,"Iowan Old Style",serif;letter-spacing:-.055em}
+.lifeos-home-intro h1 em{color:#d8b17c;font-weight:400}
+.lifeos-home-intro p{max-width:255px;margin:0;color:#c1bbae;font:italic 15px/1.65 Georgia,serif}
+.lifeos-home-quick-nav{display:grid;gap:2px;margin-top:7px}
+.lifeos-home-quick-nav button{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:center;gap:11px;padding:12px 10px;border:0;border-bottom:1px solid rgba(244,237,223,.1);background:transparent;color:#d8d2c4;text-align:left;transition:background .18s ease,color .18s ease}
+.lifeos-home-quick-nav button svg{width:16px;height:16px;color:#c8a777;stroke-width:1.5}
+.lifeos-home-quick-nav button span{font-size:12px}
+.lifeos-home-quick-nav button small{color:#a7a596;font:italic 12px Georgia,serif}
+.lifeos-home-quick-nav button:hover{background:rgba(219,185,128,.08);color:#fff4df}
+.lifeos-home-rail-note{margin-top:auto;padding:25px 3px 4px}
+.lifeos-home-rail-note span{color:#d5ad75;font-size:8px;letter-spacing:.22em}
+.lifeos-home-rail-note p{max-width:210px;margin:9px 0 0;color:#a8a999;font:italic 13px/1.65 Georgia,serif}
+.lifeos-home-rebuild-main{min-width:0}
+.lifeos-home-art-stage{position:relative;min-height:clamp(250px,32vw,410px);overflow:hidden;background:#464a39}
+.lifeos-home-art-image{position:absolute;inset:0;background-color:#454a3c;background-image:linear-gradient(90deg,rgba(20,25,20,.04),rgba(20,25,20,.03) 55%,rgba(20,25,20,.28)),url("https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1800&q=88");background-size:cover;background-position:center 47%;transform:scale(1.015);transition:transform 1.2s cubic-bezier(.2,.7,.2,1),filter .5s;filter:saturate(.78) contrast(1.02)}
+.lifeos-home-art-stage:hover .lifeos-home-art-image{transform:scale(1.045);filter:saturate(.98) contrast(1.03)}
+.lifeos-home-art-stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(15,20,16,.1),transparent 38%,rgba(15,20,16,.56))}
+.lifeos-home-art-caption{position:absolute;z-index:1;top:17px;left:19px;right:19px;display:flex;justify-content:space-between;color:#fff8e8;font-size:8px;letter-spacing:.18em;text-shadow:0 1px 8px #0008}
+.lifeos-home-art-action{position:absolute;z-index:2;right:19px;bottom:19px;display:flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid rgba(255,248,232,.7);background:rgba(27,34,27,.62);backdrop-filter:blur(10px);color:#fff8e8;font-size:11px;transition:background .2s}
+.lifeos-home-art-action:hover{background:#263327e8}
+.lifeos-home-workbench{display:grid;grid-template-columns:1fr 1fr;gap:0 30px;margin-top:24px}
+.lifeos-home-sheet{min-width:0;padding:16px 0 18px;border-top:1px solid var(--home-line)}
+.lifeos-home-sheet-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.lifeos-home-sheet-heading>span{font:italic 21px Georgia,serif;letter-spacing:-.02em}
+.lifeos-home-sheet-heading>b{display:grid;place-items:center;min-width:25px;height:25px;border:1px solid rgba(215,174,117,.5);border-radius:50%;color:#e0b77d;font:11px Georgia,serif}
+.lifeos-home-sheet-heading button,.lifeos-home-strip-title button{padding:0;border:0;background:transparent;color:#d9b781;font-size:10px}
+.lifeos-home-sheet-heading button:hover,.lifeos-home-strip-title button:hover{color:#fff0d1}
+.lifeos-home-muted{margin:0;color:#a8aa9d;font:italic 13px Georgia,serif}
+.lifeos-home-task-lines{display:grid}
+.lifeos-home-task-lines button,.lifeos-home-project-line{display:flex;align-items:center;gap:10px;width:100%;min-width:0;padding:9px 0;border:0;border-bottom:1px solid rgba(244,237,223,.08);background:transparent;text-align:left}
+.lifeos-home-task-lines button>span,.lifeos-home-project-line>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.lifeos-home-task-lines button>svg,.lifeos-home-project-line>svg{flex:none;color:#c4a271;opacity:.65}
+.lifeos-home-task-lines button:hover>span,.lifeos-home-project-line:hover strong{color:#f0c98f}
+.lifeos-home-checkbox{width:13px;height:13px;flex:none;border:1px solid #9c9d8a;border-radius:50%}
+.lifeos-home-open-line{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 0;border:0;border-bottom:1px solid rgba(244,237,223,.08);background:transparent;color:#c7c1b4;text-align:left;font:italic 13px Georgia,serif}
+.lifeos-home-open-line svg{width:14px;color:#d5ad75}
+.lifeos-home-project-line{align-items:flex-start}
+.lifeos-home-project-line>small{flex:none;padding-top:2px;color:#d5ad75;font:italic 11px Georgia,serif}
+.lifeos-home-project-line>span{white-space:normal}
+.lifeos-home-project-line strong,.lifeos-home-project-line em{display:block;overflow:hidden;text-overflow:ellipsis}
+.lifeos-home-project-line strong{font-size:11px;font-weight:500}
+.lifeos-home-project-line em{margin-top:4px;color:#aaa99b;font:italic 11px/1.45 Georgia,serif;white-space:nowrap}
+.lifeos-home-next-line{display:flex;align-items:center;gap:14px;width:100%;padding:10px 0;border:0;border-bottom:1px solid rgba(244,237,223,.08);background:transparent;text-align:left}
+.lifeos-home-next-line time{flex:none;min-width:46px;color:#d5ad75;font:italic 12px Georgia,serif}
+.lifeos-home-next-line span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.lifeos-home-next-line:hover span{color:#f0c98f}
+.lifeos-home-bottom-strip{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:10px;padding-top:20px;border-top:1px solid var(--home-line)}
+.lifeos-home-strip-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.lifeos-home-strip-title>span{font:italic 18px Georgia,serif}
+.lifeos-home-notes-strip>button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:8px 0;border:0;border-bottom:1px solid rgba(244,237,223,.08);background:transparent;text-align:left}
+.lifeos-home-notes-strip>button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+.lifeos-home-notes-strip>button time{flex:none;color:#a8aa9d;font:italic 10px Georgia,serif}
+.lifeos-home-notes-strip>button:hover span{color:#f0c98f}
+.lifeos-home-find-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.lifeos-home-find-list button{display:flex;align-items:center;gap:9px;min-width:0;padding:8px 0;border:0;border-bottom:1px solid rgba(244,237,223,.08);background:transparent;text-align:left}
+.lifeos-home-find-list button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+.lifeos-home-find-list button:hover span{color:#f0c98f}
+.lifeos-home-find-dot{width:7px;height:7px;flex:none;border-radius:50%;background:#d5ad75}
+.lifeos-home-find-dot-explore{background:#b2c2a0}.lifeos-home-find-dot-studio{background:#c49fc0}
+.lifeos-home-rebuild-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:32px;padding-top:17px;border-top:1px solid var(--home-line);color:#969b8c;font-size:9px;letter-spacing:.07em}
+.lifeos-home-rebuild-footer div{display:flex;gap:17px}
+.lifeos-home-rebuild-footer button{padding:0;border:0;background:transparent;color:#c7b58f;font-size:10px}
+.lifeos-home-rebuild-footer button:hover{color:#fff0d1}
+@media(max-width:920px){.lifeos-home-rebuild-top{grid-template-columns:1fr auto}.lifeos-home-search-area{grid-column:1/-1}.lifeos-home-rebuild-grid{grid-template-columns:minmax(155px,.68fr) minmax(0,1.6fr);gap:26px}.lifeos-home-art-stage{min-height:270px}}
+@media(max-width:650px){.lifeos-home-room.lifeos-home-rebuild{padding:17px}.lifeos-home-rebuild-top{grid-template-columns:1fr;gap:15px}.lifeos-home-date{justify-content:space-between}.lifeos-home-search-area{grid-column:auto}.lifeos-home-rebuild-grid{grid-template-columns:1fr;gap:24px;padding-top:25px}.lifeos-home-intro{padding-bottom:15px}.lifeos-home-intro h1{margin:15px 0 10px;font-size:43px}.lifeos-home-intro p{max-width:350px}.lifeos-home-quick-nav{grid-template-columns:1fr 1fr;gap:0 12px}.lifeos-home-rail-note{display:none}.lifeos-home-art-stage{min-height:240px}.lifeos-home-workbench{gap:0 18px}.lifeos-home-bottom-strip{gap:20px}.lifeos-home-find-list{grid-template-columns:1fr}.lifeos-home-rebuild-footer{align-items:flex-start;flex-direction:column}.lifeos-home-rebuild-footer div{gap:15px}}
+@media(max-width:430px){.lifeos-home-workbench,.lifeos-home-bottom-strip{grid-template-columns:1fr}.lifeos-home-art-stage{min-height:215px}.lifeos-home-intro h1{font-size:39px}}
+@media(prefers-reduced-motion:reduce){.lifeos-home-art-image,.lifeos-home-quick-nav button{transition:none}}
