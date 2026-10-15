@@ -59,3 +59,30 @@ async fn studio_categories_and_collections_keep_one_canonical_item() {
     let (_, collections) = send(&app, "GET", "/api/studio/collections", Value::Null).await;
     assert_eq!(collections.as_array().unwrap().iter().find(|c| c["id"] == second_id).unwrap()["itemCount"], 1);
 }
+
+#[tokio::test]
+async fn studio_favourites_persist_and_can_be_removed() {
+    let (app, _temp_db) = common::setup_test_app().await;
+    let (status, item) = send(&app, "POST", "/api/studio/items", json!({
+        "title":"Woodworking joinery reel","kind":"inspiration"
+    })).await;
+    assert_eq!(status, StatusCode::CREATED);
+    let id = item["id"].as_str().unwrap();
+
+    let (status, updated) = send(&app, "PATCH", &format!("/api/studio/items/{id}"), json!({
+        "isFavorite": true
+    })).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(updated["isFavorite"], true);
+
+    let (status, loaded) = send(&app, "GET", &format!("/api/studio/items/{id}"), Value::Null).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(loaded["isFavorite"], true);
+
+    let (status, updated) = send(&app, "PATCH", &format!("/api/studio/items/{id}"), json!({
+        "isFavorite": false
+    })).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(updated["isFavorite"], false);
+}
+
