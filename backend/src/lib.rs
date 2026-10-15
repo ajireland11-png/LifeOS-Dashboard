@@ -192,6 +192,12 @@ pub fn build_app(pool: SqlitePool) -> Router {
                 .patch(studio::update_item)
                 .delete(studio::delete_item),
         )
+        // Studio category management and multi-collection membership
+        .route("/api/studio/categories", get(studio::list_categories).post(studio::create_category))
+        .route("/api/studio/categories/{id}", patch(studio::update_category).delete(studio::delete_category))
+        .route("/api/studio/collections", get(studio::list_collections).post(studio::create_collection))
+        .route("/api/studio/collections/{id}", patch(studio::update_collection).delete(studio::delete_collection))
+        .route("/api/studio/collections/{collection_id}/items/{item_id}", post(studio::link_collection_item).delete(studio::unlink_collection_item))
         // Note Folders
         .route(
             "/api/note-folders",
