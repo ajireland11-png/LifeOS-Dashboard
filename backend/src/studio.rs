@@ -25,6 +25,10 @@ pub(crate) struct StudioItem {
     image_url: Option<String>,
     category: Option<String>,
     tags: Value,
+    source_account: Option<String>,
+    techniques: Value,
+    materials: Value,
+    skill_level: Option<String>,
     is_favorite: bool,
     archived: bool,
     created_at: PrismaDateTime,
@@ -42,6 +46,10 @@ fn row_to_item(r: &sqlx::sqlite::SqliteRow) -> Result<StudioItem, sqlx::Error> {
         image_url: r.try_get("imageUrl")?,
         category: r.try_get("category")?,
         tags: r.try_get::<String, _>("tagsJson").ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or(Value::Array(vec![])),
+        source_account: r.try_get("sourceAccount")?,
+        techniques: r.try_get::<String, _>("techniquesJson").ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or(Value::Array(vec![])),
+        materials: r.try_get::<String, _>("materialsJson").ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or(Value::Array(vec![])),
+        skill_level: r.try_get("skillLevel")?,
         is_favorite: r.try_get::<i64, _>("isFavorite").unwrap_or(0) != 0,
         archived: r.try_get::<i64, _>("archived")? != 0,
         created_at: PrismaDateTime(r.try_get::<i64, _>("createdAt")?),
@@ -102,13 +110,17 @@ pub async fn create_item(
     let image_url = truthy_str(&body, "imageUrl");
     let category = truthy_str(&body, "category");
     let tags_json = body.get("tags").map(|v| v.to_string()).unwrap_or_else(|| "[]".into());
+    let source_account = truthy_str(&body, "sourceAccount");
+    let techniques_json = body.get("techniques").map(|v| v.to_string()).unwrap_or_else(|| "[]".into());
+    let materials_json = body.get("materials").map(|v| v.to_string()).unwrap_or_else(|| "[]".into());
+    let skill_level = truthy_str(&body, "skillLevel");
 
     let id = gen_id();
     let now = now_ms();
 
     sqlx::query(
-        "INSERT INTO StudioItem (id, title, kind, summary, content, sourceUrl, imageUrl, category, tagsJson, isFavorite, archived, createdAt, updatedAt) \
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)",
+        "INSERT INTO StudioItem (id, title, kind, summary, content, sourceUrl, imageUrl, category, tagsJson, sourceAccount, techniquesJson, materialsJson, skillLevel, isFavorite, archived, createdAt, updatedAt) \
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)",
     )
     .bind(&id)
     .bind(&title)
@@ -119,6 +131,10 @@ pub async fn create_item(
     .bind(&image_url)
     .bind(&category)
     .bind(&tags_json)
+    .bind(&source_account)
+    .bind(&techniques_json)
+    .bind(&materials_json)
+    .bind(&skill_level)
     .bind(now)
     .bind(now)
     .execute(&st.db)
@@ -175,6 +191,18 @@ pub async fn update_item(
     }
     if let Some(v) = body.get("tags") {
         crate::push_set!(qb, first, "tagsJson = ", v.to_string());
+    }
+    if let Some(v) = patch_str(&body, "sourceAccount") {
+        crate::push_set!(qb, first, "sourceAccount = ", v);
+    }
+    if let Some(v) = body.get("techniques") {
+        crate::push_set!(qb, first, "techniquesJson = ", v.to_string());
+    }
+    if let Some(v) = body.get("materials") {
+        crate::push_set!(qb, first, "materialsJson = ", v.to_string());
+    }
+    if let Some(v) = patch_str(&body, "skillLevel") {
+        crate::push_set!(qb, first, "skillLevel = ", v);
     }
     if let Some(v) = patch_bool(&body, "isFavorite") {
         crate::push_set!(qb, first, "isFavorite = ", if v { 1_i64 } else { 0_i64 });
