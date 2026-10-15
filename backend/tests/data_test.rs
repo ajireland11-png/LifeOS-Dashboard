@@ -323,7 +323,7 @@ async fn test_backup_and_restore() {
         .unwrap();
     let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
     let tasks: Vec<Value> = serde_json::from_slice(&body_bytes).unwrap();
-    assert!(tasks.len() > 0);
+    assert!(!tasks.is_empty());
 }
 
 #[tokio::test]
