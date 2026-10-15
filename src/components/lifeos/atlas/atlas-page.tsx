@@ -18,7 +18,7 @@ import { SectionPage } from "@/components/lifeos/shared/section-page"
 import { motion } from "framer-motion"
 import { useAppStore } from "@/stores/app-store"
 
-type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem" | "knowledge"
+type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem" | "knowledge" | "person" | "persondate"
 
 type AtlasNode = {
   id: string
@@ -196,7 +196,7 @@ function AtlasLandscape({
   onOpen: (node: AtlasNode) => void
 }) {
   const [selectedKey, setSelectedKey] = useState("")
-  const [view, setView] = useState<"world" | "knowledge" | "creative" | "work">("world")
+  const [view, setView] = useState<"world" | "knowledge" | "creative" | "work" | "people">("world")
   const [zoom, setZoom] = useState(1)
   const [collapsed, setCollapsed] = useState<string[]>([])
 
@@ -210,17 +210,21 @@ function AtlasLandscape({
     subject: { label: "Subjects", mark: "S", colour: "#b5a4c7" },
     studioitem: { label: "Studio", mark: "✳", colour: "#d5a68d" },
     knowledge: { label: "Knowledge", mark: "K", colour: "#a5b9a5" },
+    person: { label: "People", mark: "♥", colour: "#d5a68d" },
+    persondate: { label: "Important dates", mark: "D", colour: "#c6a56b" },
   }
 
   const groups: { id: string; title: string; note: string; types: EntityType[]; x: number }[] = [
     { id: "ideas", title: "Ideas & references", note: "Questions, notes and things worth keeping", types: ["knowledge", "subject", "bookmark", "note"], x: 170 },
     { id: "making", title: "Make & explore", note: "Projects and creative threads", types: ["studioitem", "project"], x: 500 },
     { id: "practice", title: "Practice & commitments", note: "Goals, habits and next actions", types: ["goal", "habit", "task"], x: 830 },
+    { id: "people", title: "People & moments", note: "Relationships, dates and shared commitments", types: ["person", "persondate"], x: 1160 },
   ]
   const filtered = nodes.filter(node => {
     const matchesView = view === "knowledge" ? ["knowledge", "subject", "bookmark", "note"].includes(node.type)
       : view === "creative" ? ["studioitem", "project"].includes(node.type)
       : view === "work" ? ["goal", "habit", "task", "project"].includes(node.type)
+      : view === "people" ? ["person", "persondate", "task"].includes(node.type)
       : true
     const needle = query.trim().toLocaleLowerCase()
     const matchesSearch = !needle || (node.title + " " + (node.description || "")).toLocaleLowerCase().includes(needle)
@@ -290,6 +294,7 @@ function AtlasLandscape({
           ["knowledge", "Knowledge"],
           ["creative", "Creative"],
           ["work", "Projects & tasks"],
+          ["people", "People & dates"],
         ] as const).map(([value, label]) => (
           <button type="button" key={value} className={view === value ? "is-active" : ""} onClick={() => { setView(value); setSelectedKey("") }}>{label}</button>
         ))}
@@ -298,8 +303,8 @@ function AtlasLandscape({
 
       <div className="lo-atlas-canvas-scroll">
         {filtered.length === 0 && <p className="lo-atlas-no-matches">No nodes match this view or search. Try a broader term or choose World view.</p>}
-        <div className="lo-atlas-canvas" style={{ height: canvasHeight, transform: "scale(" + zoom + ")", transformOrigin: "top left", width: 1000 }}>
-          <svg className="lo-atlas-edges" viewBox={"0 0 1000 " + canvasHeight} preserveAspectRatio="none" aria-hidden="true">
+        <div className="lo-atlas-canvas" style={{ height: canvasHeight, transform: "scale(" + zoom + ")", transformOrigin: "top left", width: 1320 }}>
+          <svg className="lo-atlas-edges" viewBox={"0 0 1320 " + canvasHeight} preserveAspectRatio="none" aria-hidden="true">
             {lines.map(({ edge, source, target }) => {
               const bend = Math.max(40, Math.abs(target.x - source.x) * 0.45)
               const direction = target.x >= source.x ? 1 : -1
@@ -648,7 +653,8 @@ export function AtlasPage() {
         </section>
 
         <AtlasLandscape nodes={nodes} edges={edges} query={search} onOpen={(node) => {
-          const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas" }
+          const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", person: "family", persondate: "family" }
+          if(node.type === "person") useAppStore.getState().setFamilyPersonRequest(node.id)
           setActiveModule(destination[node.type] as any)
         }} />
 
