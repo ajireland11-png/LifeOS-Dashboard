@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useAppStore } from '@/stores/app-store'
 import { BookOpen, ChevronRight, ExternalLink, FileImage, FlaskConical, Microscope, Plus, Save, Table2, Trash2, X } from 'lucide-react'
 
 type Checkpoint = { id:string; title:string; done:boolean }
@@ -49,6 +50,8 @@ async function parseXlsxPreview(file:File):Promise<string[][]>{
 }
 
 export function ResearchPage(){
+  const researchPaperRequest=useAppStore(s=>s.researchPaperRequest)
+  const setResearchPaperRequest=useAppStore(s=>s.setResearchPaperRequest)
   const [papers,setPapers]=useState<Paper[]>([])
   const [allTasks,setAllTasks]=useState<Task[]>([])
   const [paperTasks,setPaperTasks]=useState<Task[]>([])
@@ -73,6 +76,7 @@ export function ResearchPage(){
   const visible=useMemo(()=>papers.filter(p=>`${p.title} ${p.authors||''} ${p.journal||''} ${p.abstractText||''}`.toLowerCase().includes(query.toLowerCase())),[papers,query])
   const sections=useMemo(()=>[['scientificQuestion','Scientific question'],['abstractText','Abstract'],['background','Background'],['mechanisms','Mechanisms'],['interpretation','Interpretation'],['limitations','Limitations'],['openQuestions','Open questions'],['notes','Reading notes']] as const,[])
   function open(p:Paper){setSelected(p);setDraft({...p,figures:p.figures??[],tables:p.tables??[],sections:p.sections??[],datasets:p.datasets??[],status:p.status||'reading'});setAdding(false);setError('')}
+  useEffect(()=>{if(!researchPaperRequest||loading)return;const paper=papers.find(p=>p.id===researchPaperRequest);if(paper)open(paper);setResearchPaperRequest(null)},[researchPaperRequest,loading,papers,setResearchPaperRequest])
   function startNew(){const p={...blank,id:'new',figures:[],tables:[],sections:defaultSections(),datasets:[]} as Paper;setSelected(p);setDraft(p);setAdding(true);setError('')}
   function patch<K extends keyof Paper>(key:K,value:Paper[K]){setDraft(d=>d?({...d,[key]:value}):d)}
   async function save(){
