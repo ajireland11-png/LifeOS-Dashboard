@@ -552,3 +552,5 @@ body { background-image:radial-gradient(ellipse at 88% 3%,rgba(185,108,81,.10),t
 .lo-area-learn::before { background:linear-gradient(180deg,rgba(234,227,242,.24),rgba(246,241,231,.87) 66%,rgba(246,241,231,.97)); }
 .lo-area-atlas::before { background:linear-gradient(180deg,rgba(237,229,206,.25),rgba(246,241,228,.87) 66%,rgba(246,241,228,.97)); }
 .lo-overview-area .lo-area-head,.lo-overview-area h2,.lo-overview-area .lo-area-foot { position:relative; z-index:1; }
+
+.lo-overview-area { background:transparent !important; }
