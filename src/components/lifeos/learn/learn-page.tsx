@@ -6,6 +6,14 @@ import { useAppStore } from '@/stores/app-store'
 
 type Subject = { id: string; title: string; summary?: string | null; content: string; archived: boolean; updatedAt?: string }
 
+function headingId(value: string) {
+  return value.toLocaleLowerCase().normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+function lessonBlocks(content: string) {
+  return content.split(/\\n{2,}/).map(block => block.trim()).filter(Boolean)
+}
+
 export function LearnPage() {
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -45,6 +53,11 @@ export function LearnPage() {
   }, [selectedId, selected?.updatedAt])
 
   const filtered = useMemo(() => subjects.filter(item => `${item.title} ${item.summary ?? ''} ${item.content}`.toLowerCase().includes(query.toLowerCase())), [subjects, query])
+  const readingBlocks = useMemo(() => lessonBlocks(selected?.content ?? ''), [selected?.content])
+  const headings = useMemo(() => readingBlocks.flatMap(block => {
+    const match = block.match(/^(#{1,3})\\s+(.+)$/)
+    return match ? [{ title: match[2].trim(), id: headingId(match[2].trim()), level: match[1].length }] : []
+  }), [readingBlocks])
 
   async function createSubject(event: React.FormEvent) {
     event.preventDefault()
@@ -102,7 +115,25 @@ export function LearnPage() {
               <h2>{selected.title}</h2>
               {selected.summary && <p className="lo-learn-deck">{selected.summary}</p>}
               <div className="lo-learn-rule"/>
-              {selected.content?.trim() ? <div className="lo-learn-body">{selected.content.split(/\n{2,}/).map((paragraph, i) => <p key={i}>{paragraph}</p>)}</div> : <div className="lo-learn-first-note"><BookOpen size={20}/><div><strong>This page is ready to grow.</strong><p>Add an introduction, mechanisms, examples, questions and references. Use Edit entry to begin.</p></div><button type="button" onClick={() => setEditing(true)}>Write this entry <ArrowUpRight size={14}/></button></div>}
+              {selected.content?.trim() ? <div className="lo-learn-reading-layout">
+                {headings.length > 0 && <nav className="lo-learn-toc" aria-label="On this page"><span>ON THIS PAGE</span>{headings.map(item => <a key={item.id} href={'#' + item.id} className={'lo-learn-toc-level-' + item.level}>{item.title}</a>)}</nav>}
+                <div className="lo-learn-body">{readingBlocks.map((block, i) => {
+                  const heading = block.match(/^(#{1,3})\s+(.+)$/)
+                  if (heading) {
+                    const id = headingId(heading[2].trim())
+                    if (heading[1].length === 1) return <h3 id={id} key={i}>{heading[2]}</h3>
+                    if (heading[1].length === 2) return <h4 id={id} key={i}>{heading[2]}</h4>
+                    return <h5 id={id} key={i}>{heading[2]}</h5>
+                  }
+                  const fence = String.fromCharCode(96).repeat(3)
+                  if (block.startsWith(fence) && block.endsWith(fence)) return <pre key={i}><code>{block.slice(3, -3).replace(/^\w+\n/, '')}</code></pre>
+                  const lines = block.split('\n')
+                  if (lines.every(line => /^[-*]\s+/.test(line))) return <ul key={i}>{lines.map((line, j) => <li key={j}>{line.replace(/^[-*]\s+/, '')}</li>)}</ul>
+                  if (lines.every(line => /^\d+\.\s+/.test(line))) return <ol key={i}>{lines.map((line, j) => <li key={j}>{line.replace(/^\d+\.\s+/, '')}</li>)}</ol>
+                  if (block.startsWith('> ')) return <blockquote key={i}>{block.replace(/^>\s?/gm, '')}</blockquote>
+                  return <p key={i}>{block}</p>
+                })}</div>
+              </div> : <div className="lo-learn-first-note"><BookOpen size={20}/><div><strong>This page is ready to grow.</strong><p>Use headings to build a proper field guide: Intuitive explanation, Mechanism, Technical detail, Worked examples, Open questions and Further reading. Use Edit entry to begin.</p></div><button type="button" onClick={() => setEditing(true)}>Write this entry <ArrowUpRight size={14}/></button></div>}
               <footer className="lo-learn-article-footer"><span>KEEP FOLLOWING THE QUESTION</span><button type="button" onClick={() => setActiveModule('atlas')}>See related knowledge <ArrowUpRight size={14}/></button></footer>
             </article>}
           </>}
