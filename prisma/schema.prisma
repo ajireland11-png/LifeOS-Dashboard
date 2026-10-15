@@ -137,6 +137,7 @@ model Task {
   timeEntries TimeEntry[]
   calendarEvents CalendarEvent[]
   pomodoroSessions PomodoroSession[]
+  personLinks PersonTaskLink[]
 }
 
 model TaskTag {
@@ -706,4 +707,59 @@ model ResearchPaper {
 
   @@index([archived])
   @@index([updatedAt])
+}
+
+
+// ============================================
+// FRIENDS & FAMILY — private people and dates
+// ============================================
+model Person {
+  id            String   @id @default(cuid())
+  name          String
+  relationship  String   @default("Friend")
+  photoUrl      String?
+  birthday      String?
+  email         String?
+  phone         String?
+  interestsJson String   @default("[]")
+  giftIdeasJson String   @default("[]")
+  notes         String?
+  archived      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  dates          PersonDate[]
+  taskLinks      PersonTaskLink[]
+
+  @@index([name])
+  @@index([archived])
+}
+
+model PersonDate {
+  id           String   @id @default(cuid())
+  personId     String
+  title        String
+  date         String
+  kind         String   @default("important")
+  recurrence   String   @default("yearly")
+  reminderDays Int      @default(7)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  person       Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId, date])
+}
+
+model PersonTaskLink {
+  personId  String
+  taskId    String
+  createdAt DateTime @default(now())
+
+  person    Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  task      Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([personId, taskId])
+  @@index([taskId])
 }
