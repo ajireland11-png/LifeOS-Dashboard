@@ -17,8 +17,8 @@ use crate::AppState;
 /// entries and courses are deliberately left out for now — this is a first
 /// slice of Atlas, not the whole vision, and those two can be added later by
 /// copying the same query pattern used below.
-const ENTITY_TYPES: [&str; 12] = [
-    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge", "person", "persondate", "paper",
+const ENTITY_TYPES: [&str; 14] = [
+    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge", "person", "persondate", "paper", "figure", "dataset",
 ];
 
 #[derive(Serialize, Clone)]
@@ -211,21 +211,84 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
     }
 
     // Research papers are canonical records in the scientific workspace.
-    // Atlas points to the same paper ID rather than creating a second knowledge item.
-    let rows = sqlx::query("SELECT id, title, abstract, status, updatedAt FROM ResearchPaper WHERE archived = 0")
+    // Figures and datasets live inside each paper's JSON fields today, so Atlas
+    // gives each nested record a stable composite identity without duplicating it.
+    let mut nested_asset_edges = Vec::new();
+    let rows = sqlx::query("SELECT id, title, abstract, status, figuresJson, datasetsJson, updatedAt FROM ResearchPaper WHERE archived = 0")
         .fetch_all(&st.db)
         .await?;
     for r in &rows {
+        let paper_id: String = r.try_get("id")?;
+        let updated_at = PrismaDateTime(r.try_get::<i64, _>("updatedAt")?);
         let abstract_text: Option<String> = r.try_get("abstract")?;
         let status: String = r.try_get("status")?;
         let description = abstract_text.filter(|s| !s.trim().is_empty()).or(Some(status));
         nodes.push(AtlasNode {
-            id: r.try_get("id")?,
+            id: paper_id.clone(),
             node_type: "paper".to_string(),
             title: r.try_get("title")?,
             description: description.map(|s| truncate(s.trim(), 180)),
-            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
+            updated_at: updated_at.clone(),
         });
+
+        let figures_json: String = r.try_get("figuresJson")?;
+        let figures: Value = serde_json::from_str(&figures_json).unwrap_or(Value::Array(vec![]));
+        if let Some(figures) = figures.as_array() {
+            for figure in figures {
+                let Some(item_id) = figure.get("id").and_then(Value::as_str).filter(|v| !v.is_empty()) else { continue };
+                let id = format!("{paper_id}::{item_id}");
+                let title = figure.get("title").and_then(Value::as_str).filter(|v| !v.trim().is_empty()).unwrap_or("Untitled figure");
+                let description = figure.get("caption").and_then(Value::as_str)
+                    .or_else(|| figure.get("description").and_then(Value::as_str))
+                    .or_else(|| figure.get("status").and_then(Value::as_str))
+                    .map(|v| truncate(v.trim(), 180));
+                nodes.push(AtlasNode {
+                    id: id.clone(),
+                    node_type: "figure".to_string(),
+                    title: title.to_string(),
+                    description,
+                    updated_at: updated_at.clone(),
+                });
+                nested_asset_edges.push(AtlasEdge {
+                    id: format!("observed-paper-figure-{paper_id}-{item_id}"),
+                    source_type: "paper".to_string(),
+                    source_id: paper_id.clone(),
+                    target_type: "figure".to_string(),
+                    target_id: id,
+                    kind: "observed".to_string(),
+                    label: Some("contains figure".to_string()),
+                });
+            }
+        }
+
+        let datasets_json: String = r.try_get("datasetsJson")?;
+        let datasets: Value = serde_json::from_str(&datasets_json).unwrap_or(Value::Array(vec![]));
+        if let Some(datasets) = datasets.as_array() {
+            for dataset in datasets {
+                let Some(item_id) = dataset.get("id").and_then(Value::as_str).filter(|v| !v.is_empty()) else { continue };
+                let id = format!("{paper_id}::{item_id}");
+                let title = dataset.get("title").and_then(Value::as_str).filter(|v| !v.trim().is_empty()).unwrap_or("Untitled dataset");
+                let description = dataset.get("purpose").and_then(Value::as_str)
+                    .or_else(|| dataset.get("status").and_then(Value::as_str))
+                    .map(|v| truncate(v.trim(), 180));
+                nodes.push(AtlasNode {
+                    id: id.clone(),
+                    node_type: "dataset".to_string(),
+                    title: title.to_string(),
+                    description,
+                    updated_at: updated_at.clone(),
+                });
+                nested_asset_edges.push(AtlasEdge {
+                    id: format!("observed-paper-dataset-{paper_id}-{item_id}"),
+                    source_type: "paper".to_string(),
+                    source_id: paper_id.clone(),
+                    target_type: "dataset".to_string(),
+                    target_id: id,
+                    kind: "observed".to_string(),
+                    label: Some("contains dataset".to_string()),
+                });
+            }
+        }
     }
 
     // People — private relationship records are first-class Atlas nodes.
@@ -255,7 +318,7 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
         });
     }
 
-    let mut edges = Vec::new();
+    let mut edges = nested_asset_edges;
 
     // ── Explicit connections the user drew themselves ──────────────────────
     let rows = sqlx::query("SELECT * FROM AtlasConnection")
