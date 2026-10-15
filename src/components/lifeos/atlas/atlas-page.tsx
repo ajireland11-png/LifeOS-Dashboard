@@ -266,11 +266,8 @@ function AtlasLandscape({
         </p>
       </div>
 
-      <div className="lifeos-atlas-mosaic relative aspect-[1.65] min-h-[360px] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(190,160,100,0.12),transparent_48%)]">
-        <div className="lifeos-atlas-bloom absolute -left-12 -top-16 h-52 w-52 rounded-full blur-3xl" aria-hidden="true" />
-        <div className="lifeos-atlas-bloom lifeos-atlas-bloom-2 absolute -bottom-20 right-0 h-64 w-64 rounded-full blur-3xl" aria-hidden="true" />
-        <div className="absolute inset-[9%] rounded-full border border-dashed border-[color:var(--lifeos-line)]" />
-        <div className="absolute inset-[22%] rounded-full border border-[color:var(--lifeos-line)] opacity-70" />
+      <div className="lo-atlas-map relative aspect-[1.65] min-h-[360px] overflow-hidden">
+
 
         <svg
           viewBox="0 0 100 100"
@@ -303,7 +300,7 @@ function AtlasLandscape({
                 style={{ left: `${x}%`, top: `${y}%` }}
               >
                 <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-full border text-[10px] uppercase tracking-[0.08em] shadow-[0_0_0_5px_rgba(18,19,17,0.65)] transition-transform duration-300 group-hover:scale-125 ${index === 0 ? "border-[color:var(--lifeos-accent)] text-[var(--lifeos-accent)]" : "border-[color:var(--lifeos-line)] bg-[var(--lifeos-night-soft)] text-muted-foreground"}`}
+                  className={`lo-atlas-node lo-atlas-node-${node.type} flex h-8 w-8 items-center justify-center rounded-full border text-[10px] uppercase tracking-[0.08em] transition-transform duration-300 group-hover:scale-125 ${index === 0 ? "is-featured" : ""}`}
                 >
                   {meta.mark}
                 </div>
