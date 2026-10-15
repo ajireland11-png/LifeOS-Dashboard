@@ -272,7 +272,7 @@ async fn test_events_date_filtering() {
     let (app, _temp_db) = common::setup_test_app().await;
 
     // Create events for different dates
-    let dates = vec![
+    let dates = [
         "2026-06-01T10:00:00Z",
         "2026-06-10T10:00:00Z",
         "2026-06-20T10:00:00Z",
@@ -312,7 +312,7 @@ async fn test_events_date_filtering() {
     let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
     let events: Vec<Value> = serde_json::from_slice(&body_bytes).unwrap();
     // Should return events within the date range
-    assert!(events.len() >= 1);
+    assert!(!events.is_empty());
 }
 
 #[tokio::test]
