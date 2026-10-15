@@ -196,7 +196,7 @@ function AtlasLandscape({
   onOpen: (node: AtlasNode) => void
 }) {
   const [selectedKey, setSelectedKey] = useState("")
-  const [view, setView] = useState<"world" | "knowledge" | "creative" | "work" | "people">("world")
+  const [view, setView] = useState<"world" | "research" | "learning" | "creative" | "work" | "people">("world")
   const [zoom, setZoom] = useState(1)
   const [collapsed, setCollapsed] = useState<string[]>([])
 
@@ -221,8 +221,14 @@ function AtlasLandscape({
     { id: "practice", title: "Practice & commitments", note: "Goals, habits and next actions", types: ["goal", "habit", "task"], x: 830 },
     { id: "people", title: "People & moments", note: "Relationships, dates and shared commitments", types: ["person", "persondate"], x: 1160 },
   ]
+  // A research view should include the real tasks already linked to papers,
+  // rather than every task in the user's life.
+  const researchTaskIds = new Set(edges
+    .filter(edge => (edge.sourceType === "paper" && edge.targetType === "task") || (edge.sourceType === "task" && edge.targetType === "paper"))
+    .map(edge => edge.sourceType === "task" ? edge.sourceId : edge.targetId))
   const filtered = nodes.filter(node => {
-    const matchesView = view === "knowledge" ? ["paper", "knowledge", "subject", "bookmark", "note"].includes(node.type)
+    const matchesView = view === "research" ? node.type === "paper" || (node.type === "task" && researchTaskIds.has(node.id))
+      : view === "learning" ? ["subject", "knowledge"].includes(node.type)
       : view === "creative" ? ["studioitem", "project"].includes(node.type)
       : view === "work" ? ["goal", "habit", "task", "project"].includes(node.type)
       : view === "people" ? ["person", "persondate", "task"].includes(node.type)
@@ -292,9 +298,10 @@ function AtlasLandscape({
       <div className="lo-atlas-viewbar" role="group" aria-label="Atlas view">
         {([
           ["world", "World view"],
-          ["knowledge", "Knowledge"],
-          ["creative", "Creative"],
-          ["work", "Projects & tasks"],
+          ["research", "Research tree"],
+          ["learning", "Learning tree"],
+          ["creative", "Creative tree"],
+          ["work", "Tasks & milestones"],
           ["people", "People & dates"],
         ] as const).map(([value, label]) => (
           <button type="button" key={value} className={view === value ? "is-active" : ""} onClick={() => { setView(value); setSelectedKey("") }}>{label}</button>
