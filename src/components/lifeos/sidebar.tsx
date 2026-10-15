@@ -3,7 +3,6 @@
 import {
   Archive,
   BookOpen,
-  Compass,
   FolderKanban,
   FlaskConical,
   Home,
