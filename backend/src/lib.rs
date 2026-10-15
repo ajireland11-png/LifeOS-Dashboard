@@ -157,6 +157,14 @@ pub fn build_app(pool: SqlitePool) -> Router {
             get(research::list_papers).post(research::create_paper),
         )
         .route(
+            "/api/research/papers/{id}/tasks",
+            get(research::list_paper_tasks),
+        )
+        .route(
+            "/api/research/papers/{paper_id}/tasks/{task_id}",
+            post(research::link_paper_task).delete(research::unlink_paper_task),
+        )
+        .route(
             "/api/research/papers/{id}",
             get(research::get_paper)
                 .patch(research::update_paper)
