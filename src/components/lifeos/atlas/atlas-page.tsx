@@ -651,40 +651,6 @@ export function AtlasPage() {
           setActiveModule(destination[node.type] as any)
         }} />
 
-        {/* Atlas introduction */}
-        <section className="lifeos-cabinet lifeos-glass-window max-w-4xl px-6 py-8 sm:px-8">
-          <div className="lifeos-colour-dash absolute left-0 right-0 top-0" aria-hidden="true" />
-          <div className="flex items-start gap-5">
-            <div className="lifeos-flower hidden sm:block" aria-hidden="true" />
-            <Network
-              size={27}
-              strokeWidth={1.2}
-              className="mt-1 shrink-0 text-[color:var(--lifeos-accent)]"
-            />
-
-            <div>
-              <h2 className="font-serif text-2xl">
-                A map, not another filing cabinet.
-              </h2>
-
-              <p className="mt-4 text-[15px] leading-7 text-foreground/60">
-                Atlas is the connective layer of Life OS. Projects, notes,
-                tasks, goals, habits and bookmarks all sit on the same map,
-                joined by connections you draw yourself and by ones already
-                observable in your data — shared tags, linked notes, task
-                dependencies, a goal's linked project.
-              </p>
-
-              <p className="mt-4 text-[15px] leading-7 text-foreground/60">
-                Solid connections are ones you made explicitly. Fainter ones
-                were observed from data that already existed. Inferred and
-                suggested connections — patterns and possibilities the system
-                notices on its own — are the next layer to build.
-              </p>
-            </div>
-          </div>
-        </section>
-
         {/* Living knowledge layer */}
         <section className="lifeos-paper relative border-y border-[color:var(--lifeos-line)] px-6 py-10 sm:px-8">
           <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr]">
