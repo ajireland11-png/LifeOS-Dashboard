@@ -686,9 +686,13 @@ model StudioItem {
   sourceUrl String?
   imageUrl  String?
   category  String?
-  tagsJson  String   @default("[]")
-  isFavorite Boolean  @default(false)
-  archived  Boolean  @default(false)
+  tagsJson       String   @default("[]")
+  sourceAccount  String?
+  techniquesJson String   @default("[]")
+  materialsJson  String   @default("[]")
+  skillLevel     String?
+  isFavorite     Boolean  @default(false)
+  archived       Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   collectionLinks StudioCollectionItem[]
