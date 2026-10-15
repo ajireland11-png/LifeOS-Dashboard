@@ -187,141 +187,175 @@ function KindBadge({ kind }: { kind: EdgeKind }) {
 function AtlasLandscape({
   nodes,
   edges,
+  onOpen,
 }: {
   nodes: AtlasNode[]
   edges: AtlasEdge[]
+  onOpen: (node: AtlasNode) => void
 }) {
-  const palette: Record<EntityType, { label: string; mark: string }> = {
-    note: { label: "Notes", mark: "N" },
-    project: { label: "Projects", mark: "P" },
-    task: { label: "Tasks", mark: "T" },
-    goal: { label: "Goals", mark: "G" },
-    habit: { label: "Habits", mark: "H" },
-    bookmark: { label: "Bookmarks", mark: "B" },
-    subject: { label: "Subjects", mark: "S" },
-    studioitem: { label: "Studio", mark: "I" },
-    knowledge: { label: "Knowledge", mark: "K" },
+  const [selectedKey, setSelectedKey] = useState("")
+  const [view, setView] = useState<"world" | "knowledge" | "creative" | "work">("world")
+  const [zoom, setZoom] = useState(1)
+  const [collapsed, setCollapsed] = useState<string[]>([])
+
+  const palette: Record<EntityType, { label: string; mark: string; colour: string }> = {
+    note: { label: "Notes", mark: "N", colour: "#c6a56b" },
+    project: { label: "Projects", mark: "P", colour: "#718575" },
+    task: { label: "Tasks", mark: "T", colour: "#a87568" },
+    goal: { label: "Goals", mark: "G", colour: "#c6a56b" },
+    habit: { label: "Habits", mark: "H", colour: "#a5b9a5" },
+    bookmark: { label: "References", mark: "R", colour: "#b5a4c7" },
+    subject: { label: "Subjects", mark: "S", colour: "#b5a4c7" },
+    studioitem: { label: "Studio", mark: "✳", colour: "#d5a68d" },
+    knowledge: { label: "Knowledge", mark: "K", colour: "#a5b9a5" },
   }
 
-  const visible = nodes.slice(0, 18)
-  const positions = visible.map((node, index) => {
-    const angle = index * 2.399963
-    const radius = 23 + (index % 4) * 8
-    return {
-      node,
-      x: 50 + Math.cos(angle) * radius,
-      y: 50 + Math.sin(angle) * radius * 0.72,
-    }
+  const groups: { id: string; title: string; note: string; types: EntityType[]; x: number }[] = [
+    { id: "ideas", title: "Ideas & references", note: "Questions, notes and things worth keeping", types: ["knowledge", "subject", "bookmark", "note"], x: 170 },
+    { id: "making", title: "Make & explore", note: "Projects and creative threads", types: ["studioitem", "project"], x: 500 },
+    { id: "practice", title: "Practice & commitments", note: "Goals, habits and next actions", types: ["goal", "habit", "task"], x: 830 },
+  ]
+  const filtered = nodes.filter(node => {
+    if (view === "knowledge") return ["knowledge", "subject", "bookmark", "note"].includes(node.type)
+    if (view === "creative") return ["studioitem", "project"].includes(node.type)
+    if (view === "work") return ["goal", "habit", "task", "project"].includes(node.type)
+    return true
   })
-
-  const positionByKey = new Map(
-    positions.map((item) => [nodeKey(item.node.type, item.node.id), item]),
-  )
-
+  const positions: { node: AtlasNode; x: number; y: number; groupId: string }[] = []
+  for (const group of groups) {
+    const inGroup = filtered.filter(node => group.types.includes(node.type))
+    if (collapsed.includes(group.id)) continue
+    inGroup.forEach((node, index) => {
+      positions.push({ node, x: group.x, y: 94 + index * 82, groupId: group.id })
+    })
+  }
+  const positionByKey = new Map(positions.map(item => [nodeKey(item.node.type, item.node.id), item]))
   const lines = edges
-    .filter((edge) => edge.kind === "connected" || edge.kind === "observed")
-    .map((edge) => ({
+    .filter(edge => edge.kind === "connected" || edge.kind === "observed")
+    .map(edge => ({
       edge,
       source: positionByKey.get(nodeKey(edge.sourceType, edge.sourceId)),
       target: positionByKey.get(nodeKey(edge.targetType, edge.targetId)),
     }))
-    .filter(
-      (item): item is {
-        edge: AtlasEdge
-        source: { node: AtlasNode; x: number; y: number }
-        target: { node: AtlasNode; x: number; y: number }
-      } => Boolean(item.source && item.target),
-    )
-    .slice(0, 28)
+    .filter((item): item is { edge: AtlasEdge; source: { node: AtlasNode; x: number; y: number; groupId: string }; target: { node: AtlasNode; x: number; y: number; groupId: string } } => Boolean(item.source && item.target))
+    .slice(0, 180)
+  const selected = positions.find(item => nodeKey(item.node.type, item.node.id) === selectedKey)?.node
+  const selectedConnections = selected ? edges.filter(edge =>
+    (edge.sourceType === selected.type && edge.sourceId === selected.id) ||
+    (edge.targetType === selected.type && edge.targetId === selected.id)
+  ).map(edge => {
+    const source = nodes.find(node => node.type === edge.sourceType && node.id === edge.sourceId)
+    const target = nodes.find(node => node.type === edge.targetType && node.id === edge.targetId)
+    return { edge, other: source?.id === selected.id && source?.type === selected.type ? target : source }
+  }).filter((item): item is { edge: AtlasEdge; other: AtlasNode } => Boolean(item.other)) : []
+  const maxRows = Math.max(4, ...groups.map(group => collapsed.includes(group.id) ? 0 : filtered.filter(node => group.types.includes(node.type)).length))
+  const canvasHeight = Math.max(430, 150 + maxRows * 82)
+  const typeLabel = (type: EntityType) => palette[type]?.label ?? type
 
-  if (!visible.length) {
+  if (!nodes.length) {
     return (
-      <div className="border-y border-[color:var(--lifeos-line)] py-16">
-        <div className="mx-auto max-w-xl text-center">
-          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--lifeos-line)] text-muted-foreground/60">
-            <Network size={19} strokeWidth={1.2} />
-          </div>
-          <h2 className="font-serif text-2xl">The landscape is still quiet.</h2>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Add notes, projects, questions or other things to give Atlas something
-            to arrange into a living map.
-          </p>
-        </div>
+      <div className="lo-atlas-empty">
+        <div className="lo-atlas-empty-mark"><Network size={22} strokeWidth={1.3} /></div>
+        <p className="lo-overline">The first threads</p>
+        <h2>The map begins with what matters to you.</h2>
+        <p>Add a question, note, project or inspiration below. Atlas will arrange real records into branches as your world grows.</p>
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden border-y border-[color:var(--lifeos-line)]">
-      <div className="flex items-end justify-between gap-6 border-b border-[color:var(--lifeos-line)] px-1 py-5">
+    <section className="lo-atlas-workspace" aria-label="Interactive knowledge tree">
+      <header className="lo-atlas-workspace-head">
         <div>
-          <p className="lifeos-kicker text-[10px] uppercase tracking-[0.2em]">
-            Intellectual landscape
-          </p>
-          <h2 className="mt-1 font-serif text-2xl">Where things meet</h2>
+          <p className="lo-overline">THE CONNECTIVE MAP</p>
+          <h2>Follow a thread.</h2>
+          <p>One shared landscape of real items. Select a node to inspect its relationships or open the original record.</p>
         </div>
-        <p className="hidden max-w-sm text-right text-xs leading-5 text-muted-foreground sm:block">
-          Not a literal diagram of everything. A quiet glimpse of the relationships
-          already emerging in your world.
-        </p>
+        <div className="lo-atlas-zoom" aria-label="Canvas zoom controls">
+          <button type="button" onClick={() => setZoom(value => Math.max(0.7, Math.round((value - 0.1) * 10) / 10))} aria-label="Zoom out">−</button>
+          <span>{Math.round(zoom * 100)}%</span>
+          <button type="button" onClick={() => setZoom(value => Math.min(1.4, Math.round((value + 0.1) * 10) / 10))} aria-label="Zoom in">+</button>
+          <button type="button" onClick={() => { setZoom(1); setSelectedKey("") }} title="Reset view">Reset</button>
+        </div>
+      </header>
+
+      <div className="lo-atlas-viewbar" role="group" aria-label="Atlas view">
+        {([
+          ["world", "World view"],
+          ["knowledge", "Knowledge"],
+          ["creative", "Creative"],
+          ["work", "Projects & tasks"],
+        ] as const).map(([value, label]) => (
+          <button type="button" key={value} className={view === value ? "is-active" : ""} onClick={() => { setView(value); setSelectedKey("") }}>{label}</button>
+        ))}
+        <span className="lo-atlas-view-count">{filtered.length} items · {lines.length} visible links</span>
       </div>
 
-      <div className="lo-atlas-map relative aspect-[1.65] min-h-[360px] overflow-hidden">
+      <div className="lo-atlas-canvas-scroll">
+        <div className="lo-atlas-canvas" style={{ height: canvasHeight, transform: "scale(" + zoom + ")", transformOrigin: "top left", width: 1000 }}>
+          <svg className="lo-atlas-edges" viewBox={"0 0 1000 " + canvasHeight} preserveAspectRatio="none" aria-hidden="true">
+            {lines.map(({ edge, source, target }) => {
+              const bend = Math.max(40, Math.abs(target.x - source.x) * 0.45)
+              const direction = target.x >= source.x ? 1 : -1
+              return <path key={edge.id} d={"M " + source.x + " " + source.y + " C " + (source.x + bend * direction) + " " + source.y + ", " + (target.x - bend * direction) + " " + target.y + ", " + target.x + " " + target.y} className={"lo-atlas-edge lo-atlas-edge-" + edge.kind} />
+            })}
+          </svg>
 
-
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="absolute inset-0 h-full w-full"
-          aria-hidden="true"
-        >
-          {lines.map(({ edge, source, target }) => (
-            <line
-              key={edge.id}
-              x1={source.x}
-              y1={source.y}
-              x2={target.x}
-              y2={target.y}
-              stroke="currentColor"
-              strokeWidth="0.22"
-              className="text-foreground/20"
-              strokeDasharray={edge.kind === "observed" ? "1 1" : undefined}
-            />
-          ))}
-        </svg>
-
-        <div className="absolute inset-0 z-10">
-          {positions.map(({ node, x, y }, index) => {
-            const meta = palette[node.type]
+          {groups.map(group => {
+            const groupNodes = positions.filter(item => item.groupId === group.id)
+            const isCollapsed = collapsed.includes(group.id)
             return (
-              <div
-                key={nodeKey(node.type, node.id)}
-                className="group absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: `${x}%`, top: `${y}%` }}
-              >
-                <div
-                  className={`lo-atlas-node lo-atlas-node-${node.type} flex h-8 w-8 items-center justify-center rounded-full border text-[10px] uppercase tracking-[0.08em] transition-transform duration-300 group-hover:scale-125 ${index === 0 ? "is-featured" : ""}`}
-                >
-                  {meta.mark}
-                </div>
-                <div className="pointer-events-none absolute left-1/2 top-10 w-32 -translate-x-1/2 text-center opacity-70 transition-opacity group-hover:opacity-100">
-                  <div className="truncate font-serif text-sm text-foreground">
-                    {displayTitle(node.title)}
-                  </div>
-                  <div className="mt-0.5 text-[9px] uppercase tracking-[0.14em] text-muted-foreground/70">
-                    {meta.label}
-                  </div>
-                </div>
-              </div>
+              <section key={group.id} className={"lo-atlas-branch lo-atlas-branch-" + group.id} style={{ left: group.x - 140, width: 280, height: canvasHeight - 36 }}>
+                <button type="button" className="lo-atlas-branch-heading" onClick={() => setCollapsed(current => isCollapsed ? current.filter(id => id !== group.id) : [...current, group.id])} aria-expanded={!isCollapsed}>
+                  <span className="lo-atlas-branch-index">{String(groups.findIndex(item => item.id === group.id) + 1).padStart(2, "0")}</span>
+                  <span><strong>{group.title}</strong><small>{group.note}</small></span>
+                  <span className="lo-atlas-branch-toggle">{isCollapsed ? "+" : "−"}</span>
+                </button>
+                {!isCollapsed && groupNodes.map(({ node, y }) => {
+                  const meta = palette[node.type]
+                  const key = nodeKey(node.type, node.id)
+                  const selectedNode = selectedKey === key
+                  return (
+                    <button type="button" key={key} className={"lo-atlas-node-card " + (selectedNode ? "is-selected" : "")} style={{ top: y - 26, left: 0, borderLeftColor: meta.colour }} onClick={() => setSelectedKey(selectedNode ? "" : key)} aria-pressed={selectedNode}>
+                      <span className="lo-atlas-node-mark" style={{ backgroundColor: meta.colour + "24", color: meta.colour }}>{meta.mark}</span>
+                      <span className="lo-atlas-node-copy"><strong>{displayTitle(node.title)}</strong><small>{typeLabel(node.type)}</small></span>
+                      <span className="lo-atlas-node-open" aria-hidden="true">↗</span>
+                    </button>
+                  )
+                })}
+              </section>
             )
           })}
         </div>
-
-        <div className="absolute bottom-5 left-6 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/55">
-          {visible.length} of {nodes.length} things shown
-        </div>
       </div>
-    </div>
+
+      <div className="lo-atlas-minimap" aria-label="Atlas map overview">
+        <span>MAP KEY</span>
+        {groups.map(group => {
+          const count = filtered.filter(node => group.types.includes(node.type)).length
+          return <div key={group.id}><i className={"lo-atlas-mini-dot lo-atlas-mini-" + group.id} /><span>{group.title}</span><strong>{count}</strong></div>
+        })}
+      </div>
+
+      {selected && (
+        <aside className="lo-atlas-selection" aria-live="polite">
+          <div className="lo-atlas-selection-main">
+            <span className="lo-overline">SELECTED THREAD / {typeLabel(selected.type).toUpperCase()}</span>
+            <h3>{displayTitle(selected.title)}</h3>
+            <p>{selected.description || "A real item in your LifeOS. Its links below come from stored connections or observed relationships."}</p>
+          </div>
+          <div className="lo-atlas-selection-links">
+            <span className="lo-overline">CONNECTED ITEMS · {selectedConnections.length}</span>
+            {selectedConnections.length ? selectedConnections.slice(0, 5).map(({ edge, other }) => (
+              <button type="button" key={edge.id} onClick={() => setSelectedKey(nodeKey(other.type, other.id))}>
+                <span>{displayTitle(other.title)}</span><small>{edge.label || edge.kind}</small>
+              </button>
+            )) : <p>No recorded connections yet. You can create one in the Connections section below.</p>}
+          </div>
+          <button type="button" className="lo-atlas-open-record" onClick={() => onOpen(selected)}>Open original record <ArrowUpRight size={15} /></button>
+        </aside>
+      )}
+    </section>
   )
 }
 
@@ -611,6 +645,11 @@ export function AtlasPage() {
             </div>
           )}
         </section>
+
+        <AtlasLandscape nodes={nodes} edges={edges} onOpen={(node) => {
+          const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas" }
+          setActiveModule(destination[node.type] as any)
+        }} />
 
         {/* Atlas introduction */}
         <section className="lifeos-cabinet lifeos-glass-window max-w-4xl px-6 py-8 sm:px-8">
