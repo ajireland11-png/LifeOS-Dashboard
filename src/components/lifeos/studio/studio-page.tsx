@@ -1,5 +1,7 @@
 'use client'
 
+import './studio-page.css'
+
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/stores/app-store'
 import { Archive, ArrowUpRight, BookOpen, Bookmark, Brush, FolderPlus, Image, Lightbulb, Pencil, Plus, Save, Sparkles, Trash2, X } from 'lucide-react'
