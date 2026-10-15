@@ -7,11 +7,11 @@ import { useAppStore } from '@/stores/app-store'
 type Subject = { id: string; title: string; summary?: string | null; content: string; archived: boolean; updatedAt?: string }
 
 function headingId(value: string) {
-  return value.toLocaleLowerCase().normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  return value.toLocaleLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
 function lessonBlocks(content: string) {
-  return content.split(/\\n{2,}/).map(block => block.trim()).filter(Boolean)
+  return content.split(/\n{2,}/).map(block => block.trim()).filter(Boolean)
 }
 
 export function LearnPage() {
@@ -55,7 +55,7 @@ export function LearnPage() {
   const filtered = useMemo(() => subjects.filter(item => `${item.title} ${item.summary ?? ''} ${item.content}`.toLowerCase().includes(query.toLowerCase())), [subjects, query])
   const readingBlocks = useMemo(() => lessonBlocks(selected?.content ?? ''), [selected?.content])
   const headings = useMemo(() => readingBlocks.flatMap(block => {
-    const match = block.match(/^(#{1,3})\\s+(.+)$/)
+    const match = block.match(/^(#{1,3})\s+(.+)$/)
     return match ? [{ title: match[2].trim(), id: headingId(match[2].trim()), level: match[1].length }] : []
   }), [readingBlocks])
 
