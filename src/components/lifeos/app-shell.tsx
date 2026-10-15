@@ -8,7 +8,7 @@ import { CommandPalette } from './command-palette'
 import { GlobalSearchPanel } from './global-search-panel'
 import { SetupWizard } from './setup/setup-wizard'
 import { WelcomeScreen } from './welcome/welcome-screen'
-import { OverviewPage } from './overview/overview-page'
+import { HomePage } from './home/home-page'
 import { LearnPage } from './learn/learn-page'
 import { DashboardPage } from './dashboard/dashboard-page'
 import { TasksPage } from './tasks/tasks-page'
@@ -36,7 +36,7 @@ import { ArchivePage } from './archive/archive-page'
 
 const moduleComponents: Record<string, React.ComponentType> = {
   // New Life OS
-  home: OverviewPage,
+  home: HomePage,
   learn: LearnPage,
   atlas: AtlasPage,
   explore: ExplorePage,
