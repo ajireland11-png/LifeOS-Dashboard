@@ -86,7 +86,7 @@
 .lifeos-home-notes-strip>button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
 .lifeos-home-notes-strip>button time{flex:none;color:#a8aa9d;font:italic 10px Georgia,serif}
 .lifeos-home-notes-strip>button:hover span{color:#f0c98f}
-.lifeos-home-find-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.lifeos-home-finds-strip{min-width:0}.lifeos-home-find-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
 .lifeos-home-find-list button{display:flex;align-items:center;gap:9px;min-width:0;padding:8px 0;border:0;border-bottom:1px solid rgba(244,237,223,.08);background:transparent;text-align:left}
 .lifeos-home-find-list button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
 .lifeos-home-find-list button:hover span{color:#f0c98f}
