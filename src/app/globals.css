@@ -593,3 +593,11 @@ input::placeholder,textarea::placeholder { color:#858d82; }
 .lo-learn-body pre { overflow:auto; margin:1.6em 0; padding:16px; border:1px solid rgba(233,224,207,.13); background:#1b1e1b; color:#d8d2c5; font:12px/1.75 var(--font-geist-mono),monospace; }
 .lo-learn-article { max-width:1120px; }
 @media(max-width:760px) { .lo-learn-reading-layout { grid-template-columns:minmax(0,1fr); gap:16px; } .lo-learn-toc { position:static; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:12px; border:1px solid rgba(233,224,207,.12); } .lo-learn-toc>span { grid-column:1/-1; } .lo-learn-toc .lo-learn-toc-level-2 { padding-left:10px; } .lo-learn-toc .lo-learn-toc-level-3 { padding-left:10px; } .lo-learn-body { font-size:14px; } }
+
+.lo-atlas-search-result { display:flex; align-items:center; justify-content:space-between; gap:18px; width:100%; padding:14px 10px; border-bottom:1px solid rgba(233,224,207,.11); text-align:left; }
+.lo-atlas-search-result:hover { background:rgba(113,133,117,.1); }
+.lo-atlas-search-result-copy { min-width:0; }
+.lo-atlas-search-result-copy strong { display:block; color:#e9e0cf; font:400 19px/1.3 Georgia,serif; }
+.lo-atlas-search-result-copy small { display:block; margin-top:4px; color:#a9ada3; font-size:11px; line-height:1.5; }
+.lo-atlas-search-result-type { display:flex; align-items:center; gap:8px; flex:none; color:#c6a56b; font-size:9px; letter-spacing:.12em; text-transform:uppercase; }
+.lo-atlas-no-matches { padding:22px 12px; color:#a9ada3; font-size:12px; }
