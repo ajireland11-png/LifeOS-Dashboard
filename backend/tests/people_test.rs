@@ -103,6 +103,13 @@ async fn people_relationships_are_bidirectional_and_removable_without_deleting_p
     assert_eq!(sam_links.as_array().unwrap().len(), 1);
     assert_eq!(sam_links[0]["name"], "Alex");
 
+    let (status, graph) = send(&app, "GET", "/api/atlas/graph", Value::Null).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(graph["edges"].as_array().unwrap().iter().any(|edge| {
+        edge["sourceType"] == "person" && edge["targetType"] == "person"
+            && edge["label"] == "Sibling"
+    }));
+
     let (status, _) = send(&app, "DELETE", &format!("/api/people/{alex_id}/relationships/{sam_id}"), Value::Null).await;
     assert_eq!(status, StatusCode::OK);
     let (_, remaining) = send(&app, "GET", &format!("/api/people/{alex_id}/relationships"), Value::Null).await;
