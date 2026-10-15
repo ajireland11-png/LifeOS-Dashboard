@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Archive, ArrowUpRight, BookOpen, Bookmark, Brush, FolderPlus, Image, Lightbulb, Pencil, Plus, Save, Sparkles, Trash2 } from 'lucide-react'
+import { Archive, ArrowUpRight, BookOpen, Bookmark, Brush, FolderPlus, Image, Lightbulb, Pencil, Plus, Save, Sparkles, Trash2, X } from 'lucide-react'
 
 type Item = { id:string; title:string; kind:string; summary?:string|null; content:string; sourceUrl?:string|null; imageUrl?:string|null; category?:string|null; tags?:string[]; archived:boolean; updatedAt:string }
 type Category = {id:string;name:string;description?:string|null;accent:string;position:number;itemCount:number}
