@@ -123,3 +123,48 @@ pub async fn delete_paper(State(st): State<AppState>, Path(id): Path<String>) ->
     if res.rows_affected()==0{return Err(AppError::NotFound("Paper not found".into()));}
     Ok(Json(serde_json::json!({"success":true})))
 }
+
+
+pub async fn list_paper_tasks(
+    State(st): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<Vec<Value>>, AppError> {
+    let exists: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM ResearchPaper WHERE id = ?")
+        .bind(&id).fetch_one(&st.db).await?;
+    if exists == 0 { return Err(AppError::NotFound("Paper not found".into())); }
+    let rows = sqlx::query("SELECT t.id,t.title,t.description,t.status,t.priority,t.dueDate,t.updatedAt FROM Task t JOIN ResearchPaperTaskLink l ON l.taskId=t.id WHERE l.paperId=? AND t.archived=0 ORDER BY t.dueDate IS NULL,t.dueDate ASC,t.createdAt DESC")
+        .bind(&id).fetch_all(&st.db).await?;
+    let tasks = rows.iter().map(|r| -> Result<Value, sqlx::Error> { Ok(serde_json::json!({
+        "id":r.try_get::<String,_>("id")?,"title":r.try_get::<String,_>("title")?,
+        "description":r.try_get::<Option<String>,_>("description")?,
+        "status":r.try_get::<String,_>("status")?,"priority":r.try_get::<String,_>("priority")?,
+        "dueDate":r.try_get::<Option<i64>,_>("dueDate")?.map(PrismaDateTime),
+        "updatedAt":PrismaDateTime(r.try_get::<i64,_>("updatedAt")?)
+    })) }).collect::<Result<Vec<_>,_>>()?;
+    Ok(Json(tasks))
+}
+
+pub async fn link_paper_task(
+    State(st): State<AppState>,
+    Path((paper_id, task_id)): Path<(String, String)>,
+) -> Result<(StatusCode, Json<Value>), AppError> {
+    let paper: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM ResearchPaper WHERE id = ?")
+        .bind(&paper_id).fetch_one(&st.db).await?;
+    if paper == 0 { return Err(AppError::NotFound("Paper not found".into())); }
+    let task: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM Task WHERE id = ?")
+        .bind(&task_id).fetch_one(&st.db).await?;
+    if task == 0 { return Err(AppError::NotFound("Task not found".into())); }
+    sqlx::query("INSERT OR IGNORE INTO ResearchPaperTaskLink (paperId,taskId,createdAt) VALUES (?,?,?)")
+        .bind(&paper_id).bind(&task_id).bind(now_ms()).execute(&st.db).await?;
+    Ok((StatusCode::CREATED, Json(serde_json::json!({"success":true,"paperId":paper_id,"taskId":task_id}))))
+}
+
+pub async fn unlink_paper_task(
+    State(st): State<AppState>,
+    Path((paper_id, task_id)): Path<(String, String)>,
+) -> Result<Json<Value>, AppError> {
+    sqlx::query("DELETE FROM ResearchPaperTaskLink WHERE paperId = ? AND taskId = ?")
+        .bind(&paper_id).bind(&task_id).execute(&st.db).await?;
+    Ok(Json(serde_json::json!({"success":true})))
+}
+
