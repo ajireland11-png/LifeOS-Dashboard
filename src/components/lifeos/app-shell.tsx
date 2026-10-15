@@ -92,7 +92,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="lifeos-shell min-h-screen flex flex-col bg-background">
       <div className="flex flex-1 h-screen overflow-hidden">
         {!focusMode && !isMobile && <Sidebar />}
 
