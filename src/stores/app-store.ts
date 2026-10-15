@@ -32,6 +32,8 @@ interface AppState {
   // Navigation
   activeModule: ModuleId
   setActiveModule: (module: ModuleId) => void
+  familyPersonRequest: string | null
+  setFamilyPersonRequest: (id: string | null) => void
   newNoteRequest: number
   requestNewNote: () => void
   
@@ -105,6 +107,8 @@ export const useAppStore = create<AppState>()(
     (set) => ({
       activeModule: 'home',
       setActiveModule: (module) => set({ activeModule: module }),
+      familyPersonRequest: null,
+      setFamilyPersonRequest: (id) => set({ familyPersonRequest: id }),
       newNoteRequest: 0,
       requestNewNote: () => set((state) => ({ newNoteRequest: state.newNoteRequest + 1 })),
       
