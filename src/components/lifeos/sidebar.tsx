@@ -18,7 +18,7 @@ import { useAppStore, type ModuleId } from '@/stores/app-store'
 const primaryNavigation: {
   id: ModuleId
   label: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
 }[] = [
   { id: 'home', label: 'Overview', icon: Home },
   { id: 'research', label: 'Research', icon: FlaskConical },
