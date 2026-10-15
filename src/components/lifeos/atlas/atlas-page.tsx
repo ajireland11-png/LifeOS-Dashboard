@@ -187,10 +187,12 @@ function KindBadge({ kind }: { kind: EdgeKind }) {
 function AtlasLandscape({
   nodes,
   edges,
+  query,
   onOpen,
 }: {
   nodes: AtlasNode[]
   edges: AtlasEdge[]
+  query: string
   onOpen: (node: AtlasNode) => void
 }) {
   const [selectedKey, setSelectedKey] = useState("")
@@ -216,10 +218,13 @@ function AtlasLandscape({
     { id: "practice", title: "Practice & commitments", note: "Goals, habits and next actions", types: ["goal", "habit", "task"], x: 830 },
   ]
   const filtered = nodes.filter(node => {
-    if (view === "knowledge") return ["knowledge", "subject", "bookmark", "note"].includes(node.type)
-    if (view === "creative") return ["studioitem", "project"].includes(node.type)
-    if (view === "work") return ["goal", "habit", "task", "project"].includes(node.type)
-    return true
+    const matchesView = view === "knowledge" ? ["knowledge", "subject", "bookmark", "note"].includes(node.type)
+      : view === "creative" ? ["studioitem", "project"].includes(node.type)
+      : view === "work" ? ["goal", "habit", "task", "project"].includes(node.type)
+      : true
+    const needle = query.trim().toLocaleLowerCase()
+    const matchesSearch = !needle || (node.title + " " + (node.description || "")).toLocaleLowerCase().includes(needle)
+    return matchesView && matchesSearch
   })
   const positions: { node: AtlasNode; x: number; y: number; groupId: string }[] = []
   for (const group of groups) {
@@ -646,7 +651,7 @@ export function AtlasPage() {
           )}
         </section>
 
-        <AtlasLandscape nodes={nodes} edges={edges} onOpen={(node) => {
+        <AtlasLandscape nodes={nodes} edges={edges} query={search} onOpen={(node) => {
           const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas" }
           setActiveModule(destination[node.type] as any)
         }} />
