@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 export type ModuleId =
   // New Life OS architecture
   | 'home'
+  | 'learn'
   | 'atlas'
   | 'explore'
   | 'studio'
