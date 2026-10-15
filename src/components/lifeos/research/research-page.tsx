@@ -60,9 +60,18 @@ export function ResearchPage(){
     if(!draft)return
     if(file.size>8*1024*1024){setError('Please choose an image smaller than 8 MB.');return}
     const reader=new FileReader()
-    reader.onload=()=>patch('figures',[...(draft.figures??[]),{id:crypto.randomUUID(),title:file.name.replace(/\.[^/.]+$/,''),dataUrl:String(reader.result)}])
+    reader.onload=()=>patch('figures',[...(draft.figures??[]),{id:crypto.randomUUID(),title:file.name.replace(/\.[^/.]+$/,''),dataUrl:String(reader.result),caption:'',description:'',status:'draft',checkpoints:[{id:crypto.randomUUID(),title:'Data verified',done:false},{id:crypto.randomUUID(),title:'Analysis complete',done:false},{id:crypto.randomUUID(),title:'Visual styling finalised',done:false},{id:crypto.randomUUID(),title:'Caption written',done:false},{id:crypto.randomUUID(),title:'Manuscript placement confirmed',done:false}]}])
     reader.readAsDataURL(file)
   }
+  async function addDataset(file:File){
+    if(!draft)return
+    if(file.size>8*1024*1024){setError('Please choose a dataset smaller than 8 MB.');return}
+    const reader=new FileReader()
+    reader.onload=async()=>{let preview:string[][]=[];if(file.name.toLowerCase().endsWith('.csv')){try{preview=parseCsv(await file.text())}catch{preview=[]}};patch('datasets',[...(draft.datasets??[]),{id:crypto.randomUUID(),title:file.name.replace(/\.[^/.]+$/,''),fileName:file.name,mimeType:file.type||'application/octet-stream',dataUrl:String(reader.result),preview,purpose:'',status:'source'}])}
+    reader.readAsDataURL(file)
+  }
+  function updateSection(id:string,fn:(s:ManuscriptSection)=>ManuscriptSection){if(draft)patch('sections',draft.sections.map(s=>s.id===id?fn(s):s))}
+  function addSection(){if(draft)patch('sections',[...draft.sections,{id:crypto.randomUUID(),title:'New section',checkpoints:CHECKPOINT_TITLES.slice(0,3).map(title=>({id:crypto.randomUUID(),title,done:false}))}])}
   function addTable(){if(draft)patch('tables',[...(draft.tables??[]),{id:crypto.randomUUID(),title:'New table',cells:[['Column 1','Column 2'],['','']]}])}
   function updateTable(id:string,fn:(t:TableBlock)=>TableBlock){if(draft)patch('tables',draft.tables.map(t=>t.id===id?fn(t):t))}
 
