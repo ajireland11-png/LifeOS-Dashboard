@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '@/stores/app-store'
 import { CalendarDays, Cake, Check, ChevronRight, Gift, Pencil, Heart, Link2, Mail, Phone, Plus, Search, Trash2, UsersRound, X } from 'lucide-react'
 
