@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowDown, ArrowUp, ArrowUpRight, Bookmark, BookOpen, ChevronDown, ChevronRight, Edit3, Plus, Search, Save, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpRight, Bookmark, BookOpen, ChevronDown, ChevronRight, Edit3, Link2, Plus, Search, Save, X } from 'lucide-react'
 import { useAppStore } from '@/stores/app-store'
 
 type Reference = {id:string;title:string;url:string;kind:string}\ntype Subject = { id: string; title: string; summary?: string | null; content: string; parentId?:string|null; kind:string; status:string; bookmarked:boolean; position:number; prerequisites:string[]; related:string[]; references:Reference[]; layers:Record<string,string>; archived: boolean; updatedAt?: string }
