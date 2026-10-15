@@ -666,6 +666,10 @@ model StudioItem {
   kind      String   @default("idea")
   summary   String?
   content   String   @default("")
+  sourceUrl String?
+  imageUrl  String?
+  category  String?
+  tagsJson  String   @default("[]")
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
