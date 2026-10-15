@@ -20,6 +20,7 @@ mod note_folders;
 mod notes;
 mod notifications;
 mod pomodoro;
+mod people;
 mod prisma_dt;
 mod profile;
 mod research;
@@ -118,6 +119,13 @@ pub fn build_app(pool: SqlitePool) -> Router {
                 .post(profile::create_profile)
                 .patch(profile::update_profile),
         )
+        // Friends & Family — profiles, important dates, and links to shared tasks
+        .route("/api/people", get(people::list_people).post(people::create_person))
+        .route("/api/people/{id}", get(people::get_person).patch(people::update_person).delete(people::delete_person))
+        .route("/api/people/{id}/dates", get(people::list_dates).post(people::create_date))
+        .route("/api/people/{person_id}/dates/{date_id}", patch(people::update_date).delete(people::delete_date))
+        .route("/api/people/{id}/tasks", get(people::list_person_tasks))
+        .route("/api/people/{person_id}/tasks/{task_id}", post(people::link_task).delete(people::unlink_task))
         // Tags
         .route("/api/tags", get(tags::list_tags).post(tags::create_tag))
         // Atlas
