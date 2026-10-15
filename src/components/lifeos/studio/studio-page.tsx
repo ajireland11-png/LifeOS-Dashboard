@@ -61,7 +61,7 @@ export function StudioPage() {
     <div className="lo-studio-main">
       <aside className="lo-studio-library">
         <div className="lo-learn-index-title"><span>COLLECTED MATERIAL</span><span>{items.length.toString().padStart(2,'0')}</span></div>
-        <form className="lo-studio-capture" onSubmit={create}><input value={newTitle} onChange={e=>setNewTitle(e.target.value)} placeholder="Capture a spark…"/><button disabled={creating||!newTitle.trim()} aria-label="Create entry"><Plus size={16}/></button></form>
+        <form className="lo-studio-capture" onSubmit={create}><input value={newTitle} onChange={e=>setNewTitle(e.target.value)} placeholder="Capture a spark…" id="studio-capture"/><button disabled={creating||!newTitle.trim()} aria-label="Create entry"><Plus size={16}/></button></form>
         <label className="lo-studio-kind-select"><span>Collect as</span><select value={newKind} onChange={e=>setNewKind(e.target.value)}>{KINDS.map(k=><option value={k} key={k}>{kindLabel[k]}</option>)}</select></label>
         <label className="lo-learn-search lo-studio-search"><Image size={15}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search the workbench"/></label>
         <div className="lo-studio-filters"><button type="button" aria-pressed={filter==='all'} onClick={()=>setFilter('all')}>Everything</button>{KINDS.map(k=><button key={k} type="button" aria-pressed={filter===k} onClick={()=>setFilter(k)}>{kindLabel[k]}</button>)}</div>
