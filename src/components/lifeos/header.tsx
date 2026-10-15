@@ -75,6 +75,7 @@ export function Header() {
 
  const moduleGroups: Record<ModuleId, string> = {
   home: 'Overview',
+  learn: 'Learn',
   atlas: 'Explore',
   explore: 'Explore',
   studio: 'Create',
