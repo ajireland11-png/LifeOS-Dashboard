@@ -49,8 +49,9 @@ export function Header() {
   const { data: profile } = useProfile()
 
   const moduleLabels: Record<ModuleId, string> = {
-   home: 'Home',
+   home: 'Overview',
     atlas: 'Atlas',
+    friends: 'Friends & Family',
     explore: 'Explore',
     studio: 'Studio',
     projects: 'Projects',
@@ -73,7 +74,7 @@ export function Header() {
   }
 
  const moduleGroups: Record<ModuleId, string> = {
-  home: 'Home',
+  home: 'Overview',
   atlas: 'Explore',
   explore: 'Explore',
   studio: 'Create',
@@ -106,7 +107,7 @@ export function Header() {
   const displayName = userName || 'User'
 
   return (
-    <header className="h-14 sticky top-0 z-30 bg-background/88 backdrop-blur-md border-b border-[color:var(--lifeos-line)] flex items-center justify-between px-5 lg:px-7 gap-4 shrink-0">
+    <header className="lifeos-app-header h-14 sticky top-0 z-30 flex items-center justify-between border-b px-5 lg:px-7 gap-4 shrink-0">
       {/* Left — breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
         {isMobile && (
