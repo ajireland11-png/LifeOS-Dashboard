@@ -100,10 +100,11 @@ export function LearnPage() {
     if (!nextTitle) return
     setCreating(true); setError('')
     try {
-      const response = await fetch('/api/explore/subjects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: nextTitle }) })
+      const response = await fetch('/api/explore/subjects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: nextTitle, kind:newKind, parentId:newParentId||null, status:'not-started', bookmarked:false }) })
       if (!response.ok) throw new Error('Could not create this subject.')
       const created = await response.json() as Subject
       setNewTitle('')
+      if(newParentId)setExpandedIds(current=>new Set([...current,newParentId]))
       await load(created.id)
       setEditing(true)
     } catch (e) { setError(e instanceof Error ? e.message : 'Could not create this subject.') }
@@ -114,13 +115,20 @@ export function LearnPage() {
     if (!selected) return
     setSaving(true); setError('')
     try {
-      const response = await fetch(`/api/explore/subjects/${selected.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: title.trim() || selected.title, summary: summary.trim() || null, content }) })
+      const response = await fetch(`/api/explore/subjects/${selected.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: title.trim() || selected.title, summary: summary.trim() || null, content, kind, parentId:parentId||null, status, bookmarked, prerequisites, related, references, layers }) })
       if (!response.ok) throw new Error('Could not save changes.')
       await load(selected.id)
       setEditing(false)
     } catch (e) { setError(e instanceof Error ? e.message : 'Could not save changes.') }
     finally { setSaving(false) }
   }
+
+
+  async function setLearningStatus(next:string){if(!selected)return;try{const r=await fetch('/api/explore/subjects/'+selected.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:next})});if(!r.ok)throw new Error('Could not update learning status.');setStatus(next);setSubjects(old=>old.map(x=>x.id===selected.id?{...x,status:next}:x))}catch(e){setError(e instanceof Error?e.message:'Could not update learning status.')}}
+  async function toggleBookmark(){if(!selected)return;const next=!bookmarked;try{const r=await fetch('/api/explore/subjects/'+selected.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookmarked:next})});if(!r.ok)throw new Error('Could not update bookmark.');setBookmarked(next);setSubjects(old=>old.map(x=>x.id===selected.id?{...x,bookmarked:next}:x))}catch(e){setError(e instanceof Error?e.message:'Could not update bookmark.')}}
+  function toggleExpanded(id:string){setExpandedIds(old=>{const next=new Set(old);if(next.has(id))next.delete(id);else next.add(id);return next})}
+  async function moveSubject(item:Subject,direction:-1|1){const siblings=subjects.filter(x=>(x.parentId||'')===(item.parentId||'')).sort((a,b)=>(a.position||0)-(b.position||0)||a.title.localeCompare(b.title));const i=siblings.findIndex(x=>x.id===item.id),j=i+direction;if(j<0||j>=siblings.length)return;const next=[...siblings];[next[i],next[j]]=[next[j],next[i]];try{await Promise.all(next.map((x,pos)=>fetch('/api/explore/subjects/'+x.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({position:pos})})));await load(selectedId||undefined)}catch(e){setError(e instanceof Error?e.message:'Could not reorder subjects.')}}
+  function toggleRelation(list:string[],setList:(v:string[])=>void,id:string,checked:boolean){setList(checked?[...list.filter(x=>x!==id),id]:list.filter(x=>x!==id))}
 
   return (
     <div className="lo-learn-page">
