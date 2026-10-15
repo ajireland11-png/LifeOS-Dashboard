@@ -178,7 +178,7 @@ async fn test_search_case_insensitive() {
 
     // Should find the task despite case difference
     let tasks = results["tasks"].as_array().unwrap();
-    assert!(tasks.len() > 0);
+    assert!(!tasks.is_empty());
 }
 
 #[tokio::test]
@@ -220,7 +220,7 @@ async fn test_search_in_descriptions() {
 
     // Should find the task by description
     let tasks = results["tasks"].as_array().unwrap();
-    assert!(tasks.len() > 0);
+    assert!(!tasks.is_empty());
     assert!(tasks.iter().any(|t| 
         t["description"].as_str().unwrap_or("").contains("roadmap")
     ));
@@ -261,7 +261,7 @@ async fn test_search_partial_match() {
 
     // Should find the note with partial match
     let notes = results["notes"].as_array().unwrap();
-    assert!(notes.len() > 0);
+    assert!(!notes.is_empty());
 }
 
 #[tokio::test]
@@ -366,5 +366,5 @@ async fn test_search_special_characters() {
 
     // Should handle special characters in search
     let tasks = results["tasks"].as_array().unwrap();
-    assert!(tasks.len() > 0);
+    assert!(!tasks.is_empty());
 }
