@@ -528,6 +528,7 @@ CREATE TABLE "StudioItem" (
     "imageUrl" TEXT,
     "category" TEXT,
     "tagsJson" TEXT NOT NULL DEFAULT '[]',
+    "isFavorite" BOOLEAN NOT NULL DEFAULT false,
     "archived" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" INTEGER NOT NULL,
     "updatedAt" INTEGER NOT NULL
