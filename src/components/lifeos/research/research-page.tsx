@@ -8,6 +8,7 @@ type Figure = { id:string; title:string; dataUrl:string; caption?:string; descri
 type TableBlock = { id:string; title:string; cells:string[][] }
 type ManuscriptSection = { id:string; title:string; checkpoints:Checkpoint[] }
 type Dataset = { id:string; title:string; fileName:string; mimeType:string; dataUrl:string; preview:string[][]; purpose:string; status:string }
+type Task = {id:string;title:string;description?:string|null;status:string;priority:string;dueDate?:string|null}
 type Paper = {
   id:string; title:string; authors?:string|null; journal?:string|null; year?:number|null; doi?:string|null; sourceUrl?:string|null
   abstractText?:string|null; scientificQuestion?:string|null; background?:string|null; mechanisms?:string|null
@@ -49,6 +50,9 @@ async function parseXlsxPreview(file:File):Promise<string[][]>{
 
 export function ResearchPage(){
   const [papers,setPapers]=useState<Paper[]>([])
+  const [allTasks,setAllTasks]=useState<Task[]>([])
+  const [paperTasks,setPaperTasks]=useState<Task[]>([])
+  const [taskToLink,setTaskToLink]=useState('')
   const [selected,setSelected]=useState<Paper|null>(null)
   const [draft,setDraft]=useState<Paper|null>(null)
   const [loading,setLoading]=useState(true)
@@ -64,7 +68,8 @@ export function ResearchPage(){
     try{const r=await fetch('/api/research/papers');if(!r.ok)throw new Error('Could not load your paper library.');const data=await r.json();setPapers(Array.isArray(data)?data:[])}
     catch(e){setError(e instanceof Error?e.message:'Could not load papers.')}finally{setLoading(false)}
   }
-  useEffect(()=>{void load()},[])
+  useEffect(()=>{void load();fetch('/api/tasks').then(r=>r.ok?r.json():[]).then(data=>setAllTasks(Array.isArray(data)?data:[])).catch(()=>setAllTasks([]))},[])
+  useEffect(()=>{if(!selected||selected.id==='new'){setPaperTasks([]);return}let cancelled=false;fetch('/api/research/papers/'+selected.id+'/tasks').then(r=>r.ok?r.json():[]).then(data=>{if(!cancelled)setPaperTasks(Array.isArray(data)?data:[])}).catch(()=>{if(!cancelled)setPaperTasks([])});return()=>{cancelled=true}},[selected?.id])
   const visible=useMemo(()=>papers.filter(p=>`${p.title} ${p.authors||''} ${p.journal||''} ${p.abstractText||''}`.toLowerCase().includes(query.toLowerCase())),[papers,query])
   const sections=useMemo(()=>[['scientificQuestion','Scientific question'],['abstractText','Abstract'],['background','Background'],['mechanisms','Mechanisms'],['interpretation','Interpretation'],['limitations','Limitations'],['openQuestions','Open questions'],['notes','Reading notes']] as const,[])
   function open(p:Paper){setSelected(p);setDraft({...p,figures:p.figures??[],tables:p.tables??[],sections:p.sections??[],datasets:p.datasets??[],status:p.status||'reading'});setAdding(false);setError('')}
@@ -100,6 +105,10 @@ export function ResearchPage(){
   }
   function updateSection(id:string,fn:(s:ManuscriptSection)=>ManuscriptSection){if(draft)patch('sections',draft.sections.map(s=>s.id===id?fn(s):s))}
   function addSection(){if(draft)patch('sections',[...draft.sections,{id:crypto.randomUUID(),title:'New section',checkpoints:CHECKPOINT_TITLES.slice(0,3).map(title=>({id:crypto.randomUUID(),title,done:false}))}])}
+  async function linkTask(e:React.FormEvent){e.preventDefault();if(!selected||selected.id==='new'||!taskToLink)return;try{const r=await fetch('/api/research/papers/'+selected.id+'/tasks/'+taskToLink,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});if(!r.ok)throw new Error('Could not link task');const res=await fetch('/api/research/papers/'+selected.id+'/tasks');setPaperTasks(res.ok?await res.json():[]);setTaskToLink('')}catch(e){setError(e instanceof Error?e.message:'Could not link task')}}
+  async function unlinkTask(id:string){if(!selected)return;try{const r=await fetch('/api/research/papers/'+selected.id+'/tasks/'+id,{method:'DELETE'});if(!r.ok)throw new Error('Could not unlink task');setPaperTasks(old=>old.filter(t=>t.id!==id))}catch(e){setError(e instanceof Error?e.message:'Could not unlink task')}}
+  const availableTasks=allTasks.filter(t=>!paperTasks.some(x=>x.id===t.id)&&!['done','cancelled'].includes(t.status))
+
   function addTable(){if(draft)patch('tables',[...(draft.tables??[]),{id:crypto.randomUUID(),title:'New table',cells:[['Column 1','Column 2'],['','']]}])}
   function updateTable(id:string,fn:(t:TableBlock)=>TableBlock){if(draft)patch('tables',draft.tables.map(t=>t.id===id?fn(t):t))}
   function updateFigure(id:string,fn:(f:Figure)=>Figure){if(draft)patch('figures',draft.figures.map(f=>f.id===id?fn(f):f))}
@@ -148,6 +157,12 @@ export function ResearchPage(){
               <section className="lo-lab-module lo-dataset-module"><div className="lo-module-heading"><span>Source datasets</span><i/></div><p className="lo-module-hint">Original files stay intact. CSV previews are derived for inspection; source files are kept separately from any edited tables.</p>
                 {draft.datasets.map(d=><article className="lo-dataset-card" key={d.id}><div className="lo-dataset-card-head"><strong>{d.title}</strong><a href={d.dataUrl} download={d.fileName}>Download source</a><button type="button" onClick={()=>patch('datasets',draft.datasets.filter(x=>x.id!==d.id))} aria-label="Remove dataset"><X size={12}/></button></div><input className="lo-dataset-title" value={d.title} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,title:e.target.value}:x))} aria-label="Dataset title"/><label>Purpose<input value={d.purpose} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,purpose:e.target.value}:x))} placeholder="What does this dataset support?"/></label><label>Analysis state<select value={d.status} onChange={e=>patch('datasets',draft.datasets.map(x=>x.id===d.id?{...x,status:e.target.value}:x))}><option value="source">Source / unmodified</option><option value="quality-check">Quality check</option><option value="analysing">Analysis in progress</option><option value="derived">Derived data produced</option><option value="used">Used in manuscript</option></select></label><small className="lo-dataset-source-name">Original file: {d.fileName} · {Math.round(d.dataUrl.length*0.75/1024)} KB encoded</small>{d.preview.length>0?<div className="lo-dataset-preview"><table><tbody>{d.preview.map((row,ri)=><tr key={ri}>{row.map((cell,ci)=><td key={ci}>{cell}</td>)}</tr>)}</tbody></table><small>CSV preview · first {d.preview.length} rows, up to 8 columns</small></div>:<p className="lo-dataset-no-preview">The original workbook is preserved. Inline preview could not be read from this workbook; the original file is still preserved.</p>}</article>)}
                 <button type="button" className="lo-dropzone lo-dataset-dropzone" onClick={()=>datasetInput.current?.click()}><Table2 size={20}/><strong>Add CSV / Excel source</strong><span>CSV or XLSX · original file retained · up to 8 MB</span></button><input ref={datasetInput} type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden onChange={e=>{const file=e.target.files?.[0];if(file)void addDataset(file);e.currentTarget.value=''}}/>
+              </section>
+              <section className="lo-lab-module lo-paper-task-module"><div className="lo-module-heading"><span>Tasks for this paper</span><i/></div><p className="lo-module-hint">Link canonical LifeOS tasks here; progress stays shared with the main task list.</p>
+                {paperTasks.map(t=><div className="lo-paper-task-row" key={t.id}><span className={'lo-paper-task-mark status-'+t.status}/><span><strong>{t.title}</strong><small>{t.status.replace('-',' ')} · {t.priority}</small></span><button type="button" onClick={()=>unlinkTask(t.id)} aria-label="Unlink task"><X size={12}/></button></div>)}
+                {paperTasks.length===0&&<p className="lo-dataset-no-preview">No tasks linked to this paper yet.</p>}
+                {draft.id!=='new'&&<form className="lo-paper-task-link" onSubmit={linkTask}><select value={taskToLink} onChange={e=>setTaskToLink(e.target.value)}><option value="">Choose an existing task…</option>{availableTasks.map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select><button type="submit" disabled={!taskToLink}><Plus size={13}/> Link task</button></form>}
+                {draft.id==='new'&&<p className="lo-dataset-no-preview">Save this paper first to link existing tasks.</p>}
               </section>
             </div>
           </div>
