@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Archive, ArrowUpRight, BookOpen, Brush, Image, Lightbulb, Plus, Save, Sparkles, Trash2 } from 'lucide-react'
 
 type Item = { id:string; title:string; kind:string; summary?:string|null; content:string; sourceUrl?:string|null; imageUrl?:string|null; category?:string|null; tags?:string[]; archived:boolean; updatedAt:string }
+type Category = {id:string;name:string;description?:string|null;accent:string;position:number;itemCount:number}
+type Collection = {id:string;name:string;description?:string|null;coverUrl?:string|null;items:string[];itemCount:number}
 const KINDS = ['idea','inspiration','material','technique','reference'] as const
 const kindLabel:Record<string,string> = { idea:'Ideas', inspiration:'Inspiration', material:'Materials', technique:'Techniques', reference:'References' }
 
@@ -13,6 +15,16 @@ function isWebUrl(value: string) {
 
 export function StudioPage() {
   const [items,setItems]=useState<Item[]>([])
+  const [categories,setCategories]=useState<Category[]>([])
+  const [collections,setCollections]=useState<Collection[]>([])
+  const [categoryFilter,setCategoryFilter]=useState('all')
+  const [selectedCollectionId,setSelectedCollectionId]=useState<string|null>(null)
+  const [newCategoryName,setNewCategoryName]=useState('')
+  const [editingCategoryId,setEditingCategoryId]=useState<string|null>(null)
+  const [editingCategoryName,setEditingCategoryName]=useState('')
+  const [newCollectionName,setNewCollectionName]=useState('')
+  const [editingCollectionId,setEditingCollectionId]=useState<string|null>(null)
+  const [editingCollectionName,setEditingCollectionName]=useState('')
   const [loading,setLoading]=useState(true)
   const [selectedId,setSelectedId]=useState<string|null>(null)
   const [filter,setFilter]=useState('all')
@@ -37,12 +49,12 @@ export function StudioPage() {
 
   const load=useCallback(async()=>{
     setLoading(true)
-    try { const r=await fetch('/api/studio/items'); if(!r.ok) throw new Error('Could not open Studio.'); const data=await r.json(); setItems(Array.isArray(data)?data.filter((x:Item)=>!x.archived):[]) }
+    try { const [ir,cr,cor]=await Promise.all([fetch('/api/studio/items'),fetch('/api/studio/categories'),fetch('/api/studio/collections')]);if(!ir.ok||!cr.ok||!cor.ok)throw new Error('Could not open Studio.');const [itemsData,catsData,colsData]=await Promise.all([ir.json(),cr.json(),cor.json()]);setItems(Array.isArray(itemsData)?itemsData.filter((x:Item)=>!x.archived):[]);setCategories(Array.isArray(catsData)?catsData:[]);setCollections(Array.isArray(colsData)?colsData:[]) }
     catch(e){setError(e instanceof Error?e.message:'Could not load Studio.')} finally{setLoading(false)}
   },[])
   useEffect(()=>{void load()},[])
   const selected=items.find(x=>x.id===selectedId)||null
-  const visible=useMemo(()=>items.filter(x=>(filter==='all'||x.kind===filter)&&`${x.title} ${x.summary||''} ${x.content} ${x.category||''} ${(x.tags||[]).join(' ')}`.toLowerCase().includes(search.toLowerCase())),[items,filter,search])
+  const visible=useMemo(()=>items.filter(x=>(filter==='all'||x.kind===filter)&&(categoryFilter==='all'||x.category===categoryFilter)&&(!selectedCollectionId||collections.find(col=>col.id===selectedCollectionId)?.items.includes(x.id))&&(x.title+' '+(x.summary||'')+' '+x.content+' '+(x.category||'')+' '+(x.tags||[]).join(' ')).toLowerCase().includes(search.toLowerCase())),[items,filter,categoryFilter,selectedCollectionId,collections,search])
   useEffect(()=>{setTitle(selected?.title||'');setKind(selected?.kind||'idea');setSummary(selected?.summary||'');setContent(selected?.content||'');setSourceUrl(selected?.sourceUrl||'');setImageUrl(selected?.imageUrl||'');setCategory(selected?.category||'');setTagsText((selected?.tags||[]).join(', '))},[selectedId,selected?.updatedAt])
 
   async function create(e:React.FormEvent){
