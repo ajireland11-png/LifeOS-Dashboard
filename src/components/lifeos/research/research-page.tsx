@@ -3,63 +3,56 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, ChevronRight, ExternalLink, FileImage, FlaskConical, Microscope, Plus, Save, Table2, Trash2, X } from 'lucide-react'
 
-type Figure = { id: string; title: string; dataUrl: string }
-type TableBlock = { id: string; title: string; cells: string[][] }
+type Figure = { id:string; title:string; dataUrl:string }
+type TableBlock = { id:string; title:string; cells:string[][] }
 type Paper = {
   id:string; title:string; authors?:string|null; journal?:string|null; year?:number|null; doi?:string|null; sourceUrl?:string|null
   abstractText?:string|null; scientificQuestion?:string|null; background?:string|null; mechanisms?:string|null
   interpretation?:string|null; limitations?:string|null; openQuestions?:string|null; notes?:string|null
   figures:Figure[]; tables:TableBlock[]
 }
-const emptyPaper = { title:'', authors:'', journal:'', year:null, doi:'', sourceUrl:'', abstractText:'', scientificQuestion:'', background:'', mechanisms:'', interpretation:'', limitations:'', openQuestions:'', notes:'' }
-const text = (v?:string|null) => v ?? ''
+const blank = { title:'', authors:'', journal:'', year:null, doi:'', sourceUrl:'', abstractText:'', scientificQuestion:'', background:'', mechanisms:'', interpretation:'', limitations:'', openQuestions:'', notes:'' }
+const val=(v?:string|null)=>v??''
 
-export function ResearchPage() {
+export function ResearchPage(){
   const [papers,setPapers]=useState<Paper[]>([])
   const [selected,setSelected]=useState<Paper|null>(null)
   const [draft,setDraft]=useState<Paper|null>(null)
   const [loading,setLoading]=useState(true)
   const [saving,setSaving]=useState(false)
   const [adding,setAdding]=useState(false)
+  const [query,setQuery]=useState('')
   const [error,setError]=useState('')
-  const figureInput=useRef<HTMLInputElement>(null)
+  const fileInput=useRef<HTMLInputElement>(null)
 
   async function load(){
     setLoading(true)
-    try { const r=await fetch('/api/research/papers'); const data=await r.json(); setPapers(Array.isArray(data)?data:[]) }
-    catch { setPapers([]) } finally { setLoading(false) }
+    try{const r=await fetch('/api/research/papers');if(!r.ok)throw new Error('Could not load your paper library.');const data=await r.json();setPapers(Array.isArray(data)?data:[])}
+    catch(e){setError(e instanceof Error?e.message:'Could not load papers.')}finally{setLoading(false)}
   }
-  useEffect(()=>{ void load() },[])
-
-  const sections = useMemo(()=>[
-    ['scientificQuestion','Scientific question'],['abstractText','Abstract'],['background','Background'],
-    ['mechanisms','Mechanisms'],['interpretation','Interpretation'],['limitations','Limitations'],
-    ['openQuestions','Open questions'],['notes','Notes']
-  ] as const,[])
-
-  function open(p:Paper){setSelected(p);setDraft({...p,figures:p.figures??[],tables:p.tables??[]});setAdding(false)}
-  function startNew(){const p={...emptyPaper,id:'new',figures:[],tables:[]} as Paper;setSelected(p);setDraft(p);setAdding(true)}
+  useEffect(()=>{void load()},[])
+  const visible=useMemo(()=>papers.filter(p=>`${p.title} ${p.authors||''} ${p.journal||''} ${p.abstractText||''}`.toLowerCase().includes(query.toLowerCase())),[papers,query])
+  const sections=useMemo(()=>[['scientificQuestion','Scientific question'],['abstractText','Abstract'],['background','Background'],['mechanisms','Mechanisms'],['interpretation','Interpretation'],['limitations','Limitations'],['openQuestions','Open questions'],['notes','Reading notes']] as const,[])
+  function open(p:Paper){setSelected(p);setDraft({...p,figures:p.figures??[],tables:p.tables??[]});setAdding(false);setError('')}
+  function startNew(){const p={...blank,id:'new',figures:[],tables:[]} as Paper;setSelected(p);setDraft(p);setAdding(true);setError('')}
   function patch<K extends keyof Paper>(key:K,value:Paper[K]){setDraft(d=>d?({...d,[key]:value}):d)}
-
   async function save(){
-    if(!draft?.title.trim()) return
+    if(!draft?.title.trim())return
     setSaving(true);setError('')
-    try {
-      const r=await fetch(draft.id==='new'?'/api/research/papers':'/api/research/papers/'+draft.id,{
-        method:draft.id==='new'?'POST':'PATCH',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({...draft,abstract:draft.abstractText})
-      })
-      if(!r.ok) throw new Error('Could not save paper')
-      const p=await r.json(); await load(); open(p)
-    } catch(e){setError(e instanceof Error?e.message:'Could not save paper')} finally {setSaving(false)}
+    try{
+      const r=await fetch(draft.id==='new'?'/api/research/papers':'/api/research/papers/'+draft.id,{method:draft.id==='new'?'POST':'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({...draft,abstract:draft.abstractText})})
+      if(!r.ok)throw new Error('Could not save this paper. Check the required fields and try again.')
+      const p=await r.json() as Paper;await load();open(p)
+    }catch(e){setError(e instanceof Error?e.message:'Could not save paper.')}finally{setSaving(false)}
   }
   async function remove(){
-    if(!draft||draft.id==='new') return
-    if(!confirm('Delete this paper?')) return
-    await fetch('/api/research/papers/'+draft.id,{method:'DELETE'});setSelected(null);setDraft(null);await load()
+    if(!draft||draft.id==='new'||!window.confirm('Permanently delete this paper?'))return
+    try{const r=await fetch('/api/research/papers/'+draft.id,{method:'DELETE'});if(!r.ok)throw new Error('Could not delete this paper.');setSelected(null);setDraft(null);await load()}
+    catch(e){setError(e instanceof Error?e.message:'Could not delete paper.')}
   }
   function addFigure(file:File){
     if(!draft)return
+    if(file.size>8*1024*1024){setError('Please choose an image smaller than 8 MB.');return}
     const reader=new FileReader()
     reader.onload=()=>patch('figures',[...(draft.figures??[]),{id:crypto.randomUUID(),title:file.name.replace(/\.[^/.]+$/,''),dataUrl:String(reader.result)}])
     reader.readAsDataURL(file)
@@ -68,79 +61,44 @@ export function ResearchPage() {
   function updateTable(id:string,fn:(t:TableBlock)=>TableBlock){if(draft)patch('tables',draft.tables.map(t=>t.id===id?fn(t):t))}
 
   return <div className="lo-research-page">
-    <header className="lo-research-header"><div><div className="lo-overline">LIFEOS / SCIENTIFIC WORK</div><h1>Research.</h1><p>Read papers actively. Capture the question, mechanism, evidence and what remains unclear.</p></div></header>
+    <header className="lo-research-header">
+      <div><div className="lo-overline">LIFEOS / SCIENTIFIC WORK</div><h1>Research.</h1><p>A working laboratory for papers, mechanisms, evidence, figures and unanswered questions.</p></div>
+      <button type="button" className="lo-research-new" onClick={startNew}><Plus size={16}/> New paper</button>
+    </header>
     <div className="lo-research-layout">
-      <aside className="lo-paper-shelf"><div className="lo-shelf-title"><BookOpen size={15}/> PAPER LIBRARY <span>{papers.length.toString().padStart(2,'0')}</span></div>{loading&&<div className="lo-shelf-empty">Loading papers…</div>}{!loading&&papers.length===0&&<button className="lo-first-specimen" onClick={startNew}><Plus size={20}/><span>Begin with the first paper</span></button>}{papers.map((p,i)=><button key={p.id} onClick={()=>open(p)} className="lo-paper-spine" data-selected={selected?.id===p.id}><span className="lo-paper-index">{String(i+1).padStart(2,'0')}</span><span><strong>{p.title}</strong><small>{p.journal||'Uncatalogued'}{p.year?' · '+p.year:''}</small></span><ChevronRight size={14}/></button>)}</aside>
+      <aside className="lo-paper-shelf">
+        <div className="lo-shelf-title"><BookOpen size={15}/> PAPER LIBRARY <span>{visible.length.toString().padStart(2,'0')}</span></div>
+        <label className="lo-research-search"><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Find a paper"/></label>
+        {loading&&<div className="lo-shelf-empty">Opening the shelves…</div>}
+        {!loading&&visible.length===0&&<button type="button" className="lo-first-specimen" onClick={startNew}><Plus size={20}/><span>{query?'No papers match. Create a new entry.':'Begin with your first paper'}</span></button>}
+        {visible.map((p,i)=><button type="button" key={p.id} onClick={()=>open(p)} className="lo-paper-spine" data-selected={selected?.id===p.id}><span className="lo-paper-index">{String(i+1).padStart(2,'0')}</span><span><strong>{p.title}</strong><small>{p.journal||'Uncatalogued'}{p.year?' · '+p.year:''}</small></span><ChevronRight size={14}/></button>)}
+      </aside>
       <main className="lo-lab-bench">
-      <div className="lifeos-lab-toolbar">
-        <div className="lifeos-lab-stamp"><FlaskConical size={18}/><span>LABORATORY</span></div>
-        <button className="lifeos-lab-add" onClick={startNew}><Plus size={16}/> New paper</button>
-      </div>
-      <div className="lifeos-lab-layout">
-        <aside className="lifeos-paper-shelf">
-          <div className="lifeos-shelf-title"><BookOpen size={15}/> Papers <span>{papers.length}</span></div>
-          {loading && <div className="lifeos-shelf-empty">Loading…</div>}
-          {!loading && papers.length===0 && <button className="lifeos-first-specimen" onClick={startNew}><Plus size={20}/><span>Place the first paper on the shelf</span></button>}
-          {papers.map((p,i)=><button key={p.id} onClick={()=>open(p)} className={'lifeos-paper-spine'} data-selected={selected?.id===p.id}>
-            <span className="lifeos-paper-index">{String(i+1).padStart(2,'0')}</span>
-            <span><strong>{p.title}</strong><small>{p.journal||'Uncatalogued'}{p.year ? ' · '+p.year : ''}</small></span><ChevronRight size={14}/>
-          </button>)}
-        </aside>
-        <main className="lifeos-lab-bench">
-          {!draft ? <div className="lo-lab-empty"><Microscope size={42}/><strong>Choose a specimen</strong><span>Open a paper, or begin a new one.</span><button onClick={startNew}>Add new paper <ChevronRight size={14}/></button></div> : <>
-            <div className="lo-paper-header">
-              <div>
-                <span className="lo-overline">{adding?'NEW SPECIMEN':'PAPER'}</span>
-                <input value={draft.title} onChange={e=>patch('title',e.target.value)} placeholder="Paper title…" className="lo-paper-title"/>
-                <div className="lo-paper-meta">
-                  <input value={text(draft.authors)} onChange={e=>patch('authors',e.target.value)} placeholder="Authors"/>
-                  <input value={text(draft.journal)} onChange={e=>patch('journal',e.target.value)} placeholder="Journal"/>
-                  <input value={draft.year??''} onChange={e=>patch('year',e.target.value?Number(e.target.value):null)} placeholder="Year" type="number"/>
-                </div>
-              </div>
-              <div className="lo-paper-actions">
-                <button onClick={save} disabled={saving||!draft.title.trim()}><Save size={15}/>{saving?'Saving':'Save'}</button>
-                {draft.id!=='new'&&<button onClick={remove} className="lo-icon-danger" title="Delete"><Trash2 size={15}/></button>}
-                <button onClick={()=>{setDraft(null);setSelected(null)}} title="Close"><X size={15}/></button>
-              </div>
+        {!draft?<div className="lo-lab-empty"><Microscope size={34}/><strong>Read beyond the abstract.</strong><span>Keep the question, mechanism, evidence and limitations in view as you work through a paper.</span><button type="button" onClick={startNew}>Add a paper <ChevronRight size={14}/></button></div>:<>
+          <div className="lo-paper-header">
+            <div className="lo-paper-heading-copy"><div className="lo-overline">{adding?'NEW PAPER / LAB NOTE':'PAPER / READING NOTES'}</div><input className="lo-paper-title" value={draft.title} onChange={e=>patch('title',e.target.value)} placeholder="Paper title…"/><div className="lo-paper-meta"><input value={val(draft.authors)} onChange={e=>patch('authors',e.target.value)} placeholder="Authors"/><input value={val(draft.journal)} onChange={e=>patch('journal',e.target.value)} placeholder="Journal"/><input value={draft.year??''} onChange={e=>patch('year',e.target.value?Number(e.target.value):null)} placeholder="Year" type="number"/></div></div>
+            <div className="lo-paper-actions"><button type="button" onClick={save} disabled={saving||!draft.title.trim()}><Save size={14}/>{saving?'Saving…':'Save'}</button>{draft.id!=='new'&&<button type="button" className="lo-icon-danger" onClick={remove} aria-label="Delete paper"><Trash2 size={14}/></button>}<button type="button" onClick={()=>{setDraft(null);setSelected(null)}} aria-label="Close paper"><X size={14}/></button></div>
+          </div>
+          <div className="lo-paper-grid">
+            <div className="lo-lab-column">
+              {sections.map(([key,label])=><section key={key} className="lo-lab-module"><div className="lo-module-heading"><span>{label}</span><i/></div><textarea value={val(draft[key])} onChange={e=>patch(key,e.target.value as never)} placeholder={key==='scientificQuestion'?'What is the paper trying to explain or test?':'Capture '+label.toLowerCase()+'…'} rows={key==='abstractText'?7:5}/></section>)}
+              <section className="lo-lab-module"><div className="lo-module-heading"><span>Source details</span><i/></div><div className="lo-source-row"><input value={val(draft.doi)} onChange={e=>patch('doi',e.target.value)} placeholder="DOI"/><input value={val(draft.sourceUrl)} onChange={e=>patch('sourceUrl',e.target.value)} placeholder="Paper URL"/>{draft.sourceUrl&&<a href={draft.sourceUrl} target="_blank" rel="noreferrer" aria-label="Open source"><ExternalLink size={14}/></a>}</div></section>
             </div>
-            <div className="lo-paper-grid">
-              <div className="lo-lab-column">
-                {sections.map(([key,label])=><section key={key} className="lo-lab-module">
-                  <div className="lo-module-heading"><span>{label}</span><i/></div>
-                  <textarea value={text(draft[key])} onChange={e=>patch(key,e.target.value as never)} placeholder={'Add '+label.toLowerCase()+'…'} rows={key==='abstractText'?7:5}/>
-                </section>)}
-                <section className="lifeos-lab-module">
-                  <div className="lifeos-module-heading"><span>Source</span><i/></div>
-                  <div className="lo-source-row"><input value={text(draft.doi)} onChange={e=>patch('doi',e.target.value)} placeholder="DOI"/><input value={text(draft.sourceUrl)} onChange={e=>patch('sourceUrl',e.target.value)} placeholder="Paper URL"/>{draft.sourceUrl&&<a href={draft.sourceUrl} target="_blank" rel="noreferrer"><ExternalLink size={14}/></a>}</div>
-                </section>
-              </div>
-              <div className="lifeos-lab-column">
-                <section className="lo-lab-module">
-                  <div className="lifeos-module-heading"><span>Figures & evidence</span><i/></div>
-                  <div className="lo-figure-grid">
-                    {draft.figures.map(f=><div key={f.id} className="lo-figure-specimen">
-                      <img src={f.dataUrl} alt={f.title}/><input value={f.title} onChange={e=>patch('figures',draft.figures.map(x=>x.id===f.id?{...x,title:e.target.value}:x))}/><button onClick={()=>patch('figures',draft.figures.filter(x=>x.id!==f.id))}><X size={12}/></button>
-                    </div>)}
-                    <button className="lo-dropzone" onClick={()=>figureInput.current?.click()}><FileImage size={22}/><strong>Add figure</strong><span>PNG, JPG, WEBP</span></button>
-                  </div>
-                  <input ref={figureInput} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={e=>{const f=e.target.files?.[0];if(f)addFigure(f);e.currentTarget.value=''}}/>
-                </section>
-                <section className="lifeos-lab-module">
-                  <div className="lifeos-module-heading"><span>Tables</span><i/></div>
-                  <div className="lo-table-stack">
-                    {draft.tables.map(t=><div className="lo-table-specimen" key={t.id}>
-                      <div className="lo-table-title"><input value={t.title} onChange={e=>updateTable(t.id,x=>({...x,title:e.target.value}))}/><button onClick={()=>patch('tables',draft.tables.filter(x=>x.id!==t.id))}><X size={12}/></button></div>
-                      <div className="lo-mini-table">{t.cells.map((row,ri)=>row.map((cell,ci)=><input key={ri+'-'+ci} value={cell} onChange={e=>updateTable(t.id,x=>{const cells=x.cells.map(r=>[...r]);cells[ri][ci]=e.target.value;return {...x,cells}})}/>) )}</div>
-                    </div>)}
-                    <button className="lo-add-module" onClick={addTable}><Table2 size={15}/> Add table</button>
-                  </div>
-                </section>
-              </div>
+            <div className="lo-lab-column">
+              <section className="lo-lab-module"><div className="lo-module-heading"><span>Figures & evidence</span><i/></div><p className="lo-module-hint">Add figure images and label what each one demonstrates. Images are kept with this paper.</p><div className="lo-figure-grid">
+                {(draft.figures??[]).map(f=><div key={f.id} className="lo-figure-specimen"><img src={f.dataUrl} alt={f.title}/><input value={f.title} onChange={e=>patch('figures',draft.figures.map(x=>x.id===f.id?{...x,title:e.target.value}:x))}/><button type="button" onClick={()=>patch('figures',draft.figures.filter(x=>x.id!==f.id))} aria-label="Remove figure"><X size={12}/></button></div>)}
+                <button type="button" className="lo-dropzone" onClick={()=>fileInput.current?.click()}><FileImage size={22}/><strong>Add figure</strong><span>PNG, JPG, WEBP · up to 8 MB</span></button>
+              </div><input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={e=>{const f=e.target.files?.[0];if(f)addFigure(f);e.currentTarget.value=''}}/></section>
+              <section className="lo-lab-module"><div className="lo-module-heading"><span>Tables</span><i/></div><div className="lo-table-stack">
+                {(draft.tables??[]).map(t=><div className="lo-table-specimen" key={t.id}><div className="lo-table-title"><input value={t.title} onChange={e=>updateTable(t.id,x=>({...x,title:e.target.value}))}/><button type="button" onClick={()=>patch('tables',draft.tables.filter(x=>x.id!==t.id))} aria-label="Remove table"><X size={12}/></button></div><div className="lo-mini-table">{t.cells.map((row,ri)=>row.map((cell,ci)=><input key={ri+'-'+ci} aria-label={`Row ${ri+1}, column ${ci+1}`} value={cell} onChange={e=>updateTable(t.id,x=>{const cells=x.cells.map(r=>[...r]);cells[ri][ci]=e.target.value;return {...x,cells}})}/>) )}</div></div>)}
+                <button type="button" className="lo-add-module" onClick={addTable}><Table2 size={15}/> Add table</button>
+              </div></section>
             </div>
-            {error&&<div className="lo-lab-error">{error}</div>}
-          </>}
-        </main>
-      </div>
+          </div>
+          {error&&<div className="lo-lab-error" role="alert">{error}</div>}
+        </>}
+      </main>
     </div>
+    {error&&!draft&&<div className="lo-lab-error" role="alert">{error}</div>}
+  </div>
 }
