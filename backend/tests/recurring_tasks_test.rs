@@ -1,16 +1,11 @@
-use lifeos_backend::tasks;
-use sqlx::SqlitePool;
-use tempfile::tempdir;
+use chrono::Datelike;
+use sqlx::{Row, SqlitePool};
 
 mod common;
 
 #[tokio::test]
 async fn test_recurring_task_daily() {
-    let dir = tempdir().unwrap();
-    let db_path = dir.path().join("test.db");
-    let database_url = format!("sqlite:{}", db_path.display());
-
-    let pool = common::setup_test_db(&database_url).await;
+    let (pool, _temp_file) = common::setup_test_db().await;
 
     // Create a recurring daily task that was completed yesterday
     let yesterday = chrono::Utc::now() - chrono::Duration::days(1);
@@ -199,10 +194,7 @@ async fn process_recurring_tasks_for_test(pool: &SqlitePool) -> Result<usize, sq
         if should_create {
             // Create new task
             let new_id = cuid::cuid1().map_err(|e| {
-                sqlx::Error::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    format!("ID generation failed: {}", e),
-                ))
+                sqlx::Error::Io(std::io::Error::other(format!("ID generation failed: {}", e)))
             })?;
             
             let now_ms = chrono::Utc::now().timestamp_millis();
