@@ -567,6 +567,11 @@ CREATE TABLE "ResearchPaper" (
     "notes" TEXT,
     "figuresJson" TEXT NOT NULL DEFAULT '[]',
     "tablesJson" TEXT NOT NULL DEFAULT '[]',
+    "status" TEXT NOT NULL DEFAULT 'reading',
+    "targetJournal" TEXT,
+    "submissionDeadline" TEXT,
+    "sectionsJson" TEXT NOT NULL DEFAULT '[]',
+    "datasetsJson" TEXT NOT NULL DEFAULT '[]',
     "archived" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" INTEGER NOT NULL,
     "updatedAt" INTEGER NOT NULL
