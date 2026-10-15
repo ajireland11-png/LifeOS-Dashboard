@@ -687,6 +687,7 @@ model StudioItem {
   imageUrl  String?
   category  String?
   tagsJson  String   @default("[]")
+  isFavorite Boolean  @default(false)
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
