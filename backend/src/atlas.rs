@@ -318,6 +318,22 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
         });
     }
 
+    // PersonRelationship — social connections are shared across both profiles,
+    // represented as one edge in Atlas rather than two mirrored edges.
+    let rows = sqlx::query("SELECT personId, relatedPersonId, label FROM PersonRelationship WHERE personId < relatedPersonId")
+        .fetch_all(&st.db).await?;
+    for r in &rows {
+        edges.push(AtlasEdge {
+            id: format!("observed-personrelationship-{}-{}", r.try_get::<String, _>("personId")?, r.try_get::<String, _>("relatedPersonId")?),
+            source_type: "person".to_string(),
+            source_id: r.try_get("personId")?,
+            target_type: "person".to_string(),
+            target_id: r.try_get("relatedPersonId")?,
+            kind: "observed".to_string(),
+            label: Some(r.try_get::<String, _>("label")?),
+        });
+    }
+
     // TaskDependency — one task depending on another.
     let rows = sqlx::query("SELECT id, taskId, dependsOnId FROM TaskDependency")
         .fetch_all(&st.db)
