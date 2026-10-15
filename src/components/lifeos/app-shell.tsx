@@ -85,7 +85,7 @@ export function AppShell() {
   }
 
   const ActiveComponent =
-    moduleComponents[activeModule] || HomePage
+    moduleComponents[activeModule] || OverviewPage
 
   const pageVariants = {
     initial: { opacity: 0, y: 6 },
