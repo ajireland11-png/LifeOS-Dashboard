@@ -48,6 +48,8 @@ interface AppState {
   setTaskRequest: (id: string | null) => void
   projectRequest: string | null
   setProjectRequest: (id: string | null) => void
+  noteRequest: string | null
+  setNoteRequest: (id: string | null) => void
   newNoteRequest: number
   requestNewNote: () => void
   
@@ -137,6 +139,8 @@ export const useAppStore = create<AppState>()(
       setTaskRequest: (id) => set({ taskRequest: id }),
       projectRequest: null,
       setProjectRequest: (id) => set({ projectRequest: id }),
+      noteRequest: null,
+      setNoteRequest: (id) => set({ noteRequest: id }),
       newNoteRequest: 0,
       requestNewNote: () => set((state) => ({ newNoteRequest: state.newNoteRequest + 1 })),
       
