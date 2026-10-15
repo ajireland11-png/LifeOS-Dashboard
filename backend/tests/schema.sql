@@ -609,6 +609,17 @@ CREATE TABLE "Person" (
 CREATE INDEX "Person_name_idx" ON "Person"("name");
 CREATE INDEX "Person_archived_idx" ON "Person"("archived");
 
+CREATE TABLE "PersonRelationship" (
+    "personId" TEXT NOT NULL,
+    "relatedPersonId" TEXT NOT NULL,
+    "label" TEXT NOT NULL DEFAULT 'Related',
+    "createdAt" INTEGER NOT NULL,
+    PRIMARY KEY ("personId", "relatedPersonId"),
+    CONSTRAINT "PersonRelationship_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "PersonRelationship_relatedPersonId_fkey" FOREIGN KEY ("relatedPersonId") REFERENCES "Person" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE INDEX "PersonRelationship_relatedPersonId_idx" ON "PersonRelationship"("relatedPersonId");
+
 CREATE TABLE "PersonDate" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "personId" TEXT NOT NULL,
