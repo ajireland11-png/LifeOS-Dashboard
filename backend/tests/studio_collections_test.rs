@@ -20,10 +20,14 @@ async fn send(app: &axum::Router, method: &str, uri: &str, body: Value) -> (Stat
 async fn studio_categories_and_collections_keep_one_canonical_item() {
     let (app, _temp_db) = common::setup_test_app().await;
     let (status, item) = send(&app, "POST", "/api/studio/items", json!({
-        "title":"Blue glaze test","kind":"inspiration","category":"Ceramics","tags":["glaze","blue"]
+        "title":"Blue glaze test","kind":"inspiration","category":"Ceramics","tags":["glaze","blue"],"sourceAccount":"@claymaker","techniques":["layered glaze","test tile"],"materials":["stoneware","cobalt oxide"],"skillLevel":"intermediate"
     })).await;
     assert_eq!(status, StatusCode::CREATED);
     let item_id = item["id"].as_str().unwrap().to_string();
+    assert_eq!(item["sourceAccount"], "@claymaker");
+    assert_eq!(item["techniques"][0], "layered glaze");
+    assert_eq!(item["materials"][0], "stoneware");
+    assert_eq!(item["skillLevel"], "intermediate");
 
     let (status, category) = send(&app, "POST", "/api/studio/categories", json!({"name":"Ceramics"})).await;
     assert_eq!(status, StatusCode::CREATED);
