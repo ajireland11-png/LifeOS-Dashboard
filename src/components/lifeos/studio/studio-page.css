@@ -1,0 +1,92 @@
+/* Creative Studio — tactile, image-led collecting space. */
+.lo-studio{
+  --studio-ink:#f2e9d8;--studio-muted:#b8b5a6;--studio-line:rgba(239,228,208,.17);
+  color:var(--studio-ink);
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(156,104,72,.13),transparent 36rem),
+    radial-gradient(ellipse at 96% 58%,rgba(112,137,101,.1),transparent 32rem),
+    #20241f;
+  border:1px solid rgba(217,187,139,.14);
+  padding:clamp(18px,2.6vw,34px);
+  position:relative;isolation:isolate;overflow:hidden;
+}
+.lo-studio:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E")}
+.lo-studio-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:4px 0 25px;border-bottom:1px solid var(--studio-line)}
+.lo-studio-header h1{margin:12px 0 8px;font:400 clamp(34px,4vw,54px)/1 Georgia,"Iowan Old Style",serif;letter-spacing:-.045em;color:#f3ead8}
+.lo-studio-header p{max-width:570px;margin:0;color:#b9b8aa;font:italic 14px/1.65 Georgia,serif}
+.lo-studio-header .lo-overline{color:#d3ad77;letter-spacing:.19em;font-size:9px}
+.lo-studio-header-actions{display:flex;flex-wrap:wrap;gap:8px}
+.lo-studio-quiet-action,.lo-studio-new-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:9px 12px;border:1px solid rgba(220,190,143,.34);background:rgba(220,190,143,.07);color:#e7c38e;font-size:10px;cursor:pointer;transition:background .18s,border-color .18s}
+.lo-studio-quiet-action:hover,.lo-studio-new-button:hover{background:rgba(220,190,143,.14);border-color:rgba(220,190,143,.65)}
+.lo-studio-main{grid-template-columns:minmax(260px,.8fr) minmax(0,1.55fr);gap:clamp(20px,3vw,38px);margin-top:23px}
+.lo-studio-library{min-width:0;padding-right:clamp(10px,1.5vw,20px);border-right:1px solid var(--studio-line)}
+.lo-studio-library .lo-learn-index-title{color:#d1b17f;font-size:9px;letter-spacing:.16em}
+.lo-studio-capture{display:flex;gap:7px;margin:14px 0 10px}
+.lo-studio-capture input,.lo-studio-capture-meta input,.lo-studio-capture-meta select,.lo-studio-kind-select select,.lo-studio-side-create input,.lo-studio-taxonomy-row input,.lo-studio-collection-row input,.lo-studio-editor-tools select,.lo-studio-source-fields input,.lo-studio-source-fields select{
+  min-width:0;background:#292d27!important;color:#f1e8d8!important;border:1px solid rgba(239,228,208,.19)!important;border-radius:0!important;font-size:11px!important;
+}
+.lo-studio-capture input{flex:1;padding:11px}
+.lo-studio-capture input::placeholder,.lo-studio-capture-meta input::placeholder,.lo-studio-source-fields input::placeholder{color:#999b8c}
+.lo-studio-capture button,.lo-studio-side-create button{display:grid;place-items:center;min-width:38px;border:1px solid rgba(220,190,143,.38);background:rgba(220,190,143,.1);color:#e6c18b;cursor:pointer}
+.lo-studio-capture-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.lo-studio-capture-meta>*{width:100%;padding:9px}
+.lo-studio-capture-meta>*:first-child,.lo-studio-capture-meta>*:nth-child(2){grid-column:1/-1}
+.lo-studio-kind-select{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:13px 0;color:#bdb9a9;font-size:10px}
+.lo-studio-kind-select select{max-width:65%;padding:8px}
+.lo-studio-search{margin:13px 0}
+.lo-studio-search input{color:#f1e8d8!important}
+.lo-studio-filters{display:flex;flex-wrap:wrap;gap:5px;margin:13px 0 19px}
+.lo-studio-filters button{display:inline-flex;align-items:center;gap:5px;padding:7px 9px;border:1px solid rgba(239,228,208,.14);background:rgba(255,255,255,.02);color:#b8b7a9;font-size:9px;cursor:pointer}
+.lo-studio-filters button:hover,.lo-studio-filters button[aria-pressed="true"]{border-color:rgba(220,190,143,.47);background:rgba(220,190,143,.09);color:#edc78f}
+.lo-studio-taxonomy,.lo-studio-collections{margin:19px 0 23px;padding-top:15px;border-top:1px solid var(--studio-line)}
+.lo-studio-side-heading{color:#d0ad77!important;letter-spacing:.15em!important;font-size:8px!important}
+.lo-studio-side-create{display:flex;gap:5px;margin:9px 0}
+.lo-studio-side-create input{flex:1;padding:8px}
+.lo-studio-side-create button{min-width:31px}
+.lo-studio-category-chip,.lo-studio-collection-chip{color:#c9c6b8!important}
+.lo-studio-taxonomy-row,.lo-studio-collection-row{border-bottom:1px solid rgba(239,228,208,.07)!important}
+.lo-studio-taxonomy-row .lo-studio-category-chip.is-active,.lo-studio-collection-chip.is-active{color:#edc78f!important;background:rgba(220,190,143,.08)!important}
+.lo-studio-item{display:grid;grid-template-columns:1fr;gap:7px;width:100%;padding:13px 12px;margin:0 0 7px;border:1px solid rgba(239,228,208,.11)!important;background:rgba(255,255,255,.022)!important;color:#f0e7d7!important;text-align:left;transition:background .2s,border-color .2s,transform .2s}
+.lo-studio-item:hover{background:rgba(255,255,255,.05)!important;border-color:rgba(220,190,143,.38)!important;transform:translateY(-1px)}
+.lo-studio-item[aria-current="true"]{border-color:rgba(220,190,143,.72)!important;background:linear-gradient(120deg,rgba(220,190,143,.11),rgba(255,255,255,.025))!important}
+.lo-studio-item>small:first-child{color:#c6a879!important;font-size:8px!important;letter-spacing:.06em}
+.lo-studio-item strong{font:400 18px/1.2 Georgia,serif!important;letter-spacing:-.02em}
+.lo-studio-item>small:not(:first-child){color:#aaa99b!important;font-size:10px!important;line-height:1.45}
+.lo-studio-item-image{display:block;width:100%;max-height:180px;aspect-ratio:16/7;object-fit:cover;margin:3px 0 5px;filter:saturate(.82);background:#30372d}
+.lo-studio-editor{min-width:0;background:rgba(255,255,255,.018);padding:clamp(16px,2vw,27px);border:1px solid rgba(239,228,208,.11)}
+.lo-studio-editor-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:17px}
+.lo-studio-editor-head .lo-overline{color:#c8a675;font-size:8px;letter-spacing:.17em}
+.lo-studio-editor-tools select{padding:7px}
+.lo-studio-title{display:block;width:100%;padding:0 0 13px;border:0!important;border-bottom:1px solid var(--studio-line)!important;background:transparent!important;color:#f3ead8!important;font:400 clamp(26px,3vw,40px)/1.1 Georgia,serif!important;letter-spacing:-.04em}
+.lo-studio-title::placeholder{color:#797f71}
+.lo-studio-summary{display:block;width:100%;margin:13px 0 19px;padding:0;border:0!important;background:transparent!important;color:#c8bda7!important;font:italic 15px/1.5 Georgia,serif!important}
+.lo-studio-summary::placeholder{color:#8f9386}
+.lo-studio-source-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lo-studio-source-fields label{display:grid;gap:6px;color:#b6b5a7;font-size:9px;letter-spacing:.04em}
+.lo-studio-source-fields input,.lo-studio-source-fields select{width:100%;padding:9px;letter-spacing:normal}
+.lo-studio-item-collections{margin:18px 0;padding:14px;border:1px solid rgba(239,228,208,.11);background:rgba(255,255,255,.018)}
+.lo-studio-item-collections>div{margin-bottom:10px;color:#d1ad78;font-size:8px;letter-spacing:.15em}
+.lo-studio-item-collections>div small{display:block;margin-top:5px;color:#999d8e;letter-spacing:normal;font-size:10px}
+.lo-studio-item-collections label{display:inline-flex;align-items:center;gap:6px;margin:4px 12px 4px 0;color:#c6c6b8;font-size:10px}
+.lo-studio-item-collections input{accent-color:#c8a675}
+.lo-studio-image-preview{margin:22px 0 14px;padding:0;border:1px solid rgba(220,190,143,.22);background:#292d27}
+.lo-studio-image-preview img{display:block;width:100%;max-height:440px;object-fit:contain;background:#171b17}
+.lo-studio-image-preview figcaption{padding:9px 12px;color:#b8b5a6;font:italic 11px Georgia,serif}
+.lo-studio-source-link{display:inline-flex;align-items:center;gap:6px;margin:0 0 17px;color:#e0b982;font-size:10px;text-decoration:none}
+.lo-studio-source-link:hover{text-decoration:underline}
+.lo-studio-content{display:block;width:100%;min-height:270px;padding:14px!important;border:1px solid rgba(239,228,208,.15)!important;background:rgba(12,16,12,.28)!important;color:#e6dfd1!important;font:13px/1.75 Georgia,serif!important;resize:vertical}
+.lo-studio-content::placeholder{color:#96998a}
+.lo-studio-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.lo-studio-actions button{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid rgba(239,228,208,.18);background:rgba(255,255,255,.025);color:#c8c5b7;font-size:10px;cursor:pointer}
+.lo-studio-actions .lo-studio-save{border-color:rgba(220,190,143,.5);background:rgba(220,190,143,.11);color:#efc88e}
+.lo-studio-actions .lo-studio-delete{color:#d6a29a}
+.lo-studio-empty{min-height:360px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(20px,5vw,65px);background:radial-gradient(ellipse at 90% 10%,rgba(163,117,151,.13),transparent 50%),rgba(255,255,255,.018)}
+.lo-studio-empty>svg{color:#d5b27c;stroke-width:1}
+.lo-studio-empty h2{max-width:480px;margin:22px 0 10px;color:#f2e9d8;font:400 clamp(28px,3vw,42px)/1.1 Georgia,serif}
+.lo-studio-empty p{max-width:420px;color:#b7b5a7;font:italic 15px/1.7 Georgia,serif}
+.lo-studio-muted{color:#aaa99b!important;font:italic 13px/1.6 Georgia,serif}
+.lo-studio-error{margin-top:14px;padding:12px;border:1px solid rgba(196,115,100,.4);background:rgba(196,115,100,.08);color:#efb3a8}
+.lo-studio select option{background:#292d27;color:#f2e9d8}
+@media(max-width:900px){.lo-studio-header{align-items:flex-start;flex-direction:column}.lo-studio-main{grid-template-columns:minmax(0,1fr);gap:20px}.lo-studio-library{padding-right:0;padding-bottom:20px;border-right:0;border-bottom:1px solid var(--studio-line)}.lo-studio-source-fields{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.lo-studio{padding:16px}.lo-studio-header-actions{width:100%}.lo-studio-header-actions button{flex:1}.lo-studio-capture-meta,.lo-studio-source-fields{grid-template-columns:1fr}.lo-studio-capture-meta>*:first-child,.lo-studio-capture-meta>*:nth-child(2){grid-column:auto}.lo-studio-editor{padding:15px}.lo-studio-editor-tools{flex-wrap:wrap}.lo-studio-editor-tools select{max-width:100%}.lo-studio-empty{min-height:260px;padding:20px}}
+@media(prefers-reduced-motion:reduce){.lo-studio-item,.lo-studio-quiet-action,.lo-studio-new-button{transition:none}}
