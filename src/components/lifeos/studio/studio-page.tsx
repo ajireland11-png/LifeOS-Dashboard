@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useAppStore } from '@/stores/app-store'
 import { Archive, ArrowUpRight, BookOpen, Bookmark, Brush, FolderPlus, Image, Lightbulb, Pencil, Plus, Save, Sparkles, Trash2, X } from 'lucide-react'
 
 type Item = { id:string; title:string; kind:string; summary?:string|null; content:string; sourceUrl?:string|null; imageUrl?:string|null; category?:string|null; tags?:string[]; sourceAccount?:string|null; techniques?:string[]; materials?:string[]; skillLevel?:string|null; isFavorite?:boolean; archived:boolean; updatedAt:string }
@@ -14,6 +15,8 @@ function isWebUrl(value: string) {
 }
 
 export function StudioPage() {
+  const studioItemRequest=useAppStore(s=>s.studioItemRequest)
+  const setStudioItemRequest=useAppStore(s=>s.setStudioItemRequest)
   const [items,setItems]=useState<Item[]>([])
   const [categories,setCategories]=useState<Category[]>([])
   const [collections,setCollections]=useState<Collection[]>([])
@@ -61,6 +64,7 @@ export function StudioPage() {
     catch(e){setError(e instanceof Error?e.message:'Could not load Studio.')} finally{setLoading(false)}
   },[])
   useEffect(()=>{void load()},[])
+  useEffect(()=>{if(!studioItemRequest||loading)return;if(items.some(item=>item.id===studioItemRequest))setSelectedId(studioItemRequest);setStudioItemRequest(null)},[studioItemRequest,loading,items,setStudioItemRequest])
   const selected=items.find(x=>x.id===selectedId)||null
   const visible=useMemo(()=>items.filter(x=>(filter==='all'||(filter==='favorites'?!!x.isFavorite:x.kind===filter))&&(categoryFilter==='all'||x.category===categoryFilter)&&(!selectedCollectionId||collections.find(col=>col.id===selectedCollectionId)?.items.includes(x.id))&&(x.title+' '+(x.summary||'')+' '+x.content+' '+(x.category||'')+' '+(x.tags||[]).join(' ')+' '+(x.sourceAccount||'')+' '+(x.techniques||[]).join(' ')+' '+(x.materials||[]).join(' ')).toLowerCase().includes(search.toLowerCase())),[items,filter,categoryFilter,selectedCollectionId,collections,search])
   useEffect(()=>{setTitle(selected?.title||'');setKind(selected?.kind||'idea');setSummary(selected?.summary||'');setContent(selected?.content||'');setSourceUrl(selected?.sourceUrl||'');setImageUrl(selected?.imageUrl||'');setCategory(selected?.category||'');setTagsText((selected?.tags||[]).join(', '));setSourceAccount(selected?.sourceAccount||'');setTechniquesText((selected?.techniques||[]).join(', '));setMaterialsText((selected?.materials||[]).join(', '));setSkillLevel(selected?.skillLevel||'')},[selectedId,selected?.updatedAt])
