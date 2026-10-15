@@ -21,6 +21,10 @@ pub(crate) struct StudioItem {
     kind: String,
     summary: Option<String>,
     content: String,
+    source_url: Option<String>,
+    image_url: Option<String>,
+    category: Option<String>,
+    tags: Value,
     archived: bool,
     created_at: PrismaDateTime,
     updated_at: PrismaDateTime,
@@ -33,6 +37,10 @@ fn row_to_item(r: &sqlx::sqlite::SqliteRow) -> Result<StudioItem, sqlx::Error> {
         kind: r.try_get("kind")?,
         summary: r.try_get::<Option<String>, _>("summary")?,
         content: r.try_get("content")?,
+        source_url: r.try_get("sourceUrl")?,
+        image_url: r.try_get("imageUrl")?,
+        category: r.try_get("category")?,
+        tags: r.try_get::<String, _>("tagsJson").ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or(Value::Array(vec![])),
         archived: r.try_get::<i64, _>("archived")? != 0,
         created_at: PrismaDateTime(r.try_get::<i64, _>("createdAt")?),
         updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt")?),
@@ -88,19 +96,27 @@ pub async fn create_item(
     let kind = str_or(&body, "kind", "idea");
     let summary = truthy_str(&body, "summary");
     let content = str_or(&body, "content", "");
+    let source_url = truthy_str(&body, "sourceUrl");
+    let image_url = truthy_str(&body, "imageUrl");
+    let category = truthy_str(&body, "category");
+    let tags_json = body.get("tags").map(|v| v.to_string()).unwrap_or_else(|| "[]".into());
 
     let id = gen_id();
     let now = now_ms();
 
     sqlx::query(
-        "INSERT INTO StudioItem (id, title, kind, summary, content, archived, createdAt, updatedAt) \
-         VALUES (?, ?, ?, ?, ?, 0, ?, ?)",
+        "INSERT INTO StudioItem (id, title, kind, summary, content, sourceUrl, imageUrl, category, tagsJson, archived, createdAt, updatedAt) \
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
     )
     .bind(&id)
     .bind(&title)
     .bind(&kind)
     .bind(&summary)
     .bind(&content)
+    .bind(&source_url)
+    .bind(&image_url)
+    .bind(&category)
+    .bind(&tags_json)
     .bind(now)
     .bind(now)
     .execute(&st.db)
@@ -145,6 +161,18 @@ pub async fn update_item(
     }
     if let Some(v) = body.get("content").and_then(|v| v.as_str()) {
         crate::push_set!(qb, first, "content = ", v.to_string());
+    }
+    if let Some(v) = patch_str(&body, "sourceUrl") {
+        crate::push_set!(qb, first, "sourceUrl = ", v);
+    }
+    if let Some(v) = patch_str(&body, "imageUrl") {
+        crate::push_set!(qb, first, "imageUrl = ", v);
+    }
+    if let Some(v) = patch_str(&body, "category") {
+        crate::push_set!(qb, first, "category = ", v);
+    }
+    if let Some(v) = body.get("tags") {
+        crate::push_set!(qb, first, "tagsJson = ", v.to_string());
     }
     if let Some(v) = patch_bool(&body, "archived") {
         crate::push_set!(qb, first, "archived = ", if v { 1_i64 } else { 0_i64 });
