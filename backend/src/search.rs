@@ -275,6 +275,59 @@ pub async fn search(
         });
     }
 
+    // Scientific Paper Interpreter — canonical papers and concepts extracted from their saved analyses.
+    let interpreter_rows = sqlx::query(
+        "SELECT id,title,doi,sourceUrl,status,updatedAt FROM PaperInterpreterPaper WHERE title LIKE ? OR COALESCE(doi,'') LIKE ? OR COALESCE(sourceUrl,'') LIKE ? ORDER BY updatedAt DESC LIMIT 5"
+    ).bind(&pat).bind(&pat).bind(&pat).fetch_all(&st.db).await.unwrap_or_default();
+    for r in &interpreter_rows {
+        let doi: Option<String> = r.try_get("doi").ok().flatten();
+        let source_url: Option<String> = r.try_get("sourceUrl").ok().flatten();
+        let status: String = r.try_get("status").unwrap_or_default();
+        results.push(SearchResult {
+            id: r.try_get("id").unwrap_or_default(),
+            r#type: "Paper Interpreter".to_string(),
+            title: r.try_get("title").unwrap_or_default(),
+            description: doi.or(source_url).unwrap_or_else(|| format!("Scientific paper · {}", status.replace('_', " "))),
+            updated_at: PrismaDateTime(r.try_get::<i64, _>("updatedAt").unwrap_or(0)),
+            module: "paper-interpreter".to_string(),
+            icon: "FileSearch".to_string(),
+            color: "amber".to_string(),
+        });
+    }
+
+    // Concept hits open the owning paper and focus its concept outline; the concept itself remains nested in that canonical analysis.
+    let concept_rows = sqlx::query(
+        "SELECT id,title,analysisJson,updatedAt FROM PaperInterpreterPaper WHERE analysisJson LIKE ? ORDER BY updatedAt DESC LIMIT 12"
+    ).bind(&pat).fetch_all(&st.db).await.unwrap_or_default();
+    for r in &concept_rows {
+        let paper_id: String = r.try_get("id").unwrap_or_default();
+        let paper_title: String = r.try_get("title").unwrap_or_default();
+        let raw: Option<String> = r.try_get("analysisJson").ok().flatten();
+        let updated = PrismaDateTime(r.try_get::<i64, _>("updatedAt").unwrap_or(0));
+        let Some(analysis) = raw.and_then(|s| serde_json::from_str::<Value>(&s).ok()) else { continue };
+        let Some(concepts) = analysis.get("concepts").and_then(Value::as_array) else { continue };
+        for concept in concepts.iter().filter(|item| {
+            let title = item.get("title").and_then(Value::as_str).unwrap_or("");
+            let definition = item.get("definition").and_then(Value::as_str).unwrap_or("");
+            let explanation = item.get("explanation").and_then(Value::as_str).unwrap_or("");
+            title.to_lowercase().contains(&q.to_lowercase()) || definition.to_lowercase().contains(&q.to_lowercase()) || explanation.to_lowercase().contains(&q.to_lowercase())
+        }).take(4) {
+            let concept_id = concept.get("id").and_then(Value::as_str).unwrap_or("");
+            let concept_title = concept.get("title").and_then(Value::as_str).unwrap_or("Untitled concept");
+            let description = concept.get("definition").and_then(Value::as_str).or_else(||concept.get("whyItMatters").and_then(Value::as_str)).unwrap_or(&paper_title);
+            results.push(SearchResult {
+                id: format!("{paper_id}::{concept_id}"),
+                r#type: "Paper concept".to_string(),
+                title: concept_title.to_string(),
+                description: format!("{} · {}", paper_title, description.chars().take(100).collect::<String>()),
+                updated_at: updated.clone(),
+                module: "paper-interpreter".to_string(),
+                icon: "Network".to_string(),
+                color: "sage".to_string(),
+            });
+        }
+    }
+
     // Projects
     let project_rows = sqlx::query(
         "SELECT id, name, description, updatedAt, status FROM Project WHERE archived = 0 AND (name LIKE ? OR description LIKE ?) ORDER BY updatedAt DESC LIMIT 5"
