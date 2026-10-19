@@ -244,3 +244,11 @@
 .pi-reference-list li>small{color:var(--pi-muted);font-size:9px}
 .pi-reference-list li>a{display:inline-flex;align-items:center;gap:5px;width:max-content;color:var(--pi-brass);font-size:10px;text-decoration:none}
 .pi-reference-list li>a:hover{text-decoration:underline}
+
+.pi-math-rendered{display:block;max-width:100%;overflow-x:auto;color:#f0e5cf;font-family:Cambria,Georgia,serif;font-size:1.12em;line-height:1.8}
+.pi-math-rendered mi{font-style:italic}
+.pi-math-rendered mn{font-variant-numeric:lining-nums tabular-nums}
+.pi-math-rendered mfrac{padding:0 .1em}
+.pi-math-rendered mspace{display:inline-block}
+.pi-math-fallback{display:block;overflow-wrap:anywhere;color:#d8c7a1;font:13px/1.8 'Cambria Math',Cambria,Georgia,serif;white-space:pre-wrap}
+.pi-latex-step .pi-math-rendered{font-size:1em}
