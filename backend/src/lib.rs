@@ -25,6 +25,10 @@ mod prisma_dt;
 mod profile;
 mod research;
 mod paper_interpreter;
+
+pub async fn resume_paper_interpreter_jobs(pool: SqlitePool) {
+    paper_interpreter::resume_incomplete(pool).await;
+}
 mod projects;
 mod search;
 mod tags;
