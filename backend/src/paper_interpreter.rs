@@ -548,9 +548,13 @@ SOURCE TEXT:
         fail(&pool,&id,"The analysis was missing required overview or concept sections. Retry the analysis.").await;return;
     }
     let now=now_ms();
-    let previous_row = sqlx::query("SELECT analysisJson,analysisHistoryJson FROM PaperInterpreterPaper WHERE id=?").bind(&id).fetch_optional(&pool).await.ok().flatten();
-    let previous_analysis = previous_row.as_ref().and_then(|row|row.try_get::<Option<String>,_>("analysisJson").ok().flatten()).and_then(|raw|serde_json::from_str::<Value>(&raw).ok());
-    let mut history = previous_row.as_ref().and_then(|row|row.try_get::<Option<String>,_>("analysisHistoryJson").ok().flatten()).and_then(|raw|serde_json::from_str::<Value>(&raw).ok()).and_then(|v|v.as_array().cloned()).unwrap_or_default();
+    let previous_row = match sqlx::query("SELECT analysisJson,analysisHistoryJson FROM PaperInterpreterPaper WHERE id=?").bind(&id).fetch_optional(&pool).await {
+        Ok(Some(row)) => row,
+        Ok(None) => { fail(&pool,&id,"The paper record disappeared before the new analysis could be saved. The previous analysis was not overwritten.").await; return; }
+        Err(error) => { fail(&pool,&id,&format!("Could not read the previous analysis version; the existing analysis was not overwritten: {error}")).await; return; }
+    };
+    let previous_analysis = previous_row.try_get::<Option<String>,_>("analysisJson").ok().flatten().and_then(|raw|serde_json::from_str::<Value>(&raw).ok());
+    let mut history = previous_row.try_get::<Option<String>,_>("analysisHistoryJson").ok().flatten().and_then(|raw|serde_json::from_str::<Value>(&raw).ok()).and_then(|v|v.as_array().cloned()).unwrap_or_default();
     if let Some(previous) = previous_analysis {
         history.push(json!({"savedAt":now,"analysis":previous}));
         if history.len()>5 { let excess=history.len()-5; history.drain(0..excess); }
