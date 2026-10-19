@@ -78,6 +78,9 @@ const nextConfig: NextConfig = {
       ...proxy("/api/analytics"),
       ...proxy("/api/weekly-review"),
       ...proxy("/api/data"),
+      ...proxy("/api/research"),
+      ...proxy("/api/people"),
+      ...proxy("/api/paper-interpreter"),
     ];
   },
 };
