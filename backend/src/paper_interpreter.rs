@@ -301,7 +301,7 @@ async fn update_stage(pool: &sqlx::SqlitePool, id: &str, status: &str, stage: &s
 }
 
 async fn process_paper(pool: sqlx::SqlitePool, id: String) {
-    let row = sqlx::query("SELECT inputType,doi,sourceUrl,fileName,sourceFile,extractedText,title FROM PaperInterpreterPaper WHERE id=?")
+    let row = sqlx::query("SELECT inputType,doi,sourceUrl,fileName,sourceFile,extractedText,title,metadataJson FROM PaperInterpreterPaper WHERE id=?")
         .bind(&id).fetch_optional(&pool).await;
     let row = match row { Ok(Some(row)) => row, _ => return };
     let input_type = row.try_get::<String, _>("inputType").unwrap_or_default();
@@ -310,6 +310,7 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
     let file_name = row.try_get::<Option<String>, _>("fileName").unwrap_or(None);
     let stored_file = row.try_get::<Option<Vec<u8>>, _>("sourceFile").unwrap_or(None);
     let existing_text = row.try_get::<Option<String>, _>("extractedText").unwrap_or(None);
+    let existing_metadata = row.try_get::<Option<String>, _>("metadataJson").unwrap_or(None);
     let mut title = row.try_get::<String, _>("title").unwrap_or_else(|_| "Untitled paper".into());
     let mut authors: Option<String> = None;
     let mut journal: Option<String> = None;
@@ -318,6 +319,10 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
     let mut metadata = json!({"inputType":input_type});
     let mut extracted = existing_text.unwrap_or_default();
     let mut limitation: Option<String> = None;
+    if !extracted.trim().is_empty() {
+        if let Some(raw) = existing_metadata { metadata = serde_json::from_str(&raw).unwrap_or(metadata); }
+        limitation = metadata.get("sourceLimitations").and_then(Value::as_array).and_then(|a|a.first()).and_then(Value::as_str).map(str::to_string);
+    }
 
     update_stage(&pool, &id, "extracting", "Retrieving source and extracting scientific text", None).await;
 
@@ -438,6 +443,9 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
 
     if extracted.trim().is_empty() {
         limitation = Some("No readable full text or abstract was available. Metadata was saved, but a source-grounded analysis cannot be generated yet.".into());
+    }
+    if let Some(ref source_limitation) = limitation {
+        if let Some(object) = metadata.as_object_mut() { object.insert("sourceLimitations".into(), json!([source_limitation])); }
     }
     let _ = sqlx::query("UPDATE PaperInterpreterPaper SET title=?,authors=COALESCE(?,authors),journal=COALESCE(?,journal),year=COALESCE(?,year),sourceUrl=COALESCE(?,sourceUrl),metadataJson=?,extractedText=?,status='analysing',stage='Building the scientific interpretation',error=?,updatedAt=? WHERE id=?")
         .bind(&title).bind(authors).bind(journal).bind(year).bind(final_url).bind(metadata.to_string())
