@@ -57,7 +57,7 @@ type MathAtom = {node:React.ReactNode;sub?:React.ReactNode;sup?:React.ReactNode}
 const greek:Record<string,string>={alpha:'α',beta:'β',gamma:'γ',delta:'δ',epsilon:'ε',varepsilon:'ϵ',zeta:'ζ',eta:'η',theta:'θ',vartheta:'ϑ',iota:'ι',kappa:'κ',lambda:'λ',mu:'μ',nu:'ν',xi:'ξ',pi:'π',rho:'ρ',sigma:'σ',tau:'τ',upsilon:'υ',phi:'φ',varphi:'ϕ',chi:'χ',psi:'ψ',omega:'ω',Gamma:'Γ',Delta:'Δ',Theta:'Θ',Lambda:'Λ',Xi:'Ξ',Pi:'Π',Sigma:'Σ',Phi:'Φ',Psi:'Ψ',Omega:'Ω'}
 const mathOperators:Record<string,string>={cdot:'·',times:'×',pm:'±',mp:'∓',approx:'≈',sim:'∼',propto:'∝',leq:'≤',le:'≤',geq:'≥',ge:'≥',neq:'≠',in:'∈',notin:'∉',subset:'⊂',subseteq:'⊆',supset:'⊃',cup:'∪',cap:'∩',sum:'∑',prod:'∏',int:'∫',iint:'∬',iiint:'∭',partial:'∂',nabla:'∇',infty:'∞',to:'→',rightarrow:'→',leftarrow:'←',Rightarrow:'⇒',Leftrightarrow:'⇔',equiv:'≡',forall:'∀',exists:'∃',perp:'⊥',parallel:'∥',degree:'°',ell:'ℓ',hbar:'ℏ',Re:'ℜ',Im:'ℑ'}
 function LatexMath({source}:{source:string}){
- const cleaned=source.trim().replace(/^\\\(|\\\)$/g,'').replace(/^\$|\$/g,'')
+ const cleaned=source.trim().replace(/^\\\(|\\\)$/g,'').replace(/^\$+|\$+$/g,'')
  const unsupported=/\\begin\s*\{/.test(cleaned)
  const rendered=useMemo(()=>{
   if(!cleaned||unsupported)return null
@@ -84,7 +84,7 @@ function LatexMath({source}:{source:string}){
    }
    return atoms
   }
-  const renderAtoms=(atoms:MathAtom[]):React.ReactNode[]=>atoms.map((a,i)=>{
+  const renderAtoms=(atoms:MathAtom[]):React.ReactNode[]=>atoms.map((a)=>{
    if(a.sub&&a.sup)return createElement('msubsup',{key:key()},a.node,a.sub,a.sup)
    if(a.sub)return createElement('msub',{key:key()},a.node,a.sub)
    if(a.sup)return createElement('msup',{key:key()},a.node,a.sup)
