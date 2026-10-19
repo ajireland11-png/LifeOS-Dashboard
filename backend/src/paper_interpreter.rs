@@ -393,7 +393,15 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
         };
 
         match source_result {
-            Ok((_url, mime, bytes)) => {
+            Ok((source_url_value, mime, bytes)) => {
+                if mime.to_ascii_lowercase().contains("pdf") || bytes.starts_with(b"%PDF-") {
+                    if input_type != "pdf" {
+                        let remote_name = source_url_value.as_ref().and_then(|u| u.path_segments().and_then(|mut p| p.next_back())).filter(|s| !s.is_empty()).unwrap_or("paper.pdf");
+                        let safe_name: String = remote_name.chars().filter(|ch| ch.is_ascii_alphanumeric() || *ch == '.' || *ch == '-' || *ch == '_').take(100).collect();
+                        let _ = sqlx::query("UPDATE PaperInterpreterPaper SET sourceFile=?,fileName=?,sourceUrl=COALESCE(?,sourceUrl),updatedAt=? WHERE id=?")
+                            .bind(bytes.clone()).bind(if safe_name.is_empty() { "paper.pdf" } else { &safe_name }).bind(source_url_value.as_ref().map(|u|u.as_str())).bind(now_ms()).bind(&id).execute(&pool).await;
+                    }
+                }
                 if mime == "metadata" {
                     // DOI metadata may provide an abstract even when full text is not openly available.
                 } else if mime == "application/pdf" || mime.to_ascii_lowercase().contains("pdf") {
