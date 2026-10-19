@@ -57,6 +57,7 @@ export function Header() {
     projects: 'Projects',
     house: 'House',
     research: 'Research',
+    'paper-interpreter': 'Paper Interpreter',
     family: 'Friends & Family',
     archive: 'Archive',
 
