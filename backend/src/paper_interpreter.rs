@@ -530,7 +530,12 @@ SOURCE TEXT:
     let answer=response_json.get("choices").and_then(Value::as_array).and_then(|a|a.first()).and_then(|v|v.get("message")).and_then(|v|v.get("content")).and_then(Value::as_str);
     let Some(answer)=answer else {fail(&pool,&id,"The AI provider returned no analysis content. Retry the analysis.").await;return;};
     let mut analysis=match serde_json::from_str::<Value>(answer){Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The analysis response was not valid structured JSON: {e}")).await;return;}};
-    normalize_analysis_provenance(&mut analysis, &extracted, &model, &input_type);
+    normalize_analysis_provenance(&mut analysis, &source_text, &model, &input_type);
+    if extracted.chars().count() > source_text.chars().count() {
+        if let Some(limitations) = analysis.get_mut("provenance").and_then(|v|v.get_mut("limitations")).and_then(Value::as_array_mut) {
+            limitations.push(json!("Only the first 65,000 characters of extracted text were supplied to the analysis model; later sections may not be represented."));
+        }
+    }
     if let Some(references) = analysis.get_mut("references").and_then(Value::as_array_mut) {
         for reference in references {
             if let Some(object) = reference.as_object_mut() {
