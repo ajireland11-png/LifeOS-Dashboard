@@ -252,3 +252,10 @@
 .pi-math-rendered mspace{display:inline-block}
 .pi-math-fallback{display:block;overflow-wrap:anywhere;color:#d8c7a1;font:13px/1.8 'Cambria Math',Cambria,Georgia,serif;white-space:pre-wrap}
 .pi-latex-step .pi-math-rendered{font-size:1em}
+
+.pi-history-list{display:grid;gap:6px;margin-top:10px}
+.pi-history-list button{display:grid;gap:5px;padding:9px;border:1px solid var(--pi-rule);background:rgba(9,12,10,.14);text-align:left;color:var(--pi-ink)}
+.pi-history-list button.active{border-color:rgba(198,165,107,.55);background:rgba(198,165,107,.08)}
+.pi-history-list button span{color:var(--pi-brass);font-size:9px}
+.pi-history-list button small{color:var(--pi-muted);font-size:10px;line-height:1.5}
+.pi-history-current{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 0;border:0;background:transparent;color:var(--pi-brass);font-size:10px}
