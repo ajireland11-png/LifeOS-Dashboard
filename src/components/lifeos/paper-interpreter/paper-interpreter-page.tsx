@@ -122,7 +122,7 @@ function LatexMath({source}:{source:string}){
  },[cleaned,unsupported])
  if(!cleaned)return <span className="pi-math-fallback">No equation text was extracted.</span>
  if(!rendered)return <code className="pi-math-fallback">{cleaned}</code>
- return <math className="pi-math-rendered" xmlns="http://www.w3.org/1998/Math/MathML" display="block">{rendered}</math>
+ return createElement("math" as any,{className:"pi-math-rendered",xmlns:"http://www.w3.org/1998/Math/MathML",display:"block"},rendered)
 }
 
 function EquationView({equation}:{equation:Equation}){
