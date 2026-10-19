@@ -88,10 +88,10 @@ The Paper Interpreter is a primary LifeOS workspace for turning real scientific 
 
 1. Apply the database migration from the project root: `bun run db:deploy`.
 2. Copy `backend/.env.example` to `backend/.env` if you do not already have a backend environment file.
-3. Add `OPENAI_API_KEY` to `backend/.env` to enable full AI-generated analysis. Optionally set `PAPER_INTERPRETER_MODEL` (defaults to `gpt-4.1`). Never put this key in a `NEXT_PUBLIC_*` variable or commit a real key.
+3. **No API key is required by default.** `PAPER_INTERPRETER_MODE=deterministic` is the default and builds a local source index from extracted headings, likely concepts, candidate equation lines, figure/table captions, and citation strings. This is a reading aid, not a model-generated scientific interpretation. To enable optional OpenAI analysis, set `PAPER_INTERPRETER_MODE=openai`, add `OPENAI_API_KEY`, and optionally set `PAPER_INTERPRETER_MODEL` (defaults to `gpt-4.1`). Never put a key in a `NEXT_PUBLIC_*` variable or commit a real key.
 4. Run the backend in one terminal from `backend` with `cargo run`, and the frontend from the project root with `bun run dev`.
 
-DOI metadata is retrieved from Crossref. URL retrieval is restricted to HTTPS public hosts, with redirects revalidated and response sizes limited. PDF uploads are capped at 20 MB. Publisher access restrictions are not bypassed. When no API key is configured, the source and extracted text are saved but the app explicitly marks the analysis as awaiting configuration rather than inventing a breakdown. Scanned PDFs and difficult equation layouts may need OCR and are disclosed as extraction limitations.
+DOI metadata is retrieved from Crossref. URL retrieval is restricted to HTTPS public hosts, with redirects revalidated and response sizes limited. PDF uploads are capped at 20 MB. Publisher access restrictions are not bypassed. No-AI mode is the default and incurs no model API charges. It saves a deterministic source index while explicitly labelling detected terms as unvalidated and not pretending to derive equations or evaluate evidence. Set `PAPER_INTERPRETER_MODE=openai` only when you deliberately want optional model-assisted interpretation. Scanned PDFs and difficult equation layouts may need OCR and are disclosed as extraction limitations.
 
 ## Getting Started
 
