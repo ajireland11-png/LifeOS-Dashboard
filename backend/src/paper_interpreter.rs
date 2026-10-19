@@ -46,6 +46,7 @@ pub struct PaperRecord {
     created_at: i64,
     updated_at: i64,
     analyzed_at: Option<i64>,
+    last_viewed_at: Option<i64>,
 }
 
 fn record_from_row(row: &sqlx::sqlite::SqliteRow, include_content: bool) -> Result<PaperRecord, sqlx::Error> {
@@ -80,13 +81,14 @@ fn record_from_row(row: &sqlx::sqlite::SqliteRow, include_content: bool) -> Resu
         created_at: row.try_get("createdAt")?,
         updated_at: row.try_get("updatedAt")?,
         analyzed_at: row.try_get("analyzedAt")?,
+        last_viewed_at: row.try_get("lastViewedAt")?,
     })
 }
 
-const SELECT_COLUMNS: &str = "id,title,authors,journal,year,doi,sourceUrl,inputType,fileName,status,stage,error,notes,bookmarked,metadataJson,analysisJson,analysisHistoryJson,conceptLinksJson,annotationsJson,extractedText,(sourceFile IS NOT NULL) AS hasDocument,createdAt,updatedAt,analyzedAt";
+const SELECT_COLUMNS: &str = "id,title,authors,journal,year,doi,sourceUrl,inputType,fileName,status,stage,error,notes,bookmarked,metadataJson,analysisJson,analysisHistoryJson,conceptLinksJson,annotationsJson,extractedText,(sourceFile IS NOT NULL) AS hasDocument,createdAt,updatedAt,analyzedAt,lastViewedAt";
 
 pub async fn list_papers(State(state): State<AppState>) -> Result<Json<Vec<PaperRecord>>, AppError> {
-    let sql = format!("SELECT {SELECT_COLUMNS} FROM PaperInterpreterPaper ORDER BY updatedAt DESC");
+    let sql = format!("SELECT {SELECT_COLUMNS} FROM PaperInterpreterPaper ORDER BY COALESCE(lastViewedAt,updatedAt) DESC");
     let rows = sqlx::query(&sql).fetch_all(&state.db).await?;
     let records = rows.iter().map(|r| record_from_row(r, false)).collect::<Result<Vec<_>, _>>()?;
     Ok(Json(records))
@@ -182,6 +184,14 @@ pub async fn update_paper(State(state): State<AppState>, Path(id): Path<String>,
     let sql = format!("SELECT {SELECT_COLUMNS} FROM PaperInterpreterPaper WHERE id=?");
     let row = sqlx::query(&sql).bind(id).fetch_one(&state.db).await?;
     Ok(Json(record_from_row(&row, true)?))
+}
+
+pub async fn mark_viewed(State(state): State<AppState>, Path(id): Path<String>) -> Result<Json<Value>, AppError> {
+    let now = now_ms();
+    let result = sqlx::query("UPDATE PaperInterpreterPaper SET lastViewedAt=? WHERE id=?")
+        .bind(now).bind(&id).execute(&state.db).await?;
+    if result.rows_affected() == 0 { return Err(AppError::NotFound("Paper workspace not found".into())); }
+    Ok(Json(json!({"success": true, "lastViewedAt": now})))
 }
 
 pub async fn delete_paper(State(state): State<AppState>, Path(id): Path<String>) -> Result<Json<Value>, AppError> {
