@@ -9,7 +9,7 @@ use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use serde::Serialize;
 use serde_json::{json, Value};
 use sqlx::Row;
-use std::{net::IpAddr, time::Duration};
+use std::{net::{IpAddr, SocketAddr}, time::Duration};
 use url::Url;
 
 use crate::{error::AppError, utils::{gen_id, now_ms}, AppState};
@@ -243,7 +243,7 @@ fn is_public_ip(ip: IpAddr) -> bool {
     }
 }
 
-async fn validate_public_url(url: &Url) -> Result<(), String> {
+async fn resolve_public_url(url: &Url) -> Result<Option<SocketAddr>, String> {
     if url.scheme() != "https" { return Err("For safety, remote paper URLs must use HTTPS.".into()); }
     if !url.username().is_empty() || url.password().is_some() { return Err("URLs containing embedded credentials are not accepted.".into()); }
     if url.port().map(|port| port != 443).unwrap_or(false) { return Err("Remote paper retrieval is limited to the standard HTTPS port.".into()); }
@@ -253,23 +253,31 @@ async fn validate_public_url(url: &Url) -> Result<(), String> {
     }
     if let Ok(ip) = host.parse::<IpAddr>() {
         if !is_public_ip(ip) { return Err("Local or private IP addresses cannot be retrieved.".into()); }
-    } else {
-        let port = url.port_or_known_default().unwrap_or(443);
-        let addresses = tokio::net::lookup_host((host, port)).await.map_err(|_| "Could not resolve the source host.".to_string())?;
-        let resolved: Vec<IpAddr> = addresses.map(|a| a.ip()).collect();
-        if resolved.is_empty() || resolved.iter().any(|ip| !is_public_ip(*ip)) {
-            return Err("The source hostname resolves to a local or non-public address and was blocked.".into());
-        }
+        return Ok(None);
     }
-    Ok(())
+    let port = url.port_or_known_default().unwrap_or(443);
+    let addresses: Vec<SocketAddr> = tokio::net::lookup_host((host, port)).await.map_err(|_| "Could not resolve the source host.".to_string())?.collect();
+    if addresses.is_empty() || addresses.iter().any(|address| !is_public_ip(address.ip())) {
+        return Err("The source hostname resolves to a local or non-public address and was blocked.".into());
+    }
+    Ok(addresses.first().copied())
+}
+
+async fn validate_public_url(url: &Url) -> Result<(), String> {
+    resolve_public_url(url).await.map(|_| ())
 }
 
 async fn fetch_remote(start: &str) -> Result<(Url, String, Vec<u8>), String> {
-    let client = reqwest::Client::builder().timeout(Duration::from_secs(25)).redirect(reqwest::redirect::Policy::none())
-        .user_agent("LifeOS-PaperInterpreter/1.0 (personal research reader)").build().map_err(|e| e.to_string())?;
     let mut current = Url::parse(start).map_err(|_| "The source URL is invalid.".to_string())?;
     for _ in 0..6 {
-        validate_public_url(&current).await?;
+        // Resolve and pin each hop separately to reduce DNS-rebinding SSRF risk.
+        let pinned_address = resolve_public_url(&current).await?;
+        let mut builder = reqwest::Client::builder().timeout(Duration::from_secs(25)).redirect(reqwest::redirect::Policy::none())
+            .user_agent("LifeOS-PaperInterpreter/1.0 (personal research reader)");
+        if let (Some(host), Some(address)) = (current.host_str(), pinned_address) {
+            builder = builder.resolve(host, address);
+        }
+        let client = builder.build().map_err(|e| e.to_string())?;
         let response = client.get(current.clone()).send().await.map_err(|e| format!("Could not retrieve the source: {e}"))?;
         if response.status().is_redirection() {
             let location = response.headers().get(header::LOCATION).and_then(|v| v.to_str().ok()).ok_or_else(|| "The source redirected without a valid location.".to_string())?;
