@@ -516,6 +516,25 @@ async fn fail(pool: &sqlx::SqlitePool, id: &str, message: &str) {
     update_stage(pool,id,"failed","Processing failed — retry available",Some(message)).await;
 }
 
+
+/// Resume durable jobs left in a non-terminal state by a previous backend process.
+/// The source and extracted text are persisted before analysis, so a restart can
+/// safely retry retrieval or continue from the extracted document.
+pub async fn resume_incomplete(pool: sqlx::SqlitePool) {
+    match sqlx::query("SELECT id FROM PaperInterpreterPaper WHERE status IN ('submitted','extracting','analysing') ORDER BY createdAt ASC")
+        .fetch_all(&pool).await {
+        Ok(rows) => {
+            for row in rows {
+                if let Ok(id) = row.try_get::<String, _>("id") {
+                    let job_pool = pool.clone();
+                    tokio::spawn(async move { process_paper(job_pool, id).await; });
+                }
+            }
+        }
+        Err(error) => tracing::warn!("Paper Interpreter recovery skipped; apply the database migration first: {error}"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
