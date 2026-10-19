@@ -323,7 +323,7 @@ pub async fn search(
                 updated_at: updated.clone(),
                 module: "paper-interpreter".to_string(),
                 icon: "Network".to_string(),
-                color: "sage".to_string(),
+                color: "amber".to_string(),
             });
         }
     }
