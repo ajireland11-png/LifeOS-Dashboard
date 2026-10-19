@@ -740,6 +740,37 @@ model ResearchPaper {
 
 
 // ============================================
+// SCIENTIFIC PAPER INTERPRETER — persistent source and analysis workspaces
+model PaperInterpreterPaper {
+  id            String   @id
+  title         String
+  authors       String?
+  journal       String?
+  year          Int?
+  doi           String?
+  sourceUrl     String?
+  inputType     String
+  fileName      String?
+  sourceFile    Bytes?
+  extractedText String?
+  metadataJson  String?
+  analysisJson  String?
+  status        String   @default("submitted")
+  stage         String   @default("Submitted")
+  error         String?
+  notes         String   @default("")
+  bookmarked    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  analyzedAt    DateTime?
+
+  @@index([status])
+  @@index([updatedAt])
+  @@index([doi])
+  @@index([sourceUrl])
+}
+
+// ============================================
 // FRIENDS & FAMILY — private people and dates
 // ============================================
 model Person {
