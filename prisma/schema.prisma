@@ -755,6 +755,7 @@ model PaperInterpreterPaper {
   extractedText String?
   metadataJson  String?
   analysisJson  String?
+  analysisHistoryJson String @default("[]")
   conceptLinksJson String  @default("{}")
   annotationsJson  String  @default("{}")
   status        String   @default("submitted")
