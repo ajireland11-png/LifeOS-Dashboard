@@ -92,7 +92,7 @@ export function PaperInterpreterPage(){
   let subjects=learnSubjects
   const refreshed=await fetch('/api/explore/subjects')
   if(refreshed.ok){const data=await refreshed.json();if(Array.isArray(data)){subjects=data;setLearnSubjects(data)}}
-  const normal=(s:string)=>s.trim().toLocaleLowerCase().replace(/\\s+/g,' ')
+  const normal=(s:string)=>s.trim().toLocaleLowerCase().replace(/\s+/g,' ')
   let target=subjects.find(s=>normal(s.title)===normal(concept.title))
   if(!target){const layers={intuitive:concept.definition||concept.whyItMatters||'',mechanism:concept.explanation||'',technical:'',examples:'',applications:'',advanced:concept.limitations||''};const created=await fetch('/api/explore/subjects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:concept.title,summary:concept.whyItMatters||concept.definition||'',content:concept.explanation||concept.definition||'',kind:'concept',status:'not-started',bookmarked:false,position:subjects.length,prerequisites:concept.prerequisites||[],related:[],references:[],layers})});const data=await created.json();if(!created.ok)throw new Error(data.error||'Could not create a Learn entry.');target=data as LearnSubject;setLearnSubjects(prev=>[...prev,target!])}
   const conceptLinks={...(selected.conceptLinks||{}),[concept.id]:target.id}
