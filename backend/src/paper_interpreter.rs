@@ -413,7 +413,7 @@ fn build_deterministic_analysis(title: &str, doi: Option<&str>, source_url: Opti
     ];
     let mut concepts = Vec::new();
     for (index, (name, aliases)) in concept_terms.iter().enumerate() {
-        if let Some(alias) = aliases.iter().find(|alias| source_lower.contains(**alias)) {
+        if let Some(alias) = aliases.iter().find(|alias| source_lower.contains(*alias)) {
             let context = source_text.split(|ch| matches!(ch, '.' | '?' | '!')).map(str::trim)
                 .find(|sentence| sentence.to_lowercase().contains(alias)).unwrap_or("");
             let quote = if context.is_empty() { Value::Null } else { json!(context.chars().take(240).collect::<String>()) };
@@ -697,7 +697,7 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
 
     let source_text: String = extracted.chars().take(MAX_ANALYSIS_CHARS).collect();
     let provider_mode = std::env::var("PAPER_INTERPRETER_MODE").unwrap_or_else(|_| "deterministic".into()).to_ascii_lowercase();
-    if provider_mode != "openai" {
+    if provider_mode != "openai" && provider_mode != "ollama" {
         update_stage(&pool, &id, "analysing", "Building a local, no-AI source index", None).await;
         let analysis = build_deterministic_analysis(&title, doi.as_deref(), final_url.as_deref().or(source_url.as_deref()), &source_text, &input_type, limitation.as_deref());
         let saved_limitation = Some("No-AI mode is active. The source index is saved, but scientific interpretation, equation derivations, and evidence evaluation have not been generated. Set PAPER_INTERPRETER_MODE=openai to enable optional model-assisted analysis.");
@@ -747,17 +747,24 @@ SOURCE TEXT:
         metadata=metadata.to_string(),
         source_text=source_text
     );
-    let model = std::env::var("PAPER_INTERPRETER_MODEL").unwrap_or_else(|_| "gpt-4.1".into());
+    let model = std::env::var("PAPER_INTERPRETER_MODEL").unwrap_or_else(|_| {
+        if provider_mode == "ollama" { "llama3.1".into() } else { "gpt-4.1".into() }
+    });
+    let endpoint = if provider_mode == "ollama" {
+        std::env::var("PAPER_INTERPRETER_OLLAMA_URL").unwrap_or_else(|_| "http://127.0.0.1:11434/v1/chat/completions".into())
+    } else {
+        "https://api.openai.com/v1/chat/completions".into()
+    };
     let client = match reqwest::Client::builder().timeout(Duration::from_secs(240)).build() {
         Ok(c)=>c,Err(e)=>{fail(&pool,&id,&format!("Could not initialise the analysis client: {e}")).await;return;}
     };
-    let response = client.post("https://api.openai.com/v1/chat/completions")
-        .bearer_auth(api_key)
+    let mut request = client.post(&endpoint)
         .json(&json!({"model":model,"temperature":0.2,"max_tokens":14000,"response_format":{"type":"json_object"},"messages":[
             {"role":"system","content":"You are a rigorous scientific educator and research-methods interpreter. Be accurate, transparent about uncertainty, and source-grounded."},
             {"role":"user","content":prompt}
-        ]}))
-        .send().await;
+        ]}));
+    if let Some(key) = api_key.as_deref() { request = request.bearer_auth(key); }
+    let response = request.send().await;
     let response = match response {
         Ok(r) if r.status().is_success()=>r,
         Ok(r)=>{let status=r.status();let detail=r.text().await.unwrap_or_default();let detail=detail.chars().take(700).collect::<String>();fail(&pool,&id,&format!("AI analysis request failed ({status}): {detail}")).await;return;}
