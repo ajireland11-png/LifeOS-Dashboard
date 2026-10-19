@@ -11,6 +11,7 @@ export type ModuleId =
   | 'projects'
   | 'house'
   | 'research'
+  | 'paper-interpreter'
   | 'family'
   | 'archive'
 
