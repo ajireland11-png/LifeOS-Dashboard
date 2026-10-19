@@ -236,3 +236,11 @@
 .pi-annotation textarea{width:100%;min-height:68px;padding:9px;border:1px solid var(--pi-rule);background:rgba(8,10,8,.22);color:var(--pi-ink);font:12px/1.7 Georgia,serif;resize:vertical;text-transform:none;letter-spacing:normal}
 .pi-annotation button{display:inline-flex;align-items:center;justify-self:start;gap:6px;padding:7px 9px;border:1px solid rgba(113,133,117,.35);background:rgba(113,133,117,.09);color:#bfd0b9;font-size:10px}
 .pi-annotation button:hover:not(:disabled){background:rgba(113,133,117,.16)}
+
+.pi-reference-list{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.pi-reference-list li{display:grid;gap:5px;padding:0 0 10px;border-bottom:1px solid rgba(201,190,164,.09)}
+.pi-reference-list li:last-child{padding-bottom:0;border-bottom:0}
+.pi-reference-list li>span{color:#c5c6ba;font-size:10px;line-height:1.65}
+.pi-reference-list li>small{color:var(--pi-muted);font-size:9px}
+.pi-reference-list li>a{display:inline-flex;align-items:center;gap:5px;width:max-content;color:var(--pi-brass);font-size:10px;text-decoration:none}
+.pi-reference-list li>a:hover{text-decoration:underline}
