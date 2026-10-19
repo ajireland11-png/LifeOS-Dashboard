@@ -31,6 +31,7 @@ import { StudioPage } from './studio/studio-page'
 import { ProjectsPage } from './projects/projects-page'
 import { HousePage } from './house/house-page'
 import { ResearchPage } from './research/research-page'
+import { PaperInterpreterPage } from './paper-interpreter/paper-interpreter-page'
 import { FriendsFamilyPage } from './family/friends-family-page'
 import { ArchivePage } from './archive/archive-page'
 
@@ -44,6 +45,7 @@ const moduleComponents: Record<string, React.ComponentType> = {
   projects: ProjectsPage,
   house: HousePage,
   research: ResearchPage,
+  'paper-interpreter': PaperInterpreterPage,
   family: FriendsFamilyPage,
   archive: ArchivePage,
 
