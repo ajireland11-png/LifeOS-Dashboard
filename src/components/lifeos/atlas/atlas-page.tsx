@@ -18,7 +18,7 @@ import { SectionPage } from "@/components/lifeos/shared/section-page"
 import { motion } from "framer-motion"
 import { useAppStore } from "@/stores/app-store"
 
-type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem" | "knowledge" | "person" | "persondate" | "paper" | "figure" | "dataset"
+type EntityType = "note" | "project" | "task" | "goal" | "habit" | "bookmark" | "subject" | "studioitem" | "knowledge" | "person" | "persondate" | "paper" | "figure" | "dataset" | "interpreterpaper"
 
 type AtlasNode = {
   id: string
@@ -215,10 +215,11 @@ function AtlasLandscape({
     paper: { label: "Research papers", mark: "P", colour: "#718575" },
     figure: { label: "Figures", mark: "F", colour: "#d5a68d" },
     dataset: { label: "Datasets", mark: "D", colour: "#a5b9a5" },
+    interpreterpaper: { label: "Paper Interpreter", mark: "I", colour: "#c6a56b" },
   }
 
   const groups: { id: string; title: string; note: string; types: EntityType[]; x: number }[] = [
-    { id: "ideas", title: "Research & references", note: "Papers, questions, notes and things worth keeping", types: ["paper", "figure", "dataset", "knowledge", "subject", "bookmark", "note"], x: 170 },
+    { id: "ideas", title: "Research & references", note: "Papers, questions, notes and things worth keeping", types: ["paper", "interpreterpaper", "figure", "dataset", "knowledge", "subject", "bookmark", "note"], x: 170 },
     { id: "making", title: "Make & explore", note: "Projects and creative threads", types: ["studioitem", "project"], x: 500 },
     { id: "practice", title: "Practice & commitments", note: "Goals, habits and next actions", types: ["goal", "habit", "task"], x: 830 },
     { id: "people", title: "People & moments", note: "Relationships, dates and shared commitments", types: ["person", "persondate"], x: 1160 },
@@ -229,7 +230,7 @@ function AtlasLandscape({
     .filter(edge => (edge.sourceType === "paper" && edge.targetType === "task") || (edge.sourceType === "task" && edge.targetType === "paper"))
     .map(edge => edge.sourceType === "task" ? edge.sourceId : edge.targetId))
   const filtered = nodes.filter(node => {
-    const matchesView = view === "research" ? ["paper", "figure", "dataset"].includes(node.type) || (node.type === "task" && researchTaskIds.has(node.id))
+    const matchesView = view === "research" ? ["paper", "interpreterpaper", "figure", "dataset"].includes(node.type) || (node.type === "task" && researchTaskIds.has(node.id))
       : view === "learning" ? ["subject", "knowledge"].includes(node.type)
       : view === "creative" ? ["studioitem", "project"].includes(node.type)
       : view === "work" ? ["goal", "habit", "task", "project"].includes(node.type)
@@ -641,8 +642,9 @@ export function AtlasPage() {
                       key={`${result.id}-${index}`}
                       className="lo-atlas-search-result"
                       onClick={() => {
-                        const destination: Record<string, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", paper: "research", researchpaper: "research" }
+                        const destination: Record<string, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", paper: "research", researchpaper: "research", interpreterpaper: "paper-interpreter" }
                         if (result.type === "paper" || result.type === "researchpaper") useAppStore.getState().setResearchPaperRequest(result.id)
+                        if (result.type === "interpreterpaper") useAppStore.getState().setPaperInterpreterRequest(result.id)
                         if (result.type === "task") useAppStore.getState().setTaskRequest(result.id)
                         if (result.type === "note") useAppStore.getState().setNoteRequest(result.id)
                         if (result.type === "project") useAppStore.getState().setProjectRequest(result.id)
@@ -669,8 +671,9 @@ export function AtlasPage() {
         </section>
 
         <AtlasLandscape nodes={nodes} edges={edges} query={search} onOpen={(node) => {
-          const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", person: "family", persondate: "family", paper: "research", figure: "research", dataset: "research" }
+          const destination: Record<EntityType, string> = { note: "notes", project: "projects", task: "tasks", goal: "goals", habit: "habits", bookmark: "explore", subject: "learn", studioitem: "studio", knowledge: "atlas", person: "family", persondate: "family", paper: "research", figure: "research", dataset: "research", interpreterpaper: "paper-interpreter" }
           if(node.type === "paper") useAppStore.getState().setResearchPaperRequest(node.id)
+          if(node.type === "interpreterpaper") useAppStore.getState().setPaperInterpreterRequest(node.id)
           if(node.type === "task") useAppStore.getState().setTaskRequest(node.id)
           if(node.type === "note") useAppStore.getState().setNoteRequest(node.id)
           if(node.type === "project") useAppStore.getState().setProjectRequest(node.id)
