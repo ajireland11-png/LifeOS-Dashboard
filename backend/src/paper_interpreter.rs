@@ -529,7 +529,8 @@ SOURCE TEXT:
     let response_json=match response.json::<Value>().await{Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The AI provider returned unreadable JSON: {e}")).await;return;}};
     let answer=response_json.get("choices").and_then(Value::as_array).and_then(|a|a.first()).and_then(|v|v.get("message")).and_then(|v|v.get("content")).and_then(Value::as_str);
     let Some(answer)=answer else {fail(&pool,&id,"The AI provider returned no analysis content. Retry the analysis.").await;return;};
-    let analysis=match serde_json::from_str::<Value>(answer){Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The analysis response was not valid structured JSON: {e}")).await;return;}};
+    let mut analysis=match serde_json::from_str::<Value>(answer){Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The analysis response was not valid structured JSON: {e}")).await;return;}};
+    normalize_analysis_provenance(&mut analysis, &extracted, &model, &input_type);
     if let Some(references) = analysis.get_mut("references").and_then(Value::as_array_mut) {
         for reference in references {
             if let Some(object) = reference.as_object_mut() {
@@ -554,6 +555,50 @@ SOURCE TEXT:
         .bind(analysis.to_string()).bind(history_json).bind(if limitation.is_some(){"completed_with_limitations"}else{"completed"})
         .bind(if limitation.is_some(){"Analysis generated with source limitations"}else{"Complete scientific breakdown generated"})
         .bind(limitation).bind(now).bind(now).bind(&id).execute(&pool).await;
+}
+
+fn normalize_analysis_provenance(analysis: &mut Value, source_text: &str, model: &str, source_type: &str) {
+    let normalized_source = source_text.split_whitespace().collect::<Vec<_>>().join(" ").to_lowercase();
+    if let Some(concepts) = analysis.get_mut("concepts").and_then(Value::as_array_mut) {
+        for concept in concepts {
+            if let Some(locations) = concept.get_mut("sourceLocations").and_then(Value::as_array_mut) {
+                for location in locations {
+                    if let Some(object) = location.as_object_mut() {
+                        object.insert("page".into(), Value::Null);
+                        object.insert("pageNumberVerified".into(), Value::Bool(false));
+                        let quote = object.get("quote").and_then(Value::as_str).map(str::to_string);
+                        let verified = quote.as_ref().map(|q| {
+                            let normalized_quote = q.split_whitespace().collect::<Vec<_>>().join(" ").to_lowercase();
+                            !normalized_quote.is_empty() && normalized_source.contains(&normalized_quote)
+                        }).unwrap_or(false);
+                        if !verified { object.insert("quote".into(), Value::Null); }
+                        object.insert("quoteVerified".into(), Value::Bool(verified));
+                    }
+                }
+            }
+        }
+    }
+    if !analysis.get("provenance").map(Value::is_object).unwrap_or(false) {
+        analysis["provenance"] = json!({});
+    }
+    if let Some(provenance) = analysis.get_mut("provenance").and_then(Value::as_object_mut) {
+        provenance.insert("model".into(), json!(model));
+        provenance.insert("sourceType".into(), json!(source_type));
+        provenance.insert("sourceCoverage".into(), json!(format!(
+            "{} characters of extracted source text. Page offsets are not preserved by the current extractor, and embedded figure pixels are not automatically extracted; figure interpretations rely on text and captions available to the analysis.",
+            source_text.chars().count()
+        )));
+        let limitations = provenance.entry("limitations").or_insert_with(|| json!([]));
+        if let Some(list) = limitations.as_array_mut() {
+            for note in [
+                "Page-level offsets are not preserved by the current PDF text extractor.",
+                "Embedded figure images are not automatically extracted; figure interpretations are limited to available captions and text.",
+                "Source quotations are retained only when their text can be matched against the extracted source."
+            ] {
+                if !list.iter().any(|v| v.as_str() == Some(note)) { list.push(json!(note)); }
+            }
+        }
+    }
 }
 
 async fn fail(pool: &sqlx::SqlitePool, id: &str, message: &str) {
