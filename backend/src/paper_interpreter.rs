@@ -373,7 +373,8 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
                         final_url=Some(u.to_string());
                         if mime.to_ascii_lowercase().contains("pdf") || bytes.starts_with(b"%PDF-") {
                             match pdf_extract::extract_text_from_mem(&bytes) {
-                                Ok(text) => Ok((Some(u),mime,text.into_bytes())),
+                                Ok(text) if text.chars().count() > 250 => Ok((Some(u),mime,bytes)),
+                                Ok(_) => Err("The PDF was retrieved but contains too little selectable text. A scanned PDF may require OCR; upload a text-based PDF if available.".into()),
                                 Err(e) => Err(format!("The PDF was retrieved but its text could not be extracted: {e}. A scanned PDF may require OCR; upload a text-based PDF if available.")),
                             }
                         } else if mime.to_ascii_lowercase().contains("html") || bytes.starts_with(b"<!DOCTYPE html") || bytes.starts_with(b"<html") {
