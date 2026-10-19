@@ -756,6 +756,7 @@ model PaperInterpreterPaper {
   metadataJson  String?
   analysisJson  String?
   conceptLinksJson String  @default("{}")
+  annotationsJson  String  @default("{}")
   status        String   @default("submitted")
   stage         String   @default("Submitted")
   error         String?
