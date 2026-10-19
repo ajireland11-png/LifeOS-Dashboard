@@ -3,7 +3,7 @@
 import "./home-page.css"
 
 import { useEffect, useMemo, useState } from "react"
-import { ArrowUpRight, BookOpen, CalendarDays, Compass, FlaskConical, House, Search, Sparkles, UsersRound } from "lucide-react"
+import { ArrowUpRight, BookOpen, CalendarDays, Compass, FlaskConical, FileSearch, House, Search, Sparkles, UsersRound } from "lucide-react"
 import { SectionPage } from "@/components/lifeos/shared/section-page"
 import { useAppStore } from "@/stores/app-store"
 
@@ -45,6 +45,7 @@ export function HomePage(){
      <nav className="lifeos-home-quick-nav">
       <button onClick={()=>setActiveModule("tasks")}><CalendarDays/><span>Tasks</span><small>{openTasks.length}</small></button>
       <button onClick={()=>setActiveModule("research")}><FlaskConical/><span>Research</span><small>{papers.length}</small></button>
+      <button onClick={()=>setActiveModule("paper-interpreter")}><FileSearch/><span>Paper Interpreter</span><small>↗</small></button>
       <button onClick={()=>setActiveModule("learn")}><BookOpen/><span>Learn</span><small>{subjects.length}</small></button>
       <button onClick={()=>setActiveModule("family")}><UsersRound/><span>People</span><small>{people.length}</small></button>
       <button onClick={requestNewNote}><BookOpen/><span>New note</span><small>+</small></button>
