@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './paper-interpreter-page.css'
 import { useAppStore } from '@/stores/app-store'
 import {
@@ -53,14 +53,86 @@ function ConceptBranch({concept,all,depth=0,links,onLink,onOpenLinked,linkingId,
   {open&&children.length>0&&<div className="pi-concept-children">{children.map(child=><ConceptBranch key={child.id} concept={child} all={all} depth={depth+1} links={links} onLink={onLink} onOpenLinked={onOpenLinked} linkingId={linkingId} annotations={annotations} onSaveAnnotation={onSaveAnnotation} savingAnnotationId={savingAnnotationId}/>)}</div>}
  </div>
 }
+type MathAtom = {node:React.ReactNode;sub?:React.ReactNode;sup?:React.ReactNode}
+const greek:Record<string,string>={alpha:'α',beta:'β',gamma:'γ',delta:'δ',epsilon:'ε',varepsilon:'ϵ',zeta:'ζ',eta:'η',theta:'θ',vartheta:'ϑ',iota:'ι',kappa:'κ',lambda:'λ',mu:'μ',nu:'ν',xi:'ξ',pi:'π',rho:'ρ',sigma:'σ',tau:'τ',upsilon:'υ',phi:'φ',varphi:'ϕ',chi:'χ',psi:'ψ',omega:'ω',Gamma:'Γ',Delta:'Δ',Theta:'Θ',Lambda:'Λ',Xi:'Ξ',Pi:'Π',Sigma:'Σ',Phi:'Φ',Psi:'Ψ',Omega:'Ω'}
+const mathOperators:Record<string,string>={cdot:'·',times:'×',pm:'±',mp:'∓',approx:'≈',sim:'∼',propto:'∝',leq:'≤',le:'≤',geq:'≥',ge:'≥',neq:'≠',in:'∈',notin:'∉',subset:'⊂',subseteq:'⊆',supset:'⊃',cup:'∪',cap:'∩',sum:'∑',prod:'∏',int:'∫',iint:'∬',iiint:'∭',partial:'∂',nabla:'∇',infty:'∞',to:'→',rightarrow:'→',leftarrow:'←',Rightarrow:'⇒',Leftrightarrow:'⇔',equiv:'≡',forall:'∀',exists:'∃',perp:'⊥',parallel:'∥',degree:'°',ell:'ℓ',hbar:'ℏ',Re:'ℜ',Im:'ℑ'}
+function LatexMath({source}:{source:string}){
+ const cleaned=source.trim().replace(/^\\\(|\\\)$/g,'').replace(/^\$|\$/g,'')
+ const unsupported=/\\begin\s*\{/.test(cleaned)
+ const rendered=useMemo(()=>{
+  if(!cleaned||unsupported)return null
+  const tokens=cleaned.match(/\\[a-zA-Z]+|\\.|[{}_^]|[A-Za-z]+|\d+(?:\.\d+)?|[^\s]/g)||[]
+  if(tokens.length>900)return null
+  let pos=0,serial=0
+  const key=()=>serial++
+  const element=(tag:string,children:React.ReactNode[],props:Record<string,unknown>={})=>createElement(tag as any,{...props,key:key()},...children)
+  const atom=(node:React.ReactNode,extra:Partial<MathAtom>={}):MathAtom=>({node,...extra})
+  const parseSequence=(stopAtBrace=false):MathAtom[]=>{
+   const atoms:MathAtom[]=[]
+   while(pos<tokens.length){
+    const token=tokens[pos++]
+    if(token==='}'&&stopAtBrace)break
+    if(token==='{'){atoms.push(atom(element('mrow',renderAtoms(parseSequence(true)))));continue}
+    if(token==='^'||token==='_'){
+     const arg=parseArgument(),last=atoms[atoms.length-1]
+     if(last){if(token==='^')last.sup=arg;else last.sub=arg}
+     else atoms.push(atom(element('mo',[createElement('mtext',{key:key()},token)])))
+     continue
+    }
+    const node=parseToken(token)
+    if(node!==null)atoms.push(atom(node))
+   }
+   return atoms
+  }
+  const renderAtoms=(atoms:MathAtom[]):React.ReactNode[]=>atoms.map((a,i)=>{
+   if(a.sub&&a.sup)return createElement('msubsup',{key:key()},a.node,a.sub,a.sup)
+   if(a.sub)return createElement('msub',{key:key()},a.node,a.sub)
+   if(a.sup)return createElement('msup',{key:key()},a.node,a.sup)
+   return createElement('mrow',{key:key()},a.node)
+  })
+  const parseArgument=():React.ReactNode=>{
+   if(pos>=tokens.length)return createElement('mtext',{key:key()},'?')
+   if(tokens[pos]==='{'){pos++;return element('mrow',renderAtoms(parseSequence(true)))}
+   const token=tokens[pos++],node=parseToken(token)
+   return node===null?createElement('mrow',{key:key()}):node
+  }
+  const parseToken=(token:string):React.ReactNode=>{
+   if(token.startsWith('\\')){
+    const name=token.slice(1)
+    if(['left','right','displaystyle','textstyle','scriptstyle','scriptscriptstyle','limits','nolimits','quad','qquad','enspace','thinspace'].includes(name)||['\\,','\\;','\\!','\\:','\\\\'].includes(token))return null
+    if(name==='frac'||name==='dfrac'||name==='tfrac'){const numerator=parseArgument(),denominator=parseArgument();return element('mfrac',[numerator,denominator])}
+    if(name==='sqrt'){return element('msqrt',[parseArgument()])}
+    if(['mathrm','text','operatorname'].includes(name)){return element('mstyle',[parseArgument()],{mathvariant:'normal'})}
+    if(name==='mathbf'||name==='boldsymbol'){return element('mstyle',[parseArgument()],{mathvariant:'bold'})}
+    if(name==='mathbb'){return element('mstyle',[parseArgument()],{mathvariant:'double-struck'})}
+    if(name==='mathcal'||name==='mathscr'){return element('mstyle',[parseArgument()],{mathvariant:'script'})}
+    if(['overline','bar','widehat','hat','tilde','vec'].includes(name)){const content=parseArgument();const accent=name==='overline'||name==='bar'?'¯':name==='tilde'?'~':name==='vec'?'→':'^';return element('mover',[content,createElement('mo',{key:key()},accent)],{accent:true})}
+    if(greek[name])return createElement('mi',{key:key()},greek[name])
+    if(mathOperators[name])return createElement('mo',{key:key()},mathOperators[name])
+    if(['log','ln','exp','sin','cos','tan','min','max','det','lim','argmin','argmax'].includes(name))return createElement('mi',{key:key()},name)
+    if(name===' ')return createElement('mspace',{key:key(),width:'0.3em'})
+    return createElement('mi',{key:key()},name)
+   }
+   if(/^\d+(?:\.\d+)?$/.test(token))return createElement('mn',{key:key()},token)
+   if(/^[A-Za-z]+$/.test(token))return createElement('mi',{key:key()},token)
+   if(token==='|'||token==='('||token===')'||token==='['||token===']'||token==='+'||token==='-'||token==='='||token==='<'||token==='>'||token===','||token==='.'||token===':'||token===';'||token==='/'||token==='*')return createElement('mo',{key:key()},token)
+   return createElement('mo',{key:key()},token)
+  }
+  return element('mrow',renderAtoms(parseSequence()))
+ },[cleaned,unsupported])
+ if(!cleaned)return <span className="pi-math-fallback">No equation text was extracted.</span>
+ if(!rendered)return <code className="pi-math-fallback">{cleaned}</code>
+ return <math className="pi-math-rendered" xmlns="http://www.w3.org/1998/Math/MathML" display="block">{rendered}</math>
+}
+
 function EquationView({equation}:{equation:Equation}){
  const [showDerivation,setShowDerivation]=useState(true)
  return <article className="pi-equation"><div className="pi-equation-heading"><div><span className="pi-kicker">EQUATION</span><h3>{equation.label||equation.id}</h3></div><span className={'pi-source-certainty '+(equation.sourceNotationCertain===false?'uncertain':'')}>{equation.sourceNotationCertain===false?'Notation uncertain':equation.sourceLocation?'Model-reported location':'Location not resolved'}</span></div>
-  <div className="pi-latex">{equation.latex||'Equation not reliably extracted from the source.'}</div>{equation.sourceLocation&&<p className="pi-source-location">Source: {equation.sourceLocation}</p>}
+  <div className="pi-latex">{equation.latex?<LatexMath source={equation.latex}/>:'Equation not reliably extracted from the source.'}</div>{equation.sourceLocation&&<p className="pi-source-location">Source: {equation.sourceLocation}</p>}
   {equation.purpose&&<Block title="What this equation is for">{equation.purpose}</Block>}{equation.intuition&&<Block title="Intuitive meaning" accent>{equation.intuition}</Block>}
   {!!equation.symbols?.length&&<Block title="Symbol dictionary"><div className="pi-symbol-table"><div className="pi-symbol-row pi-symbol-head"><span>Symbol</span><span>Meaning</span><span>Units / role</span></div>{equation.symbols.map((s,i)=><div className="pi-symbol-row" key={i}><code>{s.symbol}</code><span>{s.meaning}</span><span>{[s.units,s.role].filter(Boolean).join(' · ')||'Not specified'}</span></div>)}</div></Block>}
   {equation.termByTerm&&<Block title="Term-by-term interpretation">{equation.termByTerm}</Block>}
-  {!!equation.derivation?.length&&<div className="pi-derivation"><button className="pi-subsection-toggle" onClick={()=>setShowDerivation(v=>!v)}>{showDerivation?<ChevronDown size={15}/>:<ChevronRight size={15}/>} <span>Step-by-step derivation</span><small>{equation.derivation.length} steps</small></button>{showDerivation&&equation.derivation.map((d,i)=><div className="pi-derivation-step" key={i}><span className="pi-step-number">{d.step||i+1}</span><div>{d.expression&&<div className="pi-latex pi-latex-step">{d.expression}</div>}{d.operation&&<p><b>Operation</b> · {d.operation}</p>}{d.justification&&<p><b>Why valid</b> · {d.justification}</p>}{d.physicalMeaning&&<p><b>Physical meaning</b> · {d.physicalMeaning}</p>}</div></div>)}</div>}
+  {!!equation.derivation?.length&&<div className="pi-derivation"><button className="pi-subsection-toggle" onClick={()=>setShowDerivation(v=>!v)}>{showDerivation?<ChevronDown size={15}/>:<ChevronRight size={15}/>} <span>Step-by-step derivation</span><small>{equation.derivation.length} steps</small></button>{showDerivation&&equation.derivation.map((d,i)=><div className="pi-derivation-step" key={i}><span className="pi-step-number">{d.step||i+1}</span><div>{d.expression&&<div className="pi-latex pi-latex-step"><LatexMath source={d.expression}/></div>}{d.operation&&<p><b>Operation</b> · {d.operation}</p>}{d.justification&&<p><b>Why valid</b> · {d.justification}</p>}{d.physicalMeaning&&<p><b>Physical meaning</b> · {d.physicalMeaning}</p>}</div></div>)}</div>}
   {equation.paperApplication&&<Block title="How this paper uses it">{equation.paperApplication}</Block>}{equation.workedExample&&<Block title="Worked example">{equation.workedExample}</Block>}{!!equation.assumptions?.length&&<Block title="Assumptions and validity"><TextList items={equation.assumptions}/></Block>}{!!equation.limitingCases?.length&&<Block title="Limiting cases"><TextList items={equation.limitingCases}/></Block>}{!!equation.commonMisunderstandings?.length&&<Block title="Common misunderstandings"><TextList items={equation.commonMisunderstandings}/></Block>}{!!equation.uncertainties?.length&&<Block title="Uncertainties"><TextList items={equation.uncertainties}/></Block>}
  </article>
 }
