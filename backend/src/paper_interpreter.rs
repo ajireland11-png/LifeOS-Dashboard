@@ -9,7 +9,7 @@ use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use serde::Serialize;
 use serde_json::{json, Value};
 use sqlx::Row;
-use std::{net::{IpAddr, Ipv4Addr, Ipv6Addr}, time::Duration};
+use std::{net::IpAddr, time::Duration};
 use url::Url;
 
 use crate::{error::AppError, utils::{gen_id, now_ms}, AppState};
@@ -354,7 +354,14 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
                             if let Ok((u,mime,bytes))=fetch_remote(&pdf_url).await {
                                 if mime.to_ascii_lowercase().contains("pdf") || bytes.starts_with(b"%PDF-") {
                                     if let Ok(text)=pdf_extract::extract_text_from_mem(&bytes) {
-                                        if text.chars().count()>300 { extracted=text; final_url=Some(u.to_string()); }
+                                        if text.chars().count()>300 {
+                                            extracted=text;
+                                            final_url=Some(u.to_string());
+                                            let remote_name=u.path_segments().and_then(|mut p|p.next_back()).filter(|s|!s.is_empty()).unwrap_or("paper.pdf");
+                                            let safe_name:String=remote_name.chars().filter(|ch|ch.is_ascii_alphanumeric()||*ch=='.'||*ch=='-'||*ch=='_').take(100).collect();
+                                            let _=sqlx::query("UPDATE PaperInterpreterPaper SET sourceFile=?,fileName=?,sourceUrl=?,updatedAt=? WHERE id=?")
+                                                .bind(bytes).bind(if safe_name.is_empty(){"paper.pdf"}else{&safe_name}).bind(u.as_str()).bind(now_ms()).bind(&id).execute(&pool).await;
+                                        }
                                     }
                                 }
                             }
@@ -507,4 +514,34 @@ SOURCE TEXT:
 
 async fn fail(pool: &sqlx::SqlitePool, id: &str, message: &str) {
     update_stage(pool,id,"failed","Processing failed — retry available",Some(message)).await;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn doi_normalization_accepts_common_forms() {
+        assert_eq!(normalize_doi("doi:10.1038/nature12373").as_deref(), Some("10.1038/nature12373"));
+        assert_eq!(normalize_doi("https://doi.org/10.1038/nature12373").as_deref(), Some("10.1038/nature12373"));
+        assert!(normalize_doi("not-a-doi").is_none());
+    }
+
+    #[test]
+    fn html_cleaning_removes_markup_without_losing_text() {
+        assert_eq!(clean_html("<p>Free energy &amp; mixing</p>"), "Free energy & mixing");
+    }
+
+    #[test]
+    fn private_ip_ranges_are_rejected() {
+        assert!(!is_public_ip(IpAddr::V4("127.0.0.1".parse().unwrap())));
+        assert!(!is_public_ip(IpAddr::V4("192.168.1.10".parse().unwrap())));
+        assert!(is_public_ip(IpAddr::V4("8.8.8.8".parse().unwrap())));
+    }
+
+    #[tokio::test]
+    async fn remote_urls_must_use_https_and_cannot_target_localhost() {
+        assert!(validate_public_url(&Url::parse("http://example.org/paper.pdf").unwrap()).await.is_err());
+        assert!(validate_public_url(&Url::parse("https://localhost/paper.pdf").unwrap()).await.is_err());
+    }
 }
