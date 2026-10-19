@@ -350,6 +350,7 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
                         if let Some(abs)=msg.get("abstract").and_then(Value::as_str) { extracted=clean_html(abs); }
                         metadata = json!({"provider":"Crossref","message":msg});
                         let links = msg.get("link").and_then(Value::as_array).cloned().unwrap_or_default();
+                        let mut full_text_found = false;
                         let pdf_url = links.iter().find(|v| v.get("content-type").and_then(Value::as_str).map(|s|s.contains("pdf")).unwrap_or(false))
                             .and_then(|v|v.get("URL")).and_then(Value::as_str).map(str::to_string);
                         if let Some(pdf_url) = pdf_url {
@@ -358,6 +359,8 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
                                     if let Ok(text)=pdf_extract::extract_text_from_mem(&bytes) {
                                         if text.chars().count()>300 {
                                             extracted=text;
+                                            full_text_found = true;
+                                            limitation = None;
                                             final_url=Some(u.to_string());
                                             let remote_name=u.path_segments().and_then(|mut p|p.next_back()).filter(|s|!s.is_empty()).unwrap_or("paper.pdf");
                                             let safe_name:String=remote_name.chars().filter(|ch|ch.is_ascii_alphanumeric()||*ch=='.'||*ch=='-'||*ch=='_').take(100).collect();
@@ -368,6 +371,7 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
                                 }
                             }
                         }
+                        if !full_text_found { limitation = Some("Crossref metadata and abstract were accessible, but no open full-text PDF was retrieved. The analysis is constrained to the abstract and available metadata; upload a full-text PDF for a complete breakdown.".into()); }
                         Ok((None,"metadata".into(),Vec::new()))
                     }
                     Err(e) => Err(format!("The DOI resolver returned unreadable metadata: {e}")),
@@ -392,7 +396,7 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
                             if let Some(t)=page_title.filter(|s|!s.is_empty()){title=t;}
                             let text=clean_html(&html);
                             if text.len()<300 { Err("The publisher page did not expose enough readable full text. Upload an accessible PDF if you have one.".into()) }
-                            else { Ok((Some(u),mime,text.into_bytes())) }
+                            else { limitation = Some("Only a publisher HTML page was retrieved. Page extraction can omit full-text sections, mathematical notation, tables and figure details; upload the PDF for a more complete interpretation.".into()); Ok((Some(u),mime,text.into_bytes())) }
                         } else { Err("The URL did not return a PDF or readable article page. Try a DOI or upload the PDF.".into()) }
                     }
                     Err(e) => Err(e),
@@ -474,6 +478,7 @@ PAPER METADATA:
 Title: {title}
 DOI: {doi}
 Source URL: {source_url}
+Source limitation: {limitation}
 Metadata: {metadata}
 
 SOURCE TEXT:
@@ -481,6 +486,7 @@ SOURCE TEXT:
         title=title,
         doi=doi.as_deref().unwrap_or("not supplied"),
         source_url=final_url.as_deref().unwrap_or("not supplied"),
+        limitation=limitation.as_deref().unwrap_or("No known source limitation beyond ordinary text extraction uncertainty."),
         metadata=metadata.to_string(),
         source_text=source_text
     );
