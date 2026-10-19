@@ -22,7 +22,8 @@ CREATE TABLE "PaperInterpreterPaper" (
   "bookmarked" BOOLEAN NOT NULL DEFAULT false,
   "createdAt" BIGINT NOT NULL,
   "updatedAt" BIGINT NOT NULL,
-  "analyzedAt" BIGINT
+  "analyzedAt" BIGINT,
+  "lastViewedAt" BIGINT
 );
 CREATE INDEX "PaperInterpreterPaper_status_idx" ON "PaperInterpreterPaper"("status");
 CREATE INDEX "PaperInterpreterPaper_updatedAt_idx" ON "PaperInterpreterPaper"("updatedAt");
