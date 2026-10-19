@@ -5,6 +5,7 @@ import {
   BookOpen,
   FolderKanban,
   FlaskConical,
+  FileSearch,
   Home,
   Library,
   Menu,
@@ -23,6 +24,7 @@ const primaryNavigation: {
 }[] = [
   { id: 'home', label: 'Overview', icon: Home },
   { id: 'research', label: 'Research', icon: FlaskConical },
+  { id: 'paper-interpreter', label: 'Paper Interpreter', icon: FileSearch },
   { id: 'studio', label: 'Creative Studio', icon: Sparkles },
   { id: 'learn', label: 'Learn', icon: BookOpen },
   { id: 'family', label: 'Friends & Family', icon: UsersRound },
