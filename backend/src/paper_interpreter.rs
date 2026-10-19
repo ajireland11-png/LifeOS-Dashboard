@@ -38,6 +38,7 @@ struct PaperRecord {
     metadata: Option<Value>,
     analysis: Option<Value>,
     concept_links: Value,
+    annotations: Value,
     extracted_text: Option<String>,
     extracted_character_count: usize,
     has_document: bool,
@@ -70,6 +71,7 @@ fn record_from_row(row: &sqlx::sqlite::SqliteRow, include_content: bool) -> Resu
         metadata: parse("metadataJson"),
         analysis: if include_content { parse("analysisJson") } else { None },
         concept_links: parse("conceptLinksJson").unwrap_or_else(|| json!({})),
+        annotations: parse("annotationsJson").unwrap_or_else(|| json!({})),
         extracted_text: if include_content { extracted } else { None },
         extracted_character_count,
         has_document: row.try_get::<Option<i64>, _>("hasDocument").unwrap_or(Some(0)).unwrap_or(0) != 0,
@@ -79,7 +81,7 @@ fn record_from_row(row: &sqlx::sqlite::SqliteRow, include_content: bool) -> Resu
     })
 }
 
-const SELECT_COLUMNS: &str = "id,title,authors,journal,year,doi,sourceUrl,inputType,fileName,status,stage,error,notes,bookmarked,metadataJson,analysisJson,conceptLinksJson,extractedText,(sourceFile IS NOT NULL) AS hasDocument,createdAt,updatedAt,analyzedAt";
+const SELECT_COLUMNS: &str = "id,title,authors,journal,year,doi,sourceUrl,inputType,fileName,status,stage,error,notes,bookmarked,metadataJson,analysisJson,conceptLinksJson,annotationsJson,extractedText,(sourceFile IS NOT NULL) AS hasDocument,createdAt,updatedAt,analyzedAt";
 
 pub async fn list_papers(State(state): State<AppState>) -> Result<Json<Vec<PaperRecord>>, AppError> {
     let sql = format!("SELECT {SELECT_COLUMNS} FROM PaperInterpreterPaper ORDER BY updatedAt DESC");
@@ -171,8 +173,8 @@ pub async fn update_paper(State(state): State<AppState>, Path(id): Path<String>,
     let notes = body.get("notes").and_then(Value::as_str).map(str::to_string);
     let bookmarked = body.get("bookmarked").and_then(Value::as_bool);
     let now = now_ms();
-    let result = sqlx::query("UPDATE PaperInterpreterPaper SET title=COALESCE(?,title),notes=COALESCE(?,notes),bookmarked=COALESCE(?,bookmarked),conceptLinksJson=COALESCE(?,conceptLinksJson),updatedAt=? WHERE id=?")
-        .bind(title).bind(notes).bind(bookmarked).bind(body.get("conceptLinks").map(Value::to_string)).bind(now).bind(&id).execute(&state.db).await?;
+    let result = sqlx::query("UPDATE PaperInterpreterPaper SET title=COALESCE(?,title),notes=COALESCE(?,notes),bookmarked=COALESCE(?,bookmarked),conceptLinksJson=COALESCE(?,conceptLinksJson),annotationsJson=COALESCE(?,annotationsJson),updatedAt=? WHERE id=?")
+        .bind(title).bind(notes).bind(bookmarked).bind(body.get("conceptLinks").map(Value::to_string)).bind(body.get("annotations").map(Value::to_string)).bind(now).bind(&id).execute(&state.db).await?;
     if result.rows_affected() == 0 { return Err(AppError::NotFound("Paper workspace not found".into())); }
     let sql = format!("SELECT {SELECT_COLUMNS} FROM PaperInterpreterPaper WHERE id=?");
     let row = sqlx::query(&sql).bind(id).fetch_one(&state.db).await?;
