@@ -259,3 +259,8 @@
 .pi-history-list button span{color:var(--pi-brass);font-size:9px}
 .pi-history-list button small{color:var(--pi-muted);font-size:10px;line-height:1.5}
 .pi-history-current{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 0;border:0;background:transparent;color:var(--pi-brass);font-size:10px}
+
+.pi-stack{display:grid;gap:12px;min-width:0}
+.pi-concepts-content{min-width:0}
+.pi-concept-children{padding:2px 0 3px}
+.pi-caveat{padding:9px 10px;border-left:2px solid #c6a56b;background:rgba(198,165,107,.055);color:#d8c7a1;font-size:11px;line-height:1.7}
