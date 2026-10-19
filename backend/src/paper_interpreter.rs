@@ -20,7 +20,7 @@ const MAX_ANALYSIS_CHARS: usize = 65_000;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
-struct PaperRecord {
+pub struct PaperRecord {
     id: String,
     title: String,
     authors: Option<String>,
