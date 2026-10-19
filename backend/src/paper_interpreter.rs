@@ -103,6 +103,7 @@ pub async fn create_paper(State(state): State<AppState>, Json(body): Json<Value>
         return Err(AppError::BadRequest("Choose DOI, URL or PDF as the paper source.".into()));
     }
     let source = body.get("source").and_then(Value::as_str).unwrap_or("").trim().to_string();
+    if source.len() > 2048 { return Err(AppError::BadRequest("The source identifier or URL is too long.".into())); }
     let file_name = body.get("fileName").and_then(Value::as_str).unwrap_or("paper.pdf").trim().to_string();
     let mut doi = None;
     let mut source_url = None;
@@ -276,8 +277,12 @@ async fn fetch_remote(start: &str) -> Result<(Url, String, Vec<u8>), String> {
         if !response.status().is_success() { return Err(format!("The source server returned HTTP {}. If you have access to the paper, upload its PDF instead.", response.status())); }
         if response.content_length().map(|n| n as usize > MAX_REMOTE_BYTES).unwrap_or(false) { return Err("The remote source is larger than the 12 MB retrieval limit. Upload a smaller PDF instead.".into()); }
         let mime = response.headers().get(header::CONTENT_TYPE).and_then(|v| v.to_str().ok()).unwrap_or("application/octet-stream").to_string();
-        let bytes = response.bytes().await.map_err(|e| format!("Could not read the remote source: {e}"))?.to_vec();
-        if bytes.len() > MAX_REMOTE_BYTES { return Err("The remote source is larger than the 12 MB retrieval limit.".into()); }
+        let mut response = response;
+        let mut bytes = Vec::new();
+        while let Some(chunk) = response.chunk().await.map_err(|e| format!("Could not read the remote source: {e}"))? {
+            if bytes.len() + chunk.len() > MAX_REMOTE_BYTES { return Err("The remote source is larger than the 12 MB retrieval limit.".into()); }
+            bytes.extend_from_slice(&chunk);
+        }
         return Ok((current, mime, bytes));
     }
     Err("The source redirected too many times.".into())
