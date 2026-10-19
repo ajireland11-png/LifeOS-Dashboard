@@ -30,6 +30,9 @@ async fn main() {
         .await
         .unwrap_or_else(|e| panic!("failed to open database {database_url}: {e}"));
 
+    // Resume persisted Paper Interpreter jobs before accepting new requests.
+    lifeos_backend::resume_paper_interpreter_jobs(pool.clone()).await;
+
     // Start the recurring tasks worker
     lifeos_backend::tasks::spawn_recurrence_worker(pool.clone());
 
