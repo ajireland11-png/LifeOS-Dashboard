@@ -207,7 +207,8 @@ pub async fn get_document(State(state): State<AppState>, Path(id): Path<String>)
     let filename = row.try_get::<Option<String>, _>("fileName")?.unwrap_or_else(|| "paper.pdf".into());
     let bytes = row.try_get::<Option<Vec<u8>>, _>("sourceFile")?.ok_or_else(|| AppError::NotFound("This paper has no stored PDF. The source may have been a DOI or URL.".into()))?;
     let safe_name: String = filename.chars().filter(|c| c.is_ascii_alphanumeric() || *c == '.' || *c == '-' || *c == '_').take(100).collect();
-    let disposition = HeaderValue::from_str(&format!("inline; filename=\"{}\"", if safe_name.is_empty() { "paper.pdf" } else { &safe_name }))
+    let disposition_text = format!("inline; filename=\"{}\"", if safe_name.is_empty() { "paper.pdf" } else { &safe_name });
+    let disposition = HeaderValue::from_bytes(disposition_text.as_bytes())
         .unwrap_or_else(|_| HeaderValue::from_static("inline; filename=\"paper.pdf\""));
     Response::builder().status(StatusCode::OK).header(header::CONTENT_TYPE, "application/pdf")
         .header(header::CONTENT_DISPOSITION, disposition)
@@ -241,6 +242,8 @@ fn is_public_ip(ip: IpAddr) -> bool {
 
 async fn validate_public_url(url: &Url) -> Result<(), String> {
     if url.scheme() != "https" { return Err("For safety, remote paper URLs must use HTTPS.".into()); }
+    if !url.username().is_empty() || url.password().is_some() { return Err("URLs containing embedded credentials are not accepted.".into()); }
+    if url.port().map(|port| port != 443).unwrap_or(false) { return Err("Remote paper retrieval is limited to the standard HTTPS port.".into()); }
     let host = url.host_str().ok_or_else(|| "The source URL has no hostname.".to_string())?;
     if host.eq_ignore_ascii_case("localhost") || host.ends_with(".localhost") || host.ends_with(".local") || host.ends_with(".internal") {
         return Err("Local and private-network URLs cannot be retrieved.".into());
