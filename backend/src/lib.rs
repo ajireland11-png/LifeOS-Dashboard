@@ -180,6 +180,7 @@ pub fn build_app(pool: SqlitePool) -> Router {
         // Scientific Paper Interpreter — persistent source ingestion and analysis
         .route("/api/paper-interpreter/papers", get(paper_interpreter::list_papers).post(paper_interpreter::create_paper))
         .route("/api/paper-interpreter/papers/{id}/retry", post(paper_interpreter::retry_paper))
+        .route("/api/paper-interpreter/papers/{id}/view", post(paper_interpreter::mark_viewed))
         .route("/api/paper-interpreter/papers/{id}/document", get(paper_interpreter::get_document))
         .route("/api/paper-interpreter/papers/{id}", get(paper_interpreter::get_paper).patch(paper_interpreter::update_paper).delete(paper_interpreter::delete_paper))
         // Explore
