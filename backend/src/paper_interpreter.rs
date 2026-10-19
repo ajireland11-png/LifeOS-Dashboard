@@ -491,7 +491,7 @@ fn build_deterministic_analysis(title: &str, doi: Option<&str>, source_url: Opti
             "whyItMatters": "Not automatically inferred. Use the detected topics and source text as a navigation aid.",
             "priorKnowledge": "", "knowledgeGap": "", "researchQuestion": format!("Paper: {}", title),
             "approach": format!("The extracted document contains {} characters. Local rules detected {} likely concepts, {} candidate equations, {} figure/table captions, and {} method names.", source_text.chars().count(), concepts.len(), equations.len(), figures.len(), methods.len()),
-            "majorFindings": findings, "conclusions": "No conclusions have been inferred in deterministic mode. Read the original Results and Discussion sections.",
+            "majorFindings": [], "sourceExcerpts": findings, "conclusions": "No conclusions have been inferred in deterministic mode. Read the original Results and Discussion sections.",
             "novelty": "", "notEstablished": "Keyword matches and extracted captions do not establish the paper's findings, causality, or scientific validity.",
             "limitations": limitations.join(" "), "sourceCoverage": format!("{} characters of extracted text; {} possible section headings detected. Page offsets and embedded figure pixels are unavailable.", source_text.chars().count(), headings.len()),
             "detectedHeadings": headings
