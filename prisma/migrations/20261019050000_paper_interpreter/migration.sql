@@ -12,6 +12,7 @@ CREATE TABLE "PaperInterpreterPaper" (
   "extractedText" TEXT,
   "metadataJson" TEXT,
   "analysisJson" TEXT,
+  "conceptLinksJson" TEXT NOT NULL DEFAULT '{}',
   "status" TEXT NOT NULL DEFAULT 'submitted',
   "stage" TEXT NOT NULL DEFAULT 'Submitted',
   "error" TEXT,
