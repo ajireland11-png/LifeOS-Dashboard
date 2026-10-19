@@ -1,9 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import './paper-interpreter-page.css'
 import {
   AlertCircle, ArrowLeft, ArrowUpRight, Bookmark, BookOpen, CheckCircle2,
-  ChevronDown, ChevronRight, CircleHelp, Clock3, Download, FileSearch,
+  ChevronDown, ChevronRight, CircleHelp, Download, FileSearch,
   FileText, FlaskConical, LoaderCircle, Microscope, Network, RefreshCw,
   Search, Send, Sigma, Sparkles, StickyNote, Trash2, UploadCloud, X,
 } from 'lucide-react'
@@ -69,7 +70,7 @@ export function PaperInterpreterPage(){
  const loadLibrary=useCallback(async()=>{try{const r=await fetch('/api/paper-interpreter/papers');if(!r.ok)throw new Error('Paper Interpreter API unavailable. Check that the Rust backend is running and the database migration is applied.');const data=await r.json();setPapers(Array.isArray(data)?data:[])}catch(e){setError(e instanceof Error?e.message:'Could not load the paper library.')}finally{setLoading(false)}},[])
  const loadPaper=useCallback(async(id:string)=>{try{const r=await fetch('/api/paper-interpreter/papers/'+encodeURIComponent(id));if(!r.ok)throw new Error('Could not open this paper workspace.');const p=await r.json() as Paper;setSelected(p);setSelectedId(id);setNotesDraft(p.notes||'');return p}catch(e){setError(e instanceof Error?e.message:'Could not open paper.');return null}},[])
  useEffect(()=>{void loadLibrary()},[loadLibrary])
- useEffect(()=>{if(!selectedId)return;let cancelled=false;const refresh=async()=>{try{const r=await fetch('/api/paper-interpreter/papers/'+encodeURIComponent(selectedId));if(!r.ok)return;const p=await r.json() as Paper;if(cancelled)return;setSelected(p);setNotesDraft(p.notes||'');setPapers(prev=>prev.map(old=>old.id===p.id?{...old,...p,analysis:undefined,extractedText:undefined}:old))}catch{}};void refresh();const timer=window.setInterval(()=>{if(!terminal.has(selected?.status||'submitted'))void refresh()},2500);return()=>{cancelled=true;window.clearInterval(timer)}},[selectedId,selected?.status])
+ useEffect(()=>{if(!selectedId)return;let cancelled=false;const refresh=async()=>{try{const r=await fetch('/api/paper-interpreter/papers/'+encodeURIComponent(selectedId));if(!r.ok)return;const p=await r.json() as Paper;if(cancelled)return;setSelected(p);setPapers(prev=>prev.map(old=>old.id===p.id?{...old,...p,analysis:undefined,extractedText:undefined}:old))}catch{}};void refresh();const timer=window.setInterval(()=>{if(!terminal.has(selected?.status||'submitted'))void refresh()},2500);return()=>{cancelled=true;window.clearInterval(timer)}},[selectedId,selected?.status])
  const visible=useMemo(()=>papers.filter(p=>{const q=query.toLowerCase();const matches=(p.title+' '+(p.authors||'')+' '+(p.journal||'')+' '+(p.doi||'')).toLowerCase().includes(q);const status=filter==='all'||(filter==='in-progress'&&!terminal.has(p.status))||(filter==='ready'&&['completed','completed_with_limitations'].includes(p.status))||(filter==='saved'&&p.bookmarked);return matches&&status}),[papers,query,filter])
  const analysis=selected?.analysis,overview=analysis?.overview
  const concepts=useMemo(()=>{const all=analysis?.concepts||[];const q=conceptQuery.trim().toLowerCase();return q?all.filter(c=>(c.title+' '+(c.definition||'')+' '+(c.explanation||'')).toLowerCase().includes(q)):all},[analysis?.concepts,conceptQuery])
