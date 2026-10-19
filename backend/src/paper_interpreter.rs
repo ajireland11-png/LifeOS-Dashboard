@@ -224,7 +224,7 @@ fn normalize_doi(input: &str) -> Option<String> {
     for prefix in ["https://doi.org/", "http://doi.org/", "https://dx.doi.org/", "http://dx.doi.org/", "doi:"] {
         if value.to_ascii_lowercase().starts_with(prefix) { value = &value[prefix.len()..]; break; }
     }
-    let value = value.trim().trim_end_matches(['.', ',', ';', ')']);
+    let value = value.trim().trim_end_matches(|ch: char| matches!(ch, '.' | ',' | ';' | ')'));
     if value.len() < 7 || value.len() > 250 || !value.to_ascii_lowercase().starts_with("10.") || !value.contains('/') || value.chars().any(char::is_whitespace) { return None; }
     Some(value.to_string())
 }
