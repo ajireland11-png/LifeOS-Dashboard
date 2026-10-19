@@ -763,9 +763,9 @@ model PaperInterpreterPaper {
   error         String?
   notes         String   @default("")
   bookmarked    Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  analyzedAt    DateTime?
+  createdAt     BigInt
+  updatedAt     BigInt
+  analyzedAt    BigInt?
 
   @@index([status])
   @@index([updatedAt])
