@@ -882,6 +882,25 @@ mod tests {
     use super::*;
 
     #[test]
+    fn deterministic_analysis_extracts_candidates_without_claiming_interpretation() {
+        let source = "Abstract\nLiquid-liquid phase separation can occur in protein solutions under selected conditions.\nFCR = Ncharged / Ntotal\nFigure 1. Phase diagram showing the measured coexistence curve.\nMethods\nFluorescence correlation spectroscopy was used to estimate diffusion.";
+        let analysis = build_deterministic_analysis(
+            "Test paper",
+            Some("10.1000/example"),
+            Some("https://example.org/paper.pdf"),
+            source,
+            "pdf",
+            None,
+        );
+        assert_eq!(analysis["provenance"]["model"], "Deterministic local analysis (no AI)");
+        assert!(analysis["concepts"].as_array().unwrap().iter().any(|c| c["title"] == "liquid–liquid phase separation"));
+        assert!(!analysis["equations"].as_array().unwrap().is_empty());
+        assert!(!analysis["figures"].as_array().unwrap().is_empty());
+        assert!(analysis["overview"]["limitations"].as_str().unwrap().contains("not a scientific interpretation"));
+        assert!(analysis["references"].as_array().unwrap().is_empty());
+    }
+
+    #[test]
     fn doi_normalization_accepts_common_forms() {
         assert_eq!(normalize_doi("doi:10.1038/nature12373").as_deref(), Some("10.1038/nature12373"));
         assert_eq!(normalize_doi("https://doi.org/10.1038/nature12373").as_deref(), Some("10.1038/nature12373"));
