@@ -74,7 +74,7 @@ export function PaperInterpreterPage(){
  const visible=useMemo(()=>papers.filter(p=>{const q=query.toLowerCase();const matches=(p.title+' '+(p.authors||'')+' '+(p.journal||'')+' '+(p.doi||'')).toLowerCase().includes(q);const status=filter==='all'||(filter==='in-progress'&&!terminal.has(p.status))||(filter==='ready'&&['completed','completed_with_limitations'].includes(p.status))||(filter==='saved'&&p.bookmarked);return matches&&status}),[papers,query,filter])
  const analysis=selected?.analysis,overview=analysis?.overview
  const concepts=useMemo(()=>{const all=analysis?.concepts||[];const q=conceptQuery.trim().toLowerCase();return q?all.filter(c=>(c.title+' '+(c.definition||'')+' '+(c.explanation||'')).toLowerCase().includes(q)):all},[analysis?.concepts,conceptQuery])
- const rootConcepts=concepts.filter(c=>!c.parentId||!analysis?.concepts?.some(p=>p.id===c.parentId))
+ const rootConcepts=concepts.filter(c=>!c.parentId||!concepts.some(p=>p.id===c.parentId))
  const busy=!!selected&&!terminal.has(selected.status),hasAnalysis=!!analysis&&!!overview
 
  async function submit(e:React.FormEvent){e.preventDefault();setError('');if(mode!=='pdf'&&!source.trim()){setError(mode==='doi'?'Enter a DOI to begin.':'Enter the article URL to begin.');return}if(mode==='pdf'&&!file){setError('Choose a PDF to upload.');return}setSubmitting(true)
