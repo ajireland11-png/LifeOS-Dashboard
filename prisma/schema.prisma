@@ -766,6 +766,7 @@ model PaperInterpreterPaper {
   createdAt     BigInt
   updatedAt     BigInt
   analyzedAt    BigInt?
+  lastViewedAt  BigInt?
 
   @@index([status])
   @@index([updatedAt])
