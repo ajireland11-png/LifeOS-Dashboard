@@ -523,6 +523,14 @@ SOURCE TEXT:
     let answer=response_json.get("choices").and_then(Value::as_array).and_then(|a|a.first()).and_then(|v|v.get("message")).and_then(|v|v.get("content")).and_then(Value::as_str);
     let Some(answer)=answer else {fail(&pool,&id,"The AI provider returned no analysis content. Retry the analysis.").await;return;};
     let analysis=match serde_json::from_str::<Value>(answer){Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The analysis response was not valid structured JSON: {e}")).await;return;}};
+    if let Some(references) = analysis.get_mut("references").and_then(Value::as_array_mut) {
+        for reference in references {
+            if let Some(object) = reference.as_object_mut() {
+                // External reference verification is not implemented yet; never trust a model-generated verification flag.
+                object.insert("sourceVerified".into(), Value::Bool(false));
+            }
+        }
+    }
     if !analysis.get("overview").is_some() || !analysis.get("concepts").and_then(Value::as_array).is_some() {
         fail(&pool,&id,"The analysis was missing required overview or concept sections. Retry the analysis.").await;return;
     }
