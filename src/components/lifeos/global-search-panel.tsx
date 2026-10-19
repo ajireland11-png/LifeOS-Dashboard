@@ -16,6 +16,8 @@ import {
   Sparkles,
   Compass,
   FolderKanban,
+  FileSearch,
+  Network,
 } from 'lucide-react'
 import { useAppStore, type ModuleId } from '@/stores/app-store'
 import { useSearch, type SearchResult } from '@/lib/api/hooks'
@@ -32,6 +34,8 @@ const iconMap: Record<string, React.ElementType> = {
   Compass,
   Sparkles,
   FolderKanban,
+  FileSearch,
+  Network,
 }
 
 const colorMap: Record<string, { bg: string; text: string; border: string; badge: string }> = {
@@ -114,7 +118,7 @@ function removeRecentSearch(query: string) {
 }
 
 export function GlobalSearchPanel() {
-  const { globalSearchOpen, setGlobalSearchOpen, setActiveModule } = useAppStore()
+  const { globalSearchOpen, setGlobalSearchOpen, setActiveModule, setPaperInterpreterRequest } = useAppStore()
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [recentSearches, setRecentSearches] = useState<RecentSearchItem[]>([])
@@ -173,9 +177,10 @@ export function GlobalSearchPanel() {
 
   const handleSelect = useCallback((result: SearchResult) => {
     saveRecentSearch(query || result.title)
+    if (result.module === 'paper-interpreter') setPaperInterpreterRequest(result.id)
     setActiveModule(result.module as ModuleId)
     setGlobalSearchOpen(false)
-  }, [query, setActiveModule, setGlobalSearchOpen])
+  }, [query, setActiveModule, setGlobalSearchOpen, setPaperInterpreterRequest])
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
