@@ -579,7 +579,7 @@ fn normalize_analysis_provenance(analysis: &mut Value, source_text: &str, model:
         }
     }
     if !analysis.get("provenance").map(Value::is_object).unwrap_or(false) {
-        analysis["provenance"] = json!({});
+        if let Some(object) = analysis.as_object_mut() { object.insert("provenance".into(), json!({})); }
     }
     if let Some(provenance) = analysis.get_mut("provenance").and_then(Value::as_object_mut) {
         provenance.insert("model".into(), json!(model));
