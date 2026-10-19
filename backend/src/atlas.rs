@@ -17,8 +17,8 @@ use crate::AppState;
 /// entries and courses are deliberately left out for now — this is a first
 /// slice of Atlas, not the whole vision, and those two can be added later by
 /// copying the same query pattern used below.
-const ENTITY_TYPES: [&str; 14] = [
-    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge", "person", "persondate", "paper", "figure", "dataset",
+const ENTITY_TYPES: [&str; 15] = [
+    "note", "project", "task", "goal", "habit", "bookmark", "subject", "studioitem", "knowledge", "person", "persondate", "paper", "figure", "dataset", "interpreterpaper",
 ];
 
 #[derive(Serialize, Clone)]
@@ -286,6 +286,44 @@ pub async fn get_graph(State(st): State<AppState>) -> Result<Json<AtlasGraph>, A
                     target_id: id,
                     kind: "observed".to_string(),
                     label: Some("contains dataset".to_string()),
+                });
+            }
+        }
+    }
+
+    // Paper Interpreter records are the same canonical paper workspaces shown in its library.
+    // Reviewed links to Learn subjects become explicit graph edges; no duplicate concept nodes are created.
+    let rows = sqlx::query("SELECT id,title,doi,sourceUrl,status,extractedText,conceptLinksJson,updatedAt FROM PaperInterpreterPaper ORDER BY updatedAt DESC")
+        .fetch_all(&st.db).await?;
+    for r in &rows {
+        let paper_id: String = r.try_get("id")?;
+        let title: String = r.try_get("title")?;
+        let doi: Option<String> = r.try_get("doi")?;
+        let source_url: Option<String> = r.try_get("sourceUrl")?;
+        let status: String = r.try_get("status")?;
+        let text: Option<String> = r.try_get("extractedText")?;
+        let links_json: String = r.try_get("conceptLinksJson")?;
+        let updated_at = PrismaDateTime(r.try_get::<i64, _>("updatedAt")?);
+        let description = doi.or(source_url).or_else(|| text.filter(|s| !s.trim().is_empty()).map(|s| truncate(s.trim(), 160))).or(Some(status));
+        nodes.push(AtlasNode {
+            id: paper_id.clone(),
+            node_type: "interpreterpaper".to_string(),
+            title,
+            description,
+            updated_at: updated_at.clone(),
+        });
+        let links: Value = serde_json::from_str(&links_json).unwrap_or(Value::Object(Default::default()));
+        if let Some(object) = links.as_object() {
+            for (concept_id, learn_id) in object {
+                let Some(learn_id) = learn_id.as_str().filter(|s| !s.is_empty()) else { continue };
+                nested_asset_edges.push(AtlasEdge {
+                    id: format!("observed-interpreter-concept-{paper_id}-{concept_id}"),
+                    source_type: "interpreterpaper".to_string(),
+                    source_id: paper_id.clone(),
+                    target_type: "subject".to_string(),
+                    target_id: learn_id.to_string(),
+                    kind: "observed".to_string(),
+                    label: Some("explains concept".to_string()),
                 });
             }
         }
