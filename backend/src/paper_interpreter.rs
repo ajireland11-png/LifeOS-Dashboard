@@ -37,6 +37,7 @@ struct PaperRecord {
     bookmarked: bool,
     metadata: Option<Value>,
     analysis: Option<Value>,
+    analysis_history: Value,
     concept_links: Value,
     annotations: Value,
     extracted_text: Option<String>,
@@ -70,6 +71,7 @@ fn record_from_row(row: &sqlx::sqlite::SqliteRow, include_content: bool) -> Resu
         bookmarked: row.try_get::<Option<bool>, _>("bookmarked")?.unwrap_or(false),
         metadata: parse("metadataJson"),
         analysis: if include_content { parse("analysisJson") } else { None },
+        analysis_history: if include_content { parse("analysisHistoryJson").unwrap_or_else(|| json!([])) } else { json!([]) },
         concept_links: parse("conceptLinksJson").unwrap_or_else(|| json!({})),
         annotations: parse("annotationsJson").unwrap_or_else(|| json!({})),
         extracted_text: if include_content { extracted } else { None },
@@ -81,7 +83,7 @@ fn record_from_row(row: &sqlx::sqlite::SqliteRow, include_content: bool) -> Resu
     })
 }
 
-const SELECT_COLUMNS: &str = "id,title,authors,journal,year,doi,sourceUrl,inputType,fileName,status,stage,error,notes,bookmarked,metadataJson,analysisJson,conceptLinksJson,annotationsJson,extractedText,(sourceFile IS NOT NULL) AS hasDocument,createdAt,updatedAt,analyzedAt";
+const SELECT_COLUMNS: &str = "id,title,authors,journal,year,doi,sourceUrl,inputType,fileName,status,stage,error,notes,bookmarked,metadataJson,analysisJson,analysisHistoryJson,conceptLinksJson,annotationsJson,extractedText,(sourceFile IS NOT NULL) AS hasDocument,createdAt,updatedAt,analyzedAt";
 
 pub async fn list_papers(State(state): State<AppState>) -> Result<Json<Vec<PaperRecord>>, AppError> {
     let sql = format!("SELECT {SELECT_COLUMNS} FROM PaperInterpreterPaper ORDER BY updatedAt DESC");
@@ -540,8 +542,16 @@ SOURCE TEXT:
         fail(&pool,&id,"The analysis was missing required overview or concept sections. Retry the analysis.").await;return;
     }
     let now=now_ms();
-    let _=sqlx::query("UPDATE PaperInterpreterPaper SET analysisJson=?,status=?,stage=?,error=?,analyzedAt=?,updatedAt=? WHERE id=?")
-        .bind(analysis.to_string()).bind(if limitation.is_some(){"completed_with_limitations"}else{"completed"})
+    let previous_row = sqlx::query("SELECT analysisJson,analysisHistoryJson FROM PaperInterpreterPaper WHERE id=?").bind(&id).fetch_optional(&pool).await.ok().flatten();
+    let previous_analysis = previous_row.as_ref().and_then(|row|row.try_get::<Option<String>,_>("analysisJson").ok().flatten()).and_then(|raw|serde_json::from_str::<Value>(&raw).ok());
+    let mut history = previous_row.as_ref().and_then(|row|row.try_get::<Option<String>,_>("analysisHistoryJson").ok().flatten()).and_then(|raw|serde_json::from_str::<Value>(&raw).ok()).and_then(|v|v.as_array().cloned()).unwrap_or_default();
+    if let Some(previous) = previous_analysis {
+        history.push(json!({"savedAt":now,"analysis":previous}));
+        if history.len()>5 { let excess=history.len()-5; history.drain(0..excess); }
+    }
+    let history_json=Value::Array(history).to_string();
+    let _=sqlx::query("UPDATE PaperInterpreterPaper SET analysisJson=?,analysisHistoryJson=?,status=?,stage=?,error=?,analyzedAt=?,updatedAt=? WHERE id=?")
+        .bind(analysis.to_string()).bind(history_json).bind(if limitation.is_some(){"completed_with_limitations"}else{"completed"})
         .bind(if limitation.is_some(){"Analysis generated with source limitations"}else{"Complete scientific breakdown generated"})
         .bind(limitation).bind(now).bind(now).bind(&id).execute(&pool).await;
 }
