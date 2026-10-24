@@ -545,7 +545,7 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
     let input_type = row.try_get::<String, _>("inputType").unwrap_or_default();
     let doi = row.try_get::<Option<String>, _>("doi").unwrap_or(None);
     let source_url = row.try_get::<Option<String>, _>("sourceUrl").unwrap_or(None);
-    let file_name = row.try_get::<Option<String>, _>("fileName").unwrap_or(None);
+    let _file_name = row.try_get::<Option<String>, _>("fileName").unwrap_or(None);
     let stored_file = row.try_get::<Option<Vec<u8>>, _>("sourceFile").unwrap_or(None);
     let existing_text = row.try_get::<Option<String>, _>("extractedText").unwrap_or(None);
     let existing_metadata = row.try_get::<Option<String>, _>("metadataJson").unwrap_or(None);
@@ -686,7 +686,7 @@ async fn process_paper(pool: sqlx::SqlitePool, id: String) {
         if let Some(object) = metadata.as_object_mut() { object.insert("sourceLimitations".into(), json!([source_limitation])); }
     }
     let _ = sqlx::query("UPDATE PaperInterpreterPaper SET title=?,authors=COALESCE(?,authors),journal=COALESCE(?,journal),year=COALESCE(?,year),sourceUrl=COALESCE(?,sourceUrl),metadataJson=?,extractedText=?,status='analysing',stage='Building the scientific interpretation',error=?,updatedAt=? WHERE id=?")
-        .bind(&title).bind(authors).bind(journal).bind(year).bind(final_url).bind(metadata.to_string())
+        .bind(&title).bind(authors).bind(journal).bind(year).bind(&final_url).bind(metadata.to_string())
         .bind(if extracted.trim().is_empty(){None}else{Some(extracted.clone())})
         .bind(limitation.as_deref()).bind(now_ms()).bind(&id).execute(&pool).await;
 
