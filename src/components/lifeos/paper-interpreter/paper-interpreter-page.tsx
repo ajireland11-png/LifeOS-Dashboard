@@ -154,6 +154,8 @@ export function PaperInterpreterPage(){
  const analysis=historyIndex!==null?selected?.analysisHistory?.[historyIndex]?.analysis:selected?.analysis,overview=analysis?.overview
  const concepts=useMemo(()=>{const all=analysis?.concepts||[];const q=conceptQuery.trim().toLowerCase();return q?all.filter(c=>(c.title+' '+(c.definition||'')+' '+(c.explanation||'')).toLowerCase().includes(q)):all},[analysis?.concepts,conceptQuery])
  const rootConcepts=concepts.filter(c=>!c.parentId||!concepts.some(p=>p.id===c.parentId))
+ const sourceLines=useMemo(()=>{const all=(selected?.extractedText||'').split(/\r?\n/);const q=sourceQuery.trim().toLocaleLowerCase();if(!q)return all.map((text,index)=>({number:index+1,text}));const matches:number[]=[];all.forEach((line,index)=>{if(line.toLocaleLowerCase().includes(q))matches.push(index)});const included=new Set<number>();for(const index of matches){for(let i=Math.max(0,index-1);i<=Math.min(all.length-1,index+1);i++)included.add(i)}return Array.from(included).sort((a,b)=>a-b).map(index=>({number:index+1,text:all[index]}))},[selected?.extractedText,sourceQuery])
+ const sourceMatchCount=useMemo(()=>{const q=sourceQuery.trim().toLocaleLowerCase();if(!q)return 0;return (selected?.extractedText||'').split(/\r?\n/).filter(line=>line.toLocaleLowerCase().includes(q)).length},[selected?.extractedText,sourceQuery])
  const busy=!!selected&&!terminal.has(selected.status),hasAnalysis=!!analysis&&!!overview
 
  async function submit(e:React.FormEvent){e.preventDefault();setError('');if(mode!=='pdf'&&!source.trim()){setError(mode==='doi'?'Enter a DOI to begin.':'Enter the article URL to begin.');return}if(mode==='pdf'&&!file){setError('Choose a PDF to upload.');return}setSubmitting(true)
