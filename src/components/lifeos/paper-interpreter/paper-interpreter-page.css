@@ -264,3 +264,17 @@
 .pi-concepts-content{min-width:0}
 .pi-concept-children{padding:2px 0 3px}
 .pi-caveat{padding:9px 10px;border-left:2px solid #c6a56b;background:rgba(198,165,107,.055);color:#d8c7a1;font-size:11px;line-height:1.7}
+
+
+/* Searchable source reader: line numbers are extraction offsets, never claimed PDF pages. */
+.pi-source-reader{display:grid;gap:12px;min-width:0}
+.pi-source-search{display:flex;align-items:center;gap:8px;max-width:720px}
+.pi-source-search input{flex:1;min-width:0}
+.pi-source-search button{display:grid;place-items:center;border:0;background:transparent;color:var(--pi-muted);padding:4px}
+.pi-source-reader-meta{display:flex;flex-wrap:wrap;gap:14px;color:var(--pi-muted);font-size:10px}
+.pi-source-reader-text{margin:0;padding:10px 0;max-height:70vh;overflow:auto;border-top:1px solid var(--pi-rule);border-bottom:1px solid var(--pi-rule);background:rgba(8,11,9,.16);color:#ded8c9;font:12px/1.85 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.pi-source-line{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;padding:0 12px}
+.pi-source-line:hover{background:rgba(201,190,164,.045)}
+.pi-source-line-number{user-select:none;text-align:right;color:#7e887d;font-size:10px}
+.pi-empty-source{display:flex;align-items:center;gap:12px;padding:24px;border:1px solid var(--pi-rule);color:var(--pi-muted)}
+.pi-empty-source p{margin:0;font-size:12px;line-height:1.7}
