@@ -159,9 +159,22 @@ export function PaperInterpreterPage(){
  const busy=!!selected&&!terminal.has(selected.status),hasAnalysis=!!analysis&&!!overview
 
  async function submit(e:React.FormEvent){e.preventDefault();setError('');if(mode!=='pdf'&&!source.trim()){setError(mode==='doi'?'Enter a DOI to begin.':'Enter the article URL to begin.');return}if(mode==='pdf'&&!file){setError('Choose a PDF to upload.');return}setSubmitting(true)
-  try{let pdfBase64:string|undefined;if(file){if(file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf'))throw new Error('Choose a PDF document.');if(file.size>20*1024*1024)throw new Error('PDF files must be smaller than 20 MB.');pdfBase64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('Could not read the selected PDF.'));reader.readAsDataURL(file)})}
-   const r=await fetch('/api/paper-interpreter/papers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({inputType:mode,source:source.trim(),fileName:file?.name,title:title.trim()||undefined,pdfBase64})})
-   const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||'The paper could not be submitted.');const p=body as Paper
+  try{let r:Response
+    if(mode==='pdf'&&file){
+     if(file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf'))throw new Error('Choose a PDF document.')
+     if(file.size>20*1024*1024)throw new Error('PDF files must be smaller than 20 MB.')
+     const params=new URLSearchParams({fileName:file.name})
+     if(title.trim())params.set('title',title.trim())
+     r=await fetch('/api/paper-interpreter/papers/upload?'+params.toString(),{method:'POST',headers:{'Content-Type':'application/pdf'},body:file})
+    }else{
+     if(!source.trim())throw new Error(mode==='doi'?'Enter a DOI to begin.':'Enter the article URL to begin.')
+     r=await fetch('/api/paper-interpreter/papers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({inputType:mode,source:source.trim(),title:title.trim()||undefined})})
+    }
+    const raw=await r.text()
+    let body:Record<string,unknown>={}
+    try{body=raw?JSON.parse(raw) as Record<string,unknown>:{}}catch{body={}}
+    if(!r.ok)throw new Error(typeof body.error==='string'?body.error:raw.trim().slice(0,240)||`Upload request failed (HTTP ${r.status}). Check that the backend is running and try again.`)
+    const p=body as unknown as Paper
    setSelectedId(p.id);setSelected(p);setNotesDraft(p.notes||'');setHistoryIndex(null);setTab('overview');setSource('');setTitle('');setFile(null);if(fileRef.current)fileRef.current.value='';await loadLibrary()
   }catch(e){setError(e instanceof Error?e.message:'Paper submission failed.')}finally{setSubmitting(false)}
  }
