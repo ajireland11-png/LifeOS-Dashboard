@@ -1,12 +1,12 @@
 use axum::{
-    body::Body,
-    extract::{Path, State},
+    body::{Body, Bytes},
+    extract::{Path, Query, State},
     http::{header, HeaderValue, StatusCode},
     response::Response,
     Json,
 };
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sqlx::Row;
 use std::{net::{IpAddr, SocketAddr}, time::Duration};
@@ -99,6 +99,54 @@ pub async fn get_paper(State(state): State<AppState>, Path(id): Path<String>) ->
     let row = sqlx::query(&sql).bind(id).fetch_optional(&state.db).await?
         .ok_or_else(|| AppError::NotFound("Paper workspace not found".into()))?;
     Ok(Json(record_from_row(&row, true)?))
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PdfUploadQuery {
+    file_name: Option<String>,
+    title: Option<String>,
+}
+
+/// Accept the PDF as binary instead of Base64-in-JSON. This avoids a ~33% payload
+/// expansion and the extra browser memory needed to build a large data URL.
+pub async fn upload_pdf(
+    State(state): State<AppState>,
+    Query(query): Query<PdfUploadQuery>,
+    body: Bytes,
+) -> Result<(StatusCode, Json<PaperRecord>), AppError> {
+    if body.is_empty() || body.len() > MAX_PDF_BYTES {
+        return Err(AppError::BadRequest("PDF files must be non-empty and no larger than 20 MB.".into()));
+    }
+    if !body.starts_with(b"%PDF-") {
+        return Err(AppError::BadRequest("The selected file does not appear to be a valid PDF.".into()));
+    }
+
+    let file_name = query.file_name.as_deref().unwrap_or("paper.pdf")
+        .chars()
+        .filter(|ch| ch.is_ascii_alphanumeric() || *ch == '.' || *ch == '-' || *ch == '_' || *ch == ' ')
+        .take(120)
+        .collect::<String>();
+    let file_name = if file_name.trim().is_empty() { "paper.pdf".to_string() } else { file_name };
+    let title = query.title.as_deref().map(str::trim).filter(|s| !s.is_empty())
+        .map(str::to_string)
+        .unwrap_or_else(|| file_name.strip_suffix(".pdf").or_else(|| file_name.strip_suffix(".PDF")).unwrap_or(&file_name).to_string());
+
+    let id = gen_id();
+    let now = now_ms();
+    sqlx::query("INSERT INTO PaperInterpreterPaper (id,title,doi,sourceUrl,inputType,fileName,sourceFile,status,stage,notes,bookmarked,createdAt,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
+        .bind(&id).bind(&title).bind(Option::<String>::None).bind(Option::<String>::None).bind("pdf")
+        .bind(Some(file_name.as_str())).bind(body.to_vec()).bind("submitted").bind("Queued for ingestion")
+        .bind("").bind(false).bind(now).bind(now)
+        .execute(&state.db).await?;
+
+    let pool = state.db.clone();
+    let job_id = id.clone();
+    tokio::spawn(async move { process_paper(pool, job_id).await; });
+
+    let sql = format!("SELECT {SELECT_COLUMNS} FROM PaperInterpreterPaper WHERE id=?");
+    let row = sqlx::query(&sql).bind(id).fetch_one(&state.db).await?;
+    Ok((StatusCode::ACCEPTED, Json(record_from_row(&row, true)?)))
 }
 
 pub async fn create_paper(State(state): State<AppState>, Json(body): Json<Value>) -> Result<(StatusCode, Json<PaperRecord>), AppError> {
