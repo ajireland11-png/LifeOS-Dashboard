@@ -813,7 +813,22 @@ SOURCE TEXT:
     } else {
         "https://api.openai.com/v1/chat/completions".into()
     };
-    let client = match reqwest::Client::builder().timeout(Duration::from_secs(240)).build() {
+    // Local Ollama must be reached directly. A machine-level HTTP(S) proxy can
+    // otherwise intercept loopback requests from reqwest even while PowerShell
+    // can reach Ollama successfully. Give local Ollama requests a longer window
+    // because full-paper analysis can take several minutes on consumer hardware.
+    let is_local_ollama = provider_mode == "ollama"
+        && Url::parse(&endpoint).ok().map(|url| {
+            url.scheme() == "http"
+                && matches!(url.host_str().unwrap_or("").to_ascii_lowercase().as_str(),
+                    "127.0.0.1" | "localhost" | "::1")
+        }).unwrap_or(false);
+    let mut client_builder = reqwest::Client::builder()
+        .timeout(Duration::from_secs(if provider_mode == "ollama" { 600 } else { 240 }));
+    if is_local_ollama {
+        client_builder = client_builder.no_proxy();
+    }
+    let client = match client_builder.build() {
         Ok(c)=>c,Err(e)=>{fail(&pool,&id,&format!("Could not initialise the analysis client: {e}")).await;return;}
     };
     let mut request = client.post(&endpoint)
@@ -826,7 +841,21 @@ SOURCE TEXT:
     let response = match response {
         Ok(r) if r.status().is_success()=>r,
         Ok(r)=>{let status=r.status();let detail=r.text().await.unwrap_or_default();let detail=detail.chars().take(700).collect::<String>();fail(&pool,&id,&format!("AI analysis request failed ({status}): {detail}")).await;return;}
-        Err(e)=>{fail(&pool,&id,&format!("AI analysis request could not complete: {e}")).await;return;}
+        Err(e)=>{
+            tracing::warn!(
+                paper_id = %id,
+                endpoint = %endpoint,
+                is_connect_error = e.is_connect(),
+                is_timeout = e.is_timeout(),
+                error = %e,
+                "Paper Interpreter AI request failed before receiving a response"
+            );
+            fail(&pool,&id,&format!(
+                "AI analysis request could not complete: {e} (connect_error={}, timeout={}). Check that the configured AI endpoint is reachable from the LifeOS backend.",
+                e.is_connect(), e.is_timeout()
+            )).await;
+            return;
+        }
     };
     let response_json=match response.json::<Value>().await{Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The AI provider returned unreadable JSON: {e}")).await;return;}};
     let answer=response_json.get("choices").and_then(Value::as_array).and_then(|a|a.first()).and_then(|v|v.get("message")).and_then(|v|v.get("content")).and_then(Value::as_str);
