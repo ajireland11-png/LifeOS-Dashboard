@@ -16,7 +16,7 @@ use crate::{error::AppError, utils::{gen_id, now_ms}, AppState};
 
 const MAX_PDF_BYTES: usize = 20 * 1024 * 1024;
 const MAX_REMOTE_BYTES: usize = 12 * 1024 * 1024;
-const MAX_ANALYSIS_CHARS: usize = 65_000;
+const MAX_ANALYSIS_CHARS: usize = 42_000;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -809,7 +809,19 @@ SOURCE TEXT:
         if provider_mode == "ollama" { "llama3.1".into() } else { "gpt-4.1".into() }
     });
     let endpoint = if provider_mode == "ollama" {
-        std::env::var("PAPER_INTERPRETER_OLLAMA_URL").unwrap_or_else(|_| "http://127.0.0.1:11434/v1/chat/completions".into())
+        // Use Ollama's native API so we can set num_ctx explicitly. Keep the
+        // host/port from the configured URL, but normalize its path.
+        let configured = std::env::var("PAPER_INTERPRETER_OLLAMA_URL")
+            .unwrap_or_else(|_| "http://127.0.0.1:11434/api/chat".into());
+        match Url::parse(&configured) {
+            Ok(mut url) => {
+                url.set_path("/api/chat");
+                url.set_query(None);
+                url.set_fragment(None);
+                url.to_string()
+            }
+            Err(_) => "http://127.0.0.1:11434/api/chat".into(),
+        }
     } else {
         "https://api.openai.com/v1/chat/completions".into()
     };
@@ -831,11 +843,32 @@ SOURCE TEXT:
     let client = match client_builder.build() {
         Ok(c)=>c,Err(e)=>{fail(&pool,&id,&format!("Could not initialise the analysis client: {e}")).await;return;}
     };
-    let mut request = client.post(&endpoint)
-        .json(&json!({"model":model,"temperature":0.2,"max_tokens":14000,"response_format":{"type":"json_object"},"messages":[
-            {"role":"system","content":"You are a rigorous scientific educator and research-methods interpreter. Be accurate, transparent about uncertainty, and source-grounded."},
-            {"role":"user","content":prompt}
-        ]}));
+    let messages = json!([
+        {"role":"system","content":"You are a rigorous scientific educator and research-methods interpreter. Be accurate, transparent about uncertainty, and source-grounded. Return one complete JSON object."},
+        {"role":"user","content":prompt}
+    ]);
+    let request_body = if provider_mode == "ollama" {
+        json!({
+            "model": model,
+            "stream": false,
+            "format": "json",
+            "options": {
+                "temperature": 0.2,
+                "num_ctx": 32768,
+                "num_predict": 12000
+            },
+            "messages": messages
+        })
+    } else {
+        json!({
+            "model": model,
+            "temperature": 0.2,
+            "max_tokens": 12000,
+            "response_format": {"type":"json_object"},
+            "messages": messages
+        })
+    };
+    let mut request = client.post(&endpoint).json(&request_body);
     if let Some(key) = api_key.as_deref() { request = request.bearer_auth(key); }
     let response = request.send().await;
     let response = match response {
@@ -858,9 +891,18 @@ SOURCE TEXT:
         }
     };
     let response_json=match response.json::<Value>().await{Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The AI provider returned unreadable JSON: {e}")).await;return;}};
-    let answer=response_json.get("choices").and_then(Value::as_array).and_then(|a|a.first()).and_then(|v|v.get("message")).and_then(|v|v.get("content")).and_then(Value::as_str);
-    let Some(answer)=answer else {fail(&pool,&id,"The AI provider returned no analysis content. Retry the analysis.").await;return;};
-    let mut analysis=match serde_json::from_str::<Value>(answer){Ok(v)=>v,Err(e)=>{fail(&pool,&id,&format!("The analysis response was not valid structured JSON: {e}")).await;return;}};
+    let answer=response_json.get("message").and_then(|v|v.get("content")).and_then(Value::as_str)
+        .or_else(|| response_json.get("choices").and_then(Value::as_array).and_then(|a|a.first()).and_then(|v|v.get("message")).and_then(|v|v.get("content")).and_then(Value::as_str));
+    let Some(answer)=answer else {
+        let detail = response_json.to_string().chars().take(500).collect::<String>();
+        fail(&pool,&id,&format!("The AI provider returned no analysis content. Response preview: {detail}")).await;
+        return;
+    };
+    let mut analysis=match serde_json::from_str::<Value>(answer){Ok(v)=>v,Err(e)=>{
+        let preview = answer.chars().take(350).collect::<String>();
+        fail(&pool,&id,&format!("The analysis response was not valid structured JSON: {e}. Response preview: {preview}")).await;
+        return;
+    }};
     normalize_analysis_provenance(&mut analysis, &source_text, &model, &input_type);
     if extracted.chars().count() > source_text.chars().count() {
         if let Some(limitations) = analysis.get_mut("provenance").and_then(|v|v.get_mut("limitations")).and_then(Value::as_array_mut) {
@@ -876,7 +918,10 @@ SOURCE TEXT:
         }
     }
     if !analysis.get("overview").is_some() || !analysis.get("concepts").and_then(Value::as_array).is_some() {
-        fail(&pool,&id,"The analysis was missing required overview or concept sections. Retry the analysis.").await;return;
+        let keys = analysis.as_object().map(|o| o.keys().cloned().collect::<Vec<_>>().join(", ")).unwrap_or_else(|| "top-level JSON is not an object".into());
+        let preview = answer.chars().take(500).collect::<String>();
+        fail(&pool,&id,&format!("The model returned JSON without the required overview/concepts fields. Top-level keys: {keys}. Response preview: {preview}")).await;
+        return;
     }
     let now=now_ms();
     let previous_row = match sqlx::query("SELECT analysisJson,analysisHistoryJson FROM PaperInterpreterPaper WHERE id=?").bind(&id).fetch_optional(&pool).await {
