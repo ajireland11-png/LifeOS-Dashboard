@@ -16,7 +16,7 @@ use crate::{error::AppError, utils::{gen_id, now_ms}, AppState};
 
 const MAX_PDF_BYTES: usize = 20 * 1024 * 1024;
 const MAX_REMOTE_BYTES: usize = 12 * 1024 * 1024;
-const MAX_ANALYSIS_CHARS: usize = 42_000;
+const MAX_ANALYSIS_CHARS: usize = 28_000;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -787,7 +787,7 @@ Return this JSON shape:
  "provenance":{{"sourceType":"...","sourceCoverage":"...","generatedFrom":"the retrieved source text supplied below","limitations":["..."],"model":"configured model name"}}
 }}
 
-Requirements: cover the paper's actual major concepts; equations include both intuition and a justified derivation where possible; distinguish directly measured quantities from fitted or derived quantities; methods explain the chain from instrument output to scientific claim; figure interpretations must be based only on captions/text actually present (do not claim to have seen figure pixels unless they are included in the text); critical analysis must be specific but not invent criticism; cite short exact source phrases only when present; do not imply external references were verified unless they were. Keep content comprehensive but prioritise correctness.
+Requirements: produce a concise but useful first-pass analysis that can finish on a local computer. Include 6–10 important concepts, up to 6 equations only when genuinely present, 3–6 methods only when relevant, and up to 6 evidence/critical-analysis items. Keep each field to a few clear sentences and each list short. Do not pad sections or repeat the same information. Cover the paper's actual major concepts; equations include intuition and a justified derivation where possible; distinguish measured quantities from fitted or derived quantities; methods explain the chain from instrument output to scientific claim; figure interpretations must be based only on captions/text actually present (do not claim to have seen figure pixels unless they are included in the text); critical analysis must be specific but not invent criticism; cite short exact source phrases only when present; do not imply external references were verified unless they were. If a category is absent or unsupported, return an empty array and explain the limitation briefly. Prioritise correctness and a complete valid JSON object over exhaustive detail.
 
 PAPER METADATA:
 Title: {title}
@@ -836,7 +836,7 @@ SOURCE TEXT:
                     "127.0.0.1" | "localhost" | "::1")
         }).unwrap_or(false);
     let mut client_builder = reqwest::Client::builder()
-        .timeout(Duration::from_secs(if provider_mode == "ollama" { 600 } else { 240 }));
+        .timeout(Duration::from_secs(if provider_mode == "ollama" { 1200 } else { 240 }));
     if is_local_ollama {
         client_builder = client_builder.no_proxy();
     }
@@ -854,8 +854,8 @@ SOURCE TEXT:
             "format": "json",
             "options": {
                 "temperature": 0.2,
-                "num_ctx": 32768,
-                "num_predict": 12000
+                "num_ctx": 24576,
+                "num_predict": 6000
             },
             "messages": messages
         })
